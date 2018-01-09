@@ -1,7 +1,7 @@
 
 [What is Battlecode?](http://www.battlecode.org/)
 
-# Battlecode 2018
+## Battlecode 2018
 
 Some other team (team #12)
 
