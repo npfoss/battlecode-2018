@@ -1,13 +1,12 @@
-**new this year: branching!**
 //---branching philosophy---//
 (will be better defined after we discuss it)
 'master' branch should always be our best stable version, and be the one up on the site
-'dev' branch is what we branch, merge, merge-request, etc on to improve the bot. will be pushed to master only when stable and better
+'dev' branch is what we branch, merge, pull request, etc on to improve the bot. will be pushed to master only when stable and better
 create new branches for new features! for example 'mobile-turrets'
 	make changes and add cool things on that branch. does NOT have to be be bug-free!
 	submit pull request back into 'dev' ONLY WHEN IT *IS* BUG FREE (and has been merged with the current 'dev' version)
+when the feature is done, PR, then delete the branch
 note1: this is not actually as complicated as we thought. yay
-note2: branches like 'nav' will probably be used throughout. same rules apply: does not have to be bug free, but do pull requests when it is
 
 //---commands---------------//
 git branch <branch name> //creates new branch **DO NEXT TWO COMMANDS IMMEDIATELY after you do this one**
@@ -27,6 +26,7 @@ ONLY WHEN THERE ARE NO BUGS IN YOUR CODE
 For all your gitlab testing needs!
 step 1) cd into battlecode-2017, navigate to the proper branch, and TYPE git pull
 step 2) make your changes
+step 2.5) [optional to see exactly what changed] TYPE git diff
 step 3) TYPE git add [name of file you changed] (or -A for all)
 step 4) TYPE git commit -m "[insert descriptive message about what you did]"
 step 5) TYPE git pull
