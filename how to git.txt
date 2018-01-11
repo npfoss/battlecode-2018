@@ -14,7 +14,7 @@
     -PR dev into master (make sure no conflicts)
     -*ALWAYS* squash and merge
     -make the commit message something like "v2.4.0-advanced_rocketry" so we can keep them in order and later mass archon test against old versions and have some idea what's in each. (I'm going to write a script which takes every commit to master and makes a snapshot bot there for us to test against. fancy!)
-******* etiquette v0.9 - 1-11-18 1548
+******* etiquette v1.0 - 1-11-18 1548
 
 
 
