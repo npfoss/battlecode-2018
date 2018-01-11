@@ -1,10 +1,30 @@
+******* etiquette this year *******
+-still do all development interacting with dev branch
+-99.9% of the time, create new branch off dev if you want to modify code at all
+    -name it something useful
+    -one branch per feature
+    -possible to have one branch for big feature, and branches off that for sub-features if multiple people are working on it
+    -when done *and bug free*, submit PR to merge that branch with dev
+    -pester someone else to *review your PR*
+        -actually leave comments and update stuff as part of this process please
+        -ideally everything that goes in is the final draft
+    -squash and merge unless there's a compelling reason not to
+    -*delete* branch once merged
+-*when we're ready to upload a new bot* and *dev is better than master* (or we just want a new permanent snapshot to test against):
+    -PR dev into master (make sure no conflicts)
+    -*ALWAYS* squash and merge
+    -make the commit message something like "v2.4.0-advanced_rocketry" so we can keep them in order and later mass archon test against old versions and have some idea what's in each. (I'm going to write a script which takes every commit to master and makes a snapshot bot there for us to test against. fancy!)
+******* etiquette v0.9 - 1-11-18 1548
+
+
+
 //---branching philosophy---//
 (will be better defined after we discuss it)
 'master' branch should always be our best stable version, and be the one up on the site
 'dev' branch is what we branch, merge, pull request, etc on to improve the bot. will be pushed to master only when stable and better
 create new branches for new features! for example 'mobile-turrets'
-	make changes and add cool things on that branch. does NOT have to be be bug-free!
-	submit pull request back into 'dev' ONLY WHEN IT *IS* BUG FREE (and has been merged with the current 'dev' version)
+    make changes and add cool things on that branch. does NOT have to be be bug-free!
+    submit pull request back into 'dev' ONLY WHEN IT *IS* BUG FREE (and has been merged with the current 'dev' version)
 when the feature is done, PR, then delete the branch
 note1: this is not actually as complicated as we thought. yay
 
