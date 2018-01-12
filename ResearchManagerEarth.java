@@ -2,12 +2,12 @@ import bc.*;
 
 public class ResearchManagerEarth extends ResearchManager{
     // remember, has infoMan
-
-    public ResearchManagerEarth(InfoManager im){
-        super(im);
+	
+    public ResearchManagerEarth(GameController g, InfoManager im){
+        super(g,im);
     }
 
     public void update(Strategy strat){
-        // check if queue empty, if so add appropriate thing
+        
     }
 }

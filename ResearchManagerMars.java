@@ -3,8 +3,8 @@ import bc.*;
 public class ResearchManagerMars extends ResearchManager{
     // remember, has infoMan
 
-    public ResearchManagerMars(InfoManager im){
-        super(im);
+    public ResearchManagerMars(GameController g, InfoManager im){
+        super(g,im);
     }
 
     public void update(Strategy strat){
