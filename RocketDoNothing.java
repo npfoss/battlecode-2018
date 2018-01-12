@@ -12,5 +12,6 @@ public class RocketDoNothing extends RocketManager{
 
     public void update(){
         // does nothing, or even better, self destructs the rockets once empty
+    	
     }
 }

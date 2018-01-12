@@ -10,7 +10,7 @@ As the scheduled launch nears, sets up rocket squads to fill each rocket
 */
 public class RocketManager{
     InfoManager infoMan;
-    GameController gc;
+    public static GameController gc;
 
     public RocketManager(GameController g, InfoManager im){
         gc = g;
@@ -20,7 +20,6 @@ public class RocketManager{
     public void update(){
         // modifies rocketSquads as necessary and launches rockets
         // remember, those are in infoMan
-
 
 
 
