@@ -100,7 +100,6 @@ public class Overseer{
 
 
 
-        // Submit the actions we've done, and wait for our next turn.
-        gc.nextTurn();
+
     }
 }
