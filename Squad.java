@@ -9,7 +9,7 @@ public class Squad{
     double urgency;
     MapLocation targetLoc;
     ArrayList<UnitType> requestedUnits;
-
+    GameController gc;
     public enum Objective{
         NONE(),
         EXPLORE(),
@@ -22,12 +22,13 @@ public class Squad{
 
     Objective objective;
 
-    public Squad(){
+    public Squad(GameController g){
         units = new ArrayList<Unit>();
         urgency = 0;
         targetLoc = null;
         requestedUnits = new ArrayList<UnitType>();
         objective = Objective.NONE;
+        gc = g;
     }
 
     public void update(){

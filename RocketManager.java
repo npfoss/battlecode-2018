@@ -21,8 +21,8 @@ public class RocketManager{
         // modifies rocketSquads as necessary and launches rockets
         // remember, those are in infoMan
 
-
-
+    	
+    	
         // also update() on each squad after
         
     }

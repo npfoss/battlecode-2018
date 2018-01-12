@@ -10,18 +10,26 @@ Creates (empty) WorkerSquad to build factory (workers assigned by WorkerManager)
 public class ProductionManager{
     InfoManager infoMan;
     GameController gc;
-
     public ProductionManager(InfoManager im, GameController g){
         infoMan = im;
         gc = g;
     }
 
     public void update(Strategy strat){
-        // stuff
+        // find squads with highest urgency and find factories to build them. etc junk
+    	// stuff
 
     }
 
     public void move(){
+    	for(Unit factory : infoMan.factories) {
+    		if(factory.structureGarrison().size() > 0) {
+    			gc.unload(factory.id(), Direction.North);
+    		}
+    		else if(gc.canProduceRobot(factory.id(),UnitType.Ranger)) {
+    			gc.produceRobot(factory.id(), UnitType.Ranger);
+    		}
+    	}
         // go through the factories (in infoMan) and make them produce stuff
 
     }

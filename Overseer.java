@@ -22,8 +22,8 @@ public class Overseer{
         gc = new GameController();
 
         infoMan = new InfoManager(gc);
-        workerMan = new WorkerManager(infoMan);
-        combatMan = new CombatManager(infoMan);
+        workerMan = new WorkerManager(infoMan,gc);
+        combatMan = new CombatManager(infoMan,gc);
         prodMan = new ProductionManager(infoMan, gc);
         nav = new Nav(infoMan);
 
@@ -63,9 +63,5 @@ public class Overseer{
         for(CombatSquad cs : infoMan.combatSquads){
             cs.move(nav);
         }
-<<<<<<< HEAD
-=======
-
->>>>>>> f72d3b18403cd37c6d6b075610481bc81065248a
     }
 }
