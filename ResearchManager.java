@@ -1,10 +1,12 @@
 import bc.*;
 
 public class ResearchManager{
-    InfoManager infoMan;
+    public InfoManager infoMan;
+    public GameController gc;
 
-    public ResearchManager(InfoManager im){
+    public ResearchManager(GameController g, InfoManager im){
         infoMan = im;
+        gc = g;
     }
 
     // don't use. check out the planet-specific ones

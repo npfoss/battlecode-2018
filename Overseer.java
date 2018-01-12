@@ -30,12 +30,12 @@ public class Overseer{
         if(gc.planet() == Planet.Earth){
             // magic numbers
             magicNums = new MagicNumbersEarth();
-            researchMan = new ResearchManagerEarth(infoMan);
+            researchMan = new ResearchManagerEarth(gc, infoMan);
             rocketMan = new RocketManager(gc, infoMan);
         } else {
             // magic numbers
             magicNums = new MagicNumbersMars();
-            researchMan = new ResearchManagerMars(infoMan);
+            researchMan = new ResearchManagerMars(gc, infoMan);
             rocketMan = new RocketDoNothing(gc, infoMan);
         }
 
@@ -63,5 +63,9 @@ public class Overseer{
         for(CombatSquad cs : infoMan.combatSquads){
             cs.move(nav);
         }
+<<<<<<< HEAD
+=======
+
+>>>>>>> f72d3b18403cd37c6d6b075610481bc81065248a
     }
 }
