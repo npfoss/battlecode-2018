@@ -72,9 +72,8 @@ public class InfoManager {
 
 	public boolean isInSquads1(Unit unit, ArrayList<WorkerSquad> squad) {
 		for (Squad s : squad) {
-			for (Unit u : s.units) {
-				if (unit.id() == u.id()){
-					u = unit;
+			for (int uid : s.units) {
+				if (unit.id() == uid){
 					return true;
 				}
 			}
@@ -83,18 +82,20 @@ public class InfoManager {
 	}
 	public boolean isInSquads2(Unit unit, ArrayList<RocketSquad> squad) {
 		for (Squad s : squad) {
-			for (Unit u : s.units) {
-				if (unit.id() == u.id())
+			for (int uid : s.units) {
+				if (unit.id() == uid){
 					return true;
+				}
 			}
 		}
 		return false;
 	}
 	public boolean isInSquads3(Unit unit, ArrayList<CombatSquad> squad) {
 		for (Squad s : squad) {
-			for (Unit u : s.units) {
-				if (unit.id() == u.id())
+			for (int uid : s.units) {
+				if (unit.id() == uid){
 					return true;
+				}
 			}
 		}
 		return false;

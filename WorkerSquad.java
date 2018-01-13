@@ -12,7 +12,8 @@ public class WorkerSquad extends Squad{
     }
 
     public void move(Nav nav){
-    	for(Unit worker: units) {
+    	for(int id: units) {
+    		Unit worker = gc.unit(id);
     		Location l = worker.location();
     		if(l.isOnMap()) {
                 //// this is just here to test Nav
