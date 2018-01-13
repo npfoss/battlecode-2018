@@ -9,6 +9,7 @@ import java.util.ArrayList;
 public class InfoManager {
 	GameController gc;
 	Comms comms;
+	Planet myPlanet;
 
 	ArrayList<Unit> rockets;
 	ArrayList<Unit> workers;
@@ -24,8 +25,11 @@ public class InfoManager {
 	ArrayList<RocketSquad> rocketSquads;
 	ArrayList<CombatSquad> combatSquads;
 
+	// map grid containing when we last saw each tile
+	int[][] lastSeenGrid;
+	
 	// here lies map info (mostly for nav)
-
+	
 
 	public InfoManager(GameController g) {
 		gc = g;
@@ -35,6 +39,12 @@ public class InfoManager {
 		workerSquads = new ArrayList<WorkerSquad>();
 		rocketSquads = new ArrayList<RocketSquad>();
 		combatSquads = new ArrayList<CombatSquad>();
+		
+		myPlanet = gc.planet();
+		
+		int height = (int) gc.startingMap(myPlanet).getHeight();
+		int width = (int) gc.startingMap(myPlanet).getWidth();
+		lastSeenGrid = new int[width][height];
 	}
 
 	public void update() {
@@ -48,6 +58,7 @@ public class InfoManager {
 
 		unassignedUnits = new ArrayList<Unit>();
 
+		//keeping track of units, squad management
 		VecUnit units = gc.myUnits();
 		for (int i = 0; i < units.size(); i++) {
 			Unit unit = units.get(i);
@@ -65,6 +76,15 @@ public class InfoManager {
 				if (!isInSquads3(unit, combatSquads) && !isInSquads2(unit,rocketSquads))
 					unassignedUnits.add(unit);
 				break;
+			}
+		}
+		
+		//updating map info
+		for(int x = 0; x < lastSeenGrid.length; x++){
+			for(int y = 0; y < lastSeenGrid[0].length; y++){
+				MapLocation check = new MapLocation(myPlanet,x,y);
+				if(gc.canSenseLocation(check))
+					lastSeenGrid[x][y] = (int) gc.round();
 			}
 		}
 	}
