@@ -63,5 +63,6 @@ public class Overseer{
         for(CombatSquad cs : infoMan.combatSquads){
             cs.move(nav);
         }
+        gc.nextTurn();
     }
 }

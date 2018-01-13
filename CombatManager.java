@@ -24,7 +24,7 @@ public class CombatManager{
     public void update(Strategy strat){
     	if(infoMan.combatSquads.size()==0) {
     		CombatSquad ws = new CombatSquad(gc);
-    		ws.objective = Squad.Objective.EXPLORE;
+    		ws.objective = Objective.EXPLORE;
     		infoMan.combatSquads.add(ws);
     	}
     	for(Unit u : infoMan.unassignedUnits)

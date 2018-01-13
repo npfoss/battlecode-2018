@@ -1,7 +1,5 @@
 import bc.*;
 import java.util.ArrayList;
-import InfoManager;
-import Squad.Objective;
 /*
 rearrange worker squads (includes assigning to rocketsquads and
     empty squads for specific factories),
@@ -21,7 +19,7 @@ public class WorkerManager{
     	// create new squads if necessary
     	if(infoMan.workerSquads.size()==0) {
     		WorkerSquad ws = new WorkerSquad(gc);
-    		ws.objective = Squad.Objective.BUILD;
+    		ws.objective = Objective.BUILD;
     		infoMan.workerSquads.add(ws);
     	}
     	// assign unassigned workers

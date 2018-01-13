@@ -1,6 +1,5 @@
 import bc.*;
 import java.util.ArrayList;
-
 /* please edit this it's just late at night
  updates enemy locations and buildings (where it last saw them etc)
     and what type (number of each)
@@ -54,7 +53,7 @@ public class InfoManager {
 			switch (unit.unitType()) {
 			case Worker:
 				workers.add(unit);
-				if (!isInSquads(unit, workerSquads) && !isInSquads(unit, rocketSquads))
+				if (!isInSquads1(unit, workerSquads) && !isInSquads2(unit, rocketSquads))
 					unassignedUnits.add(unit);
 				break;
 			case Factory:
@@ -62,15 +61,33 @@ public class InfoManager {
 				break;
 			default:
 				fighters.add(unit);
-				if (!isInSquads(unit, combatSquads))
+				if (!isInSquads3(unit, combatSquads))
 					break;
 			}
 		}
 	}
 	// update arraylists of units, make sure squads don't have dead units, etc
 
-	public boolean isInSquads(Unit unit, ArrayList<Squad> squads) {
-		for (Squad s : squads) {
+	public boolean isInSquads1(Unit unit, ArrayList<WorkerSquad> squad) {
+		for (Squad s : squad) {
+			for (Unit u : s.units) {
+				if (unit.id() == u.id())
+					return true;
+			}
+		}
+		return false;
+	}
+	public boolean isInSquads2(Unit unit, ArrayList<RocketSquad> squad) {
+		for (Squad s : squad) {
+			for (Unit u : s.units) {
+				if (unit.id() == u.id())
+					return true;
+			}
+		}
+		return false;
+	}
+	public boolean isInSquads3(Unit unit, ArrayList<CombatSquad> squad) {
+		for (Squad s : squad) {
 			for (Unit u : s.units) {
 				if (unit.id() == u.id())
 					return true;

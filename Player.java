@@ -12,7 +12,6 @@ public class Player {
                 overseer.takeTurn();
             } catch(Exception e) {}
             // Submit the actions we've done, and wait for our next turn.
-            gc.nextTurn();
         }
     }
 }
