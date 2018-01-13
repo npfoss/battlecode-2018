@@ -23,7 +23,8 @@ public class ProductionManager{
 
     public void move(){
     	for(Unit factory : infoMan.factories) {
-    		if(factory.structureGarrison().size() > 0) {
+    		//TODO: pick an intelligent direction
+    		if(factory.structureGarrison().size() > 0 && false) {
     			gc.unload(factory.id(), Direction.North);
     		}
     		else if(gc.canProduceRobot(factory.id(),UnitType.Ranger)) {
