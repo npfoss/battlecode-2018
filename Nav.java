@@ -21,15 +21,15 @@ public class Nav{
     }
 
     public Direction dirToMove(MapLocation start, MapLocation target){
-        System.out.println("begin");
+        //System.out.println("begin");
         Direction dirTowards = directionTowards(start, target);
-        System.out.println("dir to target " + dirTowards);
+        //System.out.println("dir to target " + dirTowards);
         
         // now check if legal and stuff
         if (infoMan.isLocationClear(start.add(dirTowards))){
             return dirTowards;
         }
-        System.out.println("ideal dir didn't work");
+        //System.out.println("ideal dir didn't work");
         // if not, try slight deviations
         Direction left = dirTowards;
         Direction right = dirTowards;

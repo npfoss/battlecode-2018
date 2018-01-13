@@ -19,9 +19,9 @@ public class WorkerSquad extends Squad{
                 //// this is just here to test Nav
                 MapLocation fivefive = l.mapLocation().translate(5-l.mapLocation().getX(), 5-l.mapLocation().getY());
                 if(worker.unitType() == UnitType.Worker && gc.isMoveReady(worker.id())){
-                    System.out.println("my loc: " + l.mapLocation().getX() + " " + l.mapLocation().getY());
+                    //System.out.println("my loc: " + l.mapLocation().getX() + " " + l.mapLocation().getY());
                     Direction movedir = nav.dirToMove(l.mapLocation(), fivefive);
-                    System.out.println("final move choice " + movedir);
+                    //System.out.println("final move choice " + movedir);
                     if(movedir != Direction.Center)
                         gc.moveRobot(worker.id(), movedir);
                 }
