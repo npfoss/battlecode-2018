@@ -8,6 +8,7 @@ public class Squad{
     ArrayList<Integer> units;
     double urgency;
     MapLocation targetLoc;
+    UnitType toBuild;
     ArrayList<UnitType> requestedUnits;
     GameController gc;
 
@@ -17,13 +18,15 @@ public class Squad{
         units = new ArrayList<Integer>();
         urgency = 0;
         targetLoc = null;
+        toBuild = UnitType.Factory;
         requestedUnits = new ArrayList<UnitType>();
         objective = Objective.NONE;
         gc = g;
     }
 
     public void update(){
-        // udpates fields every turn? managers might do that
+        // managers will update squad needs
+    	// squads will only reset their objective once completed
     }
 
     public void move(Nav nav){
