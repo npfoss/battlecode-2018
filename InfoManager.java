@@ -62,8 +62,9 @@ public class InfoManager {
 				break;
 			default:
 				fighters.add(unit);
-				if (!isInSquads3(unit, combatSquads))
-					break;
+				if (!isInSquads3(unit, combatSquads) && !isInSquads2(unit,rocketSquads))
+					unassignedUnits.add(unit);
+				break;
 			}
 		}
 	}
@@ -72,8 +73,10 @@ public class InfoManager {
 	public boolean isInSquads1(Unit unit, ArrayList<WorkerSquad> squad) {
 		for (Squad s : squad) {
 			for (Unit u : s.units) {
-				if (unit.id() == u.id())
+				if (unit.id() == u.id()){
+					u = unit;
 					return true;
+				}
 			}
 		}
 		return false;
