@@ -14,7 +14,7 @@ public class Player {
         while (true) {
             try{
                 overseer.takeTurn();
-                Thread.sleep(25);
+                //Thread.sleep(25);
             } catch(Exception e) {
                 System.out.println("***ERROR AHHHHHHHHHHHHHHHHHHHHHHHHH***");
                 e.printStackTrace(System.out);
