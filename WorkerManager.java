@@ -25,7 +25,7 @@ public class WorkerManager{
     	// assign unassigned workers
     	for(Unit u : infoMan.unassignedUnits)
     		if(u.unitType() == UnitType.Worker) {
-    			infoMan.workerSquads.get(0).units.add(u);
+    			infoMan.workerSquads.get(0).units.add(u.id());
     			infoMan.workerSquads.get(0).update();
     		}
     	//TODO:assign workers who are just mining karbonite if there's something better to do, add to rocket squads if necessary

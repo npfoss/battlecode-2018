@@ -5,7 +5,7 @@ import java.util.ArrayList;
 Subclasses of these objects actually issue the move commands for their units
 */
 public class Squad{
-    ArrayList<Unit> units;
+    ArrayList<Integer> units;
     double urgency;
     MapLocation targetLoc;
     ArrayList<UnitType> requestedUnits;
@@ -14,7 +14,7 @@ public class Squad{
     Objective objective;
 
     public Squad(GameController g){
-        units = new ArrayList<Unit>();
+        units = new ArrayList<Integer>();
         urgency = 0;
         targetLoc = null;
         requestedUnits = new ArrayList<UnitType>();

@@ -11,7 +11,8 @@ public class CombatSquad extends Squad{
     }
 
     public void move(Nav nav){
-    	for(Unit fighter: units) {
+    	for(int id: units) {
+    		Unit fighter = gc.unit(id);
     		Location l = fighter.location();
     		if(l.isOnMap()) {
     			VecUnit nearby = gc.senseNearbyUnits(l.mapLocation(),70);

@@ -29,7 +29,7 @@ public class CombatManager{
     	}
     	for(Unit u : infoMan.unassignedUnits)
     		if(u.unitType() != UnitType.Worker && u.unitType() != UnitType.Factory &&  u.unitType() != UnitType.Rocket) {
-    			infoMan.workerSquads.get(0).units.add(u);
+    			infoMan.workerSquads.get(0).units.add(u.id());
     		}
     }	
     
