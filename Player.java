@@ -10,8 +10,9 @@ public class Player {
         while (true) {
             try{
                 overseer.takeTurn();
-            } catch(Exception e) {}
-            // Submit the actions we've done, and wait for our next turn.
+            } catch(Exception e) {
+                System.out.println("***ERROR AHHHHHHHHHHHHHHHHHHHHHHHHH***");
+            }
         }
     }
 }
