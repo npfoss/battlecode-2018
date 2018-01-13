@@ -14,12 +14,10 @@ public class Overseer{
 
     Nav nav;
 
-    public Overseer(){
-        // stuff that doesn't need gc
-        strat = Strategy.UNSURE;
+    public Overseer(GameController g){
+        gc = g;
 
-        // Connect to the manager, starting the game
-        gc = new GameController();
+        strat = Strategy.UNSURE;
 
         infoMan = new InfoManager(gc);
         workerMan = new WorkerManager(infoMan,gc);
