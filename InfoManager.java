@@ -108,11 +108,11 @@ public class InfoManager {
     // returns false if we can't see that loc
     public boolean isLocationClear(MapLocation loc){
         try{
-            System.out.println("" + loc.getX() + ", " + loc.getY() + " " + isLocationWalkable(loc) + " " + (gc.isOccupiable(loc) > 0));
+            //System.out.println("" + loc.getX() + ", " + loc.getY() + " " + isLocationWalkable(loc) + " " + (gc.isOccupiable(loc) > 0));
             // return isLocationWalkable(loc);// && !gc.hasUnitAtLocation(loc); //TODO THIS IS BROKEN IN THE API :(((((
             return isLocationWalkable(loc) && gc.isOccupiable(loc) > 0;
         } catch (Exception e) {
-            System.out.println("this happened");
+            //System.out.println("this happened");
             return false;
         }
     }
