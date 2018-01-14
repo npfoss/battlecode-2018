@@ -19,7 +19,7 @@ public class Player {
                 e.printStackTrace(System.out);
                 gc.nextTurn();
             }
-            //Thread.sleep(25);
+            // try{Thread.sleep(25);}catch(Exception e){}
         }
     }
 }
