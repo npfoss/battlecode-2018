@@ -104,8 +104,6 @@ public class InfoManager {
 			}
 			else{
 				addEnemyUnit(unit);
-				removeEnemyUnit(unit);
-				addEnemyUnit(unit);
 				enemyLastSeen.put(unit.id(),(int) gc.round());
 			}
 		}
@@ -159,7 +157,6 @@ public class InfoManager {
 			}
 		}
 	}
-	// update arraylists of units, make sure squads don't have dead units, etc
 
 	private void addEnemyUnit(Unit unit){
 		switch (unit.unitType()){
@@ -199,6 +196,7 @@ public class InfoManager {
 			if(u.id()==unit.id()){
 				remove = true;
 				toRemove = u;
+				break;
 			}
 		}
 		if(remove) al.remove(toRemove);
