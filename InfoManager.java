@@ -1,5 +1,6 @@
 import bc.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 /* please edit this it's just late at night
  updates enemy locations and buildings (where it last saw them etc)
     and what type (number of each)
@@ -27,6 +28,9 @@ public class InfoManager {
 	ArrayList<Unit> enemyHealers;
 	ArrayList<Unit> enemyKnights;
 
+	//for knowing when you last saw a given enemy unit (unit id -> turn last seen)
+	HashMap<Integer,Integer> enemyLastSeen;
+	
 	// Squads
 	ArrayList<WorkerSquad> workerSquads;
 	ArrayList<RocketSquad> rocketSquads;
@@ -60,6 +64,8 @@ public class InfoManager {
 		enemyMages = new ArrayList<Unit>();
 		enemyKnights = new ArrayList<Unit>();
 		enemyHealers = new ArrayList<Unit>();
+		
+		enemyLastSeen = new HashMap<Integer,Integer>();
 	}
 
 	public void update() {
@@ -100,6 +106,7 @@ public class InfoManager {
 				addEnemyUnit(unit);
 				removeEnemyUnit(unit);
 				addEnemyUnit(unit);
+				enemyLastSeen.put(unit.id(),(int) gc.round());
 			}
 		}
 
