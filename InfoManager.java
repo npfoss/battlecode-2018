@@ -173,20 +173,12 @@ public class InfoManager {
 	}
 
 	private ArrayList<Unit> removeByID(ArrayList<Unit> al, int id){
-		Unit toRemove = new Unit();
-		boolean remove = false;
-		for(Unit unit: al){
-			if(unit.id()==id){
-				remove = true;
-				toRemove = unit;
-			}
-		}
-		if(remove) al.remove(toRemove);
+		al.remove(gc.unit(id));
 		return al;
 	}
 
 	private ArrayList<Unit> updateUnit(ArrayList<Unit> al, Unit unit){
-		Unit toRemove = new Unit();
+		Unit toRemove = unit;
 		boolean remove = false;
 		for(Unit u: al){
 			if(u.id()==unit.id()){
