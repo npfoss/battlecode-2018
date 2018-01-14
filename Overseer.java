@@ -22,17 +22,18 @@ public class Overseer{
         infoMan = new InfoManager(gc);
         workerMan = new WorkerManager(infoMan,gc);
         combatMan = new CombatManager(infoMan,gc);
-        prodMan = new ProductionManager(infoMan, gc);
         nav = new Nav(infoMan);
 
         if(gc.planet() == Planet.Earth){
             // magic numbers
             magicNums = new MagicNumbersEarth();
+            prodMan = new ProductionManager(infoMan, gc);
             researchMan = new ResearchManagerEarth(gc, infoMan);
             rocketMan = new RocketManager(gc, infoMan);
         } else {
             // magic numbers
             magicNums = new MagicNumbersMars();
+            prodMan = new ProductionManagerDoNothing();
             researchMan = new ResearchManagerMars(gc, infoMan);
             rocketMan = new RocketDoNothing(gc, infoMan);
         }
