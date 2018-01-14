@@ -11,7 +11,10 @@ public class RocketDoNothing extends RocketManager{
     }
 
     public void update(){
-        // does nothing, or even better, self destructs the rockets once empty
-    	
+    	for(RocketSquad s : infoMan.rocketSquads) {
+    		if(gc.unit(s.rocketID).structureGarrison().size() == 0) {
+    			gc.disintegrateUnit(s.rocketID);
+    		}
+    	}
     }
 }

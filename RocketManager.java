@@ -20,8 +20,10 @@ public class RocketManager{
     public void update(){
         // modifies rocketSquads as necessary and launches rockets
         // remember, those are in infoMan
-
+    	//sets the squad to be in space or not
     	
+    	//move unassigned units into rocket squads
+    	//get info from mars to make smart decisions
     	
         // also update() on each squad after
         

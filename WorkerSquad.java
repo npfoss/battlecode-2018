@@ -12,7 +12,6 @@ public class WorkerSquad extends Squad {
 	public void move(Nav nav) {
 		for(int id : units) {
 			Unit worker = gc.unit(id);
-			
 			//For now we shall replicate once at the start.
 			if(gc.round() == 1)
 			for(Direction dirToReplicate : Utils.orderedDirections) {
@@ -25,7 +24,7 @@ public class WorkerSquad extends Squad {
 			switch (objective) {
 			case BUILD:
 				if(targetLoc != null) {
-					if(!worker.location().mapLocation().isAdjacentTo(targetLoc)) {
+					if(!worker.location().mapLocation().isAdjacentTo(targetLoc) && gc.isMoveReady(id)) {
 						//Move towards the target location
 						Direction movedir = nav.dirToMove(worker.location().mapLocation(),targetLoc);
 						if (movedir != Direction.Center) {
@@ -39,8 +38,6 @@ public class WorkerSquad extends Squad {
 								break;
 							}
 						}
-
-
 					}
 					if(worker.location().mapLocation().isAdjacentTo(targetLoc)) {
 						//We're here! Lets make a blueprint/work on building it up.
@@ -58,8 +55,8 @@ public class WorkerSquad extends Squad {
 								gc.build(id, blueprint.id());
 							}
 						}
-						System.out.println(gc.senseUnitAtLocation(targetLoc).unitType());
-						if(gc.senseUnitAtLocation(targetLoc).structureIsBuilt() != 0) {
+						//System.out.println(gc.senseUnitAtLocation(targetLoc).unitType());
+						if(gc.senseUnitAtLocation(targetLoc)!= null && gc.senseUnitAtLocation(targetLoc).structureIsBuilt() != 0) {
 							objective = Objective.NONE;
 						}
 					}

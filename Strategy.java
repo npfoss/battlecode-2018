@@ -9,9 +9,10 @@ public enum Strategy{
     ECON(); // focus production more on workers and factories
 
     public Strategy update(InfoManager infoMan){
-        if(this == Strategy.ECON){
+        /*if(this == Strategy.ECON){
             return Strategy.RUSH;
         }
-        return this;
+        return this;*/
+        return Strategy.RUSH;
     }
 }

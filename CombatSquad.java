@@ -23,7 +23,7 @@ public class CombatSquad extends Squad{
 					}
 				}
 				Direction dirToMove = Utils.orderedDirections[(int) (8*Math.random())];
-				if(gc.isMoveReady(id) && gc.canMove(id, dirToMove))
+				if(gc.isMoveReady(id) && gc.canMove(id, dirToMove)&&!gc.unit(id).location().isInGarrison())
 					gc.moveRobot(id, dirToMove);
 				fighter = gc.unit(id);
 				nearby = gc.senseNearbyUnits(fighter.location().mapLocation(),50);
