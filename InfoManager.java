@@ -9,6 +9,7 @@ import java.util.ArrayList;
 public class InfoManager {
 	GameController gc;
 	Comms comms;
+	Planet myPlanet;
 
 	ArrayList<Unit> rockets;
 	ArrayList<Unit> workers;
@@ -24,8 +25,11 @@ public class InfoManager {
 	ArrayList<RocketSquad> rocketSquads;
 	ArrayList<CombatSquad> combatSquads;
 
+	// map grid containing when we last saw each tile
+	int[][] lastSeenGrid;
+	
 	// here lies map info (mostly for nav)
-
+	
 
 	public InfoManager(GameController g) {
 		gc = g;
@@ -35,6 +39,12 @@ public class InfoManager {
 		workerSquads = new ArrayList<WorkerSquad>();
 		rocketSquads = new ArrayList<RocketSquad>();
 		combatSquads = new ArrayList<CombatSquad>();
+		
+		myPlanet = gc.planet();
+		
+		int height = (int) gc.startingMap(myPlanet).getHeight();
+		int width = (int) gc.startingMap(myPlanet).getWidth();
+		lastSeenGrid = new int[width][height];
 	}
 
 	public void update() {
@@ -48,9 +58,12 @@ public class InfoManager {
 
 		unassignedUnits = new ArrayList<Unit>();
 
+		//keeping track of units, squad management
 		VecUnit units = gc.myUnits();
+		ArrayList<Integer> ids = new ArrayList<Integer>();
 		for (int i = 0; i < units.size(); i++) {
 			Unit unit = units.get(i);
+			ids.add(unit.id());
 			switch (unit.unitType()) {
 			case Worker:
 				workers.add(unit);
@@ -65,6 +78,55 @@ public class InfoManager {
 				if (!isInSquads3(unit, combatSquads) && !isInSquads2(unit,rocketSquads))
 					unassignedUnits.add(unit);
 				break;
+			}
+		}
+		
+		//check for dead units + remove from squads
+		for(Squad s: workerSquads){
+			ArrayList<Integer> toRemove = new ArrayList<Integer>();
+			for(int id: s.units){
+				if(!ids.contains(id)){
+					toRemove.add(id);
+				}
+			}
+			for(int id: toRemove){
+				s.units.remove(id);
+			}
+			s.update();
+		}
+		
+		for(Squad s: rocketSquads){
+			ArrayList<Integer> toRemove = new ArrayList<Integer>();
+			for(int id: s.units){
+				if(!ids.contains(id)){
+					toRemove.add(id);
+				}
+			}
+			for(int id: toRemove){
+				s.units.remove(id);
+			}
+			s.update();
+		}
+		
+		for(Squad s: workerSquads){
+			ArrayList<Integer> toRemove = new ArrayList<Integer>();
+			for(int id: s.units){
+				if(!ids.contains(id)){
+					toRemove.add(id);
+				}
+			}
+			for(int id: toRemove){
+				s.units.remove(id);
+			}
+			s.update();
+		}
+		
+		//updating map info
+		for(int x = 0; x < lastSeenGrid.length; x++){
+			for(int y = 0; y < lastSeenGrid[0].length; y++){
+				MapLocation check = new MapLocation(myPlanet,x,y);
+				if(gc.canSenseLocation(check))
+					lastSeenGrid[x][y] = (int) gc.round();
 			}
 		}
 	}
