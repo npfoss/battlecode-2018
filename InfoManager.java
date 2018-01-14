@@ -236,26 +236,23 @@ public class InfoManager {
 	}
 
 
+/******** Map related functions below this line *******/
 
-	/******** Map related functions below this line *******/
-	// this means on map, walkable, AND no unit currently in the way
-	// returns false if we can't see that loc
-	public boolean isLocationClear(MapLocation loc){
-		try{
-			//System.out.println("" + loc.getX() + ", " + loc.getY() + " " + isLocationWalkable(loc) + " " + (gc.isOccupiable(loc) > 0));
-			// return isLocationWalkable(loc);// && !gc.hasUnitAtLocation(loc); //TODO THIS IS BROKEN IN THE API :(((((
-			return isLocationWalkable(loc) && gc.isOccupiable(loc) > 0;
-		} catch (Exception e) {
-			//System.out.println("this happened");
-			return false;
-		}
-	}
+    // this means on map, walkable, AND no unit currently in the way
+    // returns false if we can't see that loc
+    public boolean isLocationClear(MapLocation loc){
+        try{
+            return isLocationWalkable(loc) && gc.isOccupiable(loc) > 0;
+        } catch (Exception e) {
+            System.out.println("isLocationClear threw Exception. help");
+            return false;
+        }
+    }
 
-	// means on the map, passable terrain, and none of our buildings there
-	public boolean isLocationWalkable(MapLocation loc) throws Exception {
-		// TODO: make it not throw errors when tile isn't visible (need mapinfo)
-		// TODO: add the part about building (requires caching map info)
-		// System.out.println(gc.startingMap(gc.planet()).isPassableTerrainAt(loc));
-		return gc.startingMap(gc.planet()).isPassableTerrainAt(loc) > 0;
-	}
+    // means on the map, passable terrain, and none of our buildings there
+    public boolean isLocationWalkable(MapLocation loc) throws Exception {
+        // TODO: make it not throw errors when tile isn't visible (need mapinfo)
+        // TODO: add the part about building (requires caching map info)
+        return gc.startingMap(gc.planet()).isPassableTerrainAt(loc) > 0;
+    }
 }
