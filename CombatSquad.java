@@ -7,7 +7,8 @@ public class CombatSquad extends Squad{
 		super(g);
 	}
 	public void update(){
-
+		if(requestedUnits.isEmpty())
+			requestedUnits.add(UnitType.Ranger);
 	}
 
 	public void move(Nav nav){

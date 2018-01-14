@@ -1,12 +1,13 @@
 import bc.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 /*
 Subclasses of these objects actually issue the move commands for their units
 */
 public class Squad{
     ArrayList<Integer> units;
-    double urgency;
+    int urgency;
     MapLocation targetLoc;
     UnitType toBuild;
     ArrayList<UnitType> requestedUnits;
@@ -26,10 +27,22 @@ public class Squad{
 
     public void update(){
         // managers will update squad needs
-    	// squads will only reset their objective once completed
     }
 
     public void move(Nav nav){
         // actually move the units
     }
+    
+    //not sure if i flipped the order lol
+	public static Comparator<Squad> byUrgency()
+    {   
+     Comparator<Squad> comp = new Comparator<Squad>(){
+         @Override
+         public int compare(Squad s1, Squad s2)
+         {
+             return s1.urgency - s2.urgency;
+         }        
+     };
+     return comp;
+    }  
 }
