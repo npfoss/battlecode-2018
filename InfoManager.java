@@ -52,6 +52,14 @@ public class InfoManager {
 		int height = (int) gc.startingMap(myPlanet).getHeight();
 		int width = (int) gc.startingMap(myPlanet).getWidth();
 		lastSeenGrid = new int[width][height];
+		
+		enemyRockets = new ArrayList<Unit>();
+		enemyWorkers = new ArrayList<Unit>();
+		enemyFactories = new ArrayList<Unit>();
+		enemyRangers = new ArrayList<Unit>();
+		enemyMages = new ArrayList<Unit>();
+		enemyKnights = new ArrayList<Unit>();
+		enemyHealers = new ArrayList<Unit>();
 	}
 
 	public void update() {
