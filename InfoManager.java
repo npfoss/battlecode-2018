@@ -90,7 +90,7 @@ public class InfoManager {
 				}
 			}
 			for(int id: toRemove){
-				s.units.remove(id);
+				s.units.remove(s.units.indexOf(id));
 			}
 			s.update();
 		}
@@ -103,12 +103,12 @@ public class InfoManager {
 				}
 			}
 			for(int id: toRemove){
-				s.units.remove(id);
+				s.units.remove(s.units.indexOf(id));
 			}
 			s.update();
 		}
 		
-		for(Squad s: workerSquads){
+		for(Squad s: combatSquads){
 			ArrayList<Integer> toRemove = new ArrayList<Integer>();
 			for(int id: s.units){
 				if(!ids.contains(id)){
@@ -116,7 +116,7 @@ public class InfoManager {
 				}
 			}
 			for(int id: toRemove){
-				s.units.remove(id);
+				s.units.remove(s.units.indexOf(id));
 			}
 			s.update();
 		}

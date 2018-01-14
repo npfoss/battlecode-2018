@@ -12,61 +12,80 @@ public class WorkerSquad extends Squad {
 	public void move(Nav nav) {
 		for(int id : units) {
 			Unit worker = gc.unit(id);
+			
+			//For now we shall replicate once at the start.
+			if(gc.round() == 1)
+			for(Direction dirToReplicate : Utils.orderedDirections) {
+				if (gc.canReplicate(id, dirToReplicate)) {
+					gc.replicate(id, dirToReplicate);
+					break;
+				}
+			}
+
 			switch (objective) {
 			case BUILD:
 				if(targetLoc != null) {
 					if(!worker.location().mapLocation().isAdjacentTo(targetLoc)) {
+						//Move towards the target location
 						Direction movedir = nav.dirToMove(worker.location().mapLocation(),targetLoc);
 						if (movedir != Direction.Center) {
 							gc.moveRobot(id, movedir);
 							worker = gc.unit(id);
 						}
-
-					}
-					if(!madeBlueprint) {
-						Direction dirToBuild = worker.location().mapLocation().directionTo(targetLoc);
-						if (gc.karbonite() > bc.bcUnitTypeBlueprintCost(toBuild)
-								&& gc.canBlueprint(id, toBuild, dirToBuild)) {
-							gc.blueprint(worker.id(), toBuild, dirToBuild);
-							madeBlueprint = true;
+						else {//We are on top of the targetLoc, move away
+							for(Direction dirToMove : Utils.orderedDirections) {
+								if (gc.canMove(id, dirToMove))
+									gc.moveRobot(id, dirToMove);
+								break;
+							}
 						}
+
+
 					}
 					if(worker.location().mapLocation().isAdjacentTo(targetLoc)) {
-						Unit blueprint = gc.senseUnitAtLocation(targetLoc);
-						if (gc.canBuild(id, blueprint.id())) {
-							gc.build(id, blueprint.id());
+						//We're here! Lets make a blueprint/work on building it up.
+						if(!madeBlueprint) {
+							Direction dirToBuild = worker.location().mapLocation().directionTo(targetLoc);
+							if (gc.karbonite() > bc.bcUnitTypeBlueprintCost(toBuild)
+									&& gc.canBlueprint(id, toBuild, dirToBuild)) {
+								gc.blueprint(worker.id(), toBuild, dirToBuild);
+								madeBlueprint = true;
+							}
+						}
+						if(worker.location().mapLocation().isAdjacentTo(targetLoc)) {
+							Unit blueprint = gc.senseUnitAtLocation(targetLoc);
+							if (gc.canBuild(id, blueprint.id())) {
+								gc.build(id, blueprint.id());
+							}
+						}
+						System.out.println(gc.senseUnitAtLocation(targetLoc).unitType());
+						if(gc.senseUnitAtLocation(targetLoc).structureIsBuilt() != 0) {
+							objective = Objective.NONE;
 						}
 					}
-					if(gc.senseUnitAtLocation(targetLoc).structureIsBuilt() != 0) {
-						objective = Objective.NONE;
-					}
-
 				}
-			else {
-				if(!madeBlueprint) {
+				else {
+					//we are told to build without a location??? angrily build in all directions.
+					VecUnit vu = gc.senseNearbyUnits(worker.location().mapLocation(), 2);
+					for (int i = 0; i < vu.size(); i++) {
+						if (gc.canBuild(id, vu.get(i).id())) {
+							gc.build(id, vu.get(i).id());
+						}
+					}
 					for(Direction dirToBuild : Utils.orderedDirections) {
 						if (gc.karbonite() > bc.bcUnitTypeBlueprintCost(toBuild)
 								&& gc.canBlueprint(id, toBuild, dirToBuild)) {
 							gc.blueprint(worker.id(), toBuild, dirToBuild);
-							madeBlueprint = true;
 							break;
 						}
 					}
-				}
-				VecUnit vu = gc.senseNearbyUnits(worker.location().mapLocation(), 2);
-				for (int i = 0; i < vu.size(); i++) {
-					if (gc.canBuild(id, vu.get(i).id())) {
-						gc.build(id, vu.get(i).id());
-					}
-				}
 					
-			}
+
+				}
 			break;
 		case MINE:
 			break;
 		case BOARD_ROCKET:
-			break;
-		case EXPLORE:
 			break;
 		default:
 			break;

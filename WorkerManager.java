@@ -28,6 +28,8 @@ public class WorkerManager{
     			infoMan.workerSquads.get(0).units.add(u.id());
     			infoMan.workerSquads.get(0).update();
     		}
+    	
+    	//infoMan.workerSquads.get(0).targetLoc = Utils.averageMapLocationEarth(gc,infoMan.workerSquads.get(0).units);
     	//TODO:assign workers who are just mining karbonite if there's something better to do, add to rocket squads if necessary
     }
 }
