@@ -60,8 +60,10 @@ public class InfoManager {
 
 		//keeping track of units, squad management
 		VecUnit units = gc.myUnits();
+		ArrayList<Integer> ids = new ArrayList<Integer>();
 		for (int i = 0; i < units.size(); i++) {
 			Unit unit = units.get(i);
+			ids.add(unit.id());
 			switch (unit.unitType()) {
 			case Worker:
 				workers.add(unit);
@@ -77,6 +79,46 @@ public class InfoManager {
 					unassignedUnits.add(unit);
 				break;
 			}
+		}
+		
+		//check for dead units + remove from squads
+		for(Squad s: workerSquads){
+			ArrayList<Integer> toRemove = new ArrayList<Integer>();
+			for(int id: s.units){
+				if(!ids.contains(id)){
+					toRemove.add(id);
+				}
+			}
+			for(int id: toRemove){
+				s.units.remove(id);
+			}
+			s.update();
+		}
+		
+		for(Squad s: rocketSquads){
+			ArrayList<Integer> toRemove = new ArrayList<Integer>();
+			for(int id: s.units){
+				if(!ids.contains(id)){
+					toRemove.add(id);
+				}
+			}
+			for(int id: toRemove){
+				s.units.remove(id);
+			}
+			s.update();
+		}
+		
+		for(Squad s: workerSquads){
+			ArrayList<Integer> toRemove = new ArrayList<Integer>();
+			for(int id: s.units){
+				if(!ids.contains(id)){
+					toRemove.add(id);
+				}
+			}
+			for(int id: toRemove){
+				s.units.remove(id);
+			}
+			s.update();
 		}
 		
 		//updating map info
