@@ -25,13 +25,11 @@ public class Overseer{
         nav = new Nav(infoMan);
 
         if(gc.planet() == Planet.Earth){
-            // magic numbers
             magicNums = new MagicNumbersEarth();
             prodMan = new ProductionManager(infoMan, gc);
             researchMan = new ResearchManagerEarth(gc, infoMan);
             rocketMan = new RocketManager(gc, infoMan);
         } else {
-            // magic numbers
             magicNums = new MagicNumbersMars();
             prodMan = new ProductionManagerDoNothing();
             researchMan = new ResearchManagerMars(gc, infoMan);
