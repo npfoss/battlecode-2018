@@ -51,13 +51,15 @@ public class WorkerSquad extends Squad {
 							}
 						}
 						if(worker.location().mapLocation().isAdjacentTo(targetLoc)) {
-							Unit blueprint = gc.senseUnitAtLocation(targetLoc);
-							if (gc.canBuild(id, blueprint.id())) {
-								gc.build(id, blueprint.id());
+							if(gc.hasUnitAtLocation(targetLoc)) {
+								Unit blueprint = gc.senseUnitAtLocation(targetLoc);
+								if (gc.canBuild(id, blueprint.id())) {
+									gc.build(id, blueprint.id());
+								}
 							}
 						}
 						//System.out.println(gc.senseUnitAtLocation(targetLoc).unitType());
-						if(gc.senseUnitAtLocation(targetLoc)!= null && gc.senseUnitAtLocation(targetLoc).structureIsBuilt() != 0) {
+						if(gc.hasUnitAtLocation(targetLoc) && gc.senseUnitAtLocation(targetLoc).structureIsBuilt() != 0) {
 							objective = Objective.NONE;
 						}
 					}
