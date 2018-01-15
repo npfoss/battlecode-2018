@@ -41,7 +41,7 @@ public class InfoManager {
 	int[][] lastSeenGrid;
 
 	// here lies map info (mostly for nav)
-
+	
 
 	public InfoManager(GameController g) {
 		gc = g;

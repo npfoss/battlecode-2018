@@ -2,29 +2,46 @@ import bc.*;
 import java.util.ArrayList;
 
 public class CombatSquad extends Squad{
-	
+
 	public CombatSquad(GameController g) {
 		super(g);
 	}
-    public void update(){
+	public void update(){
+		if(requestedUnits.isEmpty())
+			requestedUnits.add(UnitType.Ranger);
+	}
 
-    }
+	public void move(Nav nav){
+		for(int id : units) {
+			Unit fighter = gc.unit(id);
+			if(fighter.location().isInSpace() || fighter.location().isInGarrison())
+				continue;
+			switch (objective) {
+			case EXPLORE:
+				VecUnit nearby = gc.senseNearbyUnits(fighter.location().mapLocation(),50);
+				for(int i=0;i<nearby.size();i++) {
+					Unit other = nearby.get(i);
+					if(other.team() != gc.team() && gc.isAttackReady(fighter.id()) && gc.canAttack(fighter.id(), other.id())) {
+						gc.attack(fighter.id(),other.id());
+					}
+				}
+				Direction dirToMove = Utils.orderedDirections[(int) (8*Math.random())];
+				if(gc.isMoveReady(id) && gc.canMove(id, dirToMove)&&!gc.unit(id).location().isInGarrison())
+					gc.moveRobot(id, dirToMove);
+				fighter = gc.unit(id);
+				nearby = gc.senseNearbyUnits(fighter.location().mapLocation(),50);
+				for(int i=0;i<nearby.size();i++) {
+					Unit other = nearby.get(i);
+					if(other.team() != gc.team() && gc.isAttackReady(fighter.id()) && gc.canAttack(fighter.id(), other.id())) {
+						gc.attack(fighter.id(),other.id());
+					}
+				}
+				break;
+			default:
+				break;
+			}
+		}
+	}
 
-    public void move(Nav nav){
-    	for(int id: units) {
-    		Unit fighter = gc.unit(id);
-    		Location l = fighter.location();
-    		if(l.isOnMap()) {
-    			VecUnit nearby = gc.senseNearbyUnits(l.mapLocation(),70);
-    			for(int i=0;i<nearby.size();i++) {
-    				Unit other = nearby.get(i);
-    				if(other.team() != gc.team() && gc.isAttackReady(fighter.id()) && gc.canAttack(fighter.id(), other.id())) {
-    					gc.attack(fighter.id(),other.id());
-    				}
-    			}
-    		}
-    	}
-    }
-
-    // micro will probably go here
+	// micro will probably go here
 }

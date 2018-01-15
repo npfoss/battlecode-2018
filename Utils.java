@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 import bc.*;
 
 public class Utils{
@@ -31,5 +33,17 @@ public class Utils{
             case Northeast: return Direction.East;
         }
         return Direction.Center;
+    }
+    public static MapLocation averageMapLocationEarth(GameController gc, ArrayList<Integer> units) {
+    	if(units.size() == 0)
+    		return null;
+    	int x = 0;
+    	int y = 0;
+    	for(int i : units) {
+    		Unit u = gc.unit(i);
+    		x+= u.location().mapLocation().getX();
+    		y+= u.location().mapLocation().getY();
+    	}
+    	return new MapLocation(Planet.Earth,x/units.size(), y/units.size());
     }
 }

@@ -52,7 +52,7 @@ public class Overseer{
         prodMan.move();
 
         for(RocketSquad rs : infoMan.rocketSquads){
-            rs.move(nav);
+        	rs.move(nav);
         }
         for(WorkerSquad ws : infoMan.workerSquads){
             ws.move(nav);
