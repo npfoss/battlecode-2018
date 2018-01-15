@@ -116,7 +116,7 @@ public class InfoManager {
 
 		//check for dead units + remove from squads
 		for(Squad s: workerSquads){
-			for(int i = s.units.size()-1; i >= 0; i++){
+			for(int i = s.units.size()-1; i >= 0; i--){
 				int id = s.units.get(i);
 				if(!ids.contains(id)){
 					s.units.remove(i);
@@ -126,7 +126,7 @@ public class InfoManager {
 		}
 
 		for(Squad s: rocketSquads){
-			for(int i = s.units.size()-1; i >= 0; i++){
+			for(int i = s.units.size()-1; i >= 0; i--){
 				int id = s.units.get(i);
 				if(!ids.contains(id)){
 					s.units.remove(i);
@@ -136,7 +136,7 @@ public class InfoManager {
 		}
 
 		for(Squad s: combatSquads){
-			for(int i = s.units.size()-1; i >= 0; i++){
+			for(int i = s.units.size()-1; i >= 0; i--){
 				int id = s.units.get(i);
 				if(!ids.contains(id)){
 					s.units.remove(i);
