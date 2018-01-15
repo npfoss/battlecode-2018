@@ -1,6 +1,7 @@
 import bc.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 /* please edit this it's just late at night
  updates enemy locations and buildings (where it last saw them etc)
     and what type (number of each)
@@ -81,7 +82,7 @@ public class InfoManager {
 
 		//keeping track of our/enemy units, squad management
 		VecUnit units = gc.units();
-		ArrayList<Integer> ids = new ArrayList<Integer>();
+		HashSet<Integer> ids = new HashSet<Integer>();
 		for (int i = 0; i < units.size(); i++) {
 			Unit unit = units.get(i);
 			if(unit.team() == gc.team()){
@@ -94,6 +95,11 @@ public class InfoManager {
 					break;
 				case Factory:
 					factories.add(unit);
+					break;
+				case Rocket:
+					rockets.add(unit);
+					if (!isInSquads2(unit, rocketSquads))
+						unassignedUnits.add(unit);
 					break;
 				default:
 					fighters.add(unit);
@@ -110,40 +116,31 @@ public class InfoManager {
 
 		//check for dead units + remove from squads
 		for(Squad s: workerSquads){
-			ArrayList<Integer> toRemove = new ArrayList<Integer>();
-			for(int id: s.units){
+			for(int i = s.units.size()-1; i >= 0; i++){
+				int id = s.units.get(i);
 				if(!ids.contains(id)){
-					toRemove.add(id);
+					s.units.remove(i);
 				}
-			}
-			for(int id: toRemove){
-				s.units.remove(s.units.indexOf(id));
 			}
 			s.update();
 		}
 
 		for(Squad s: rocketSquads){
-			ArrayList<Integer> toRemove = new ArrayList<Integer>();
-			for(int id: s.units){
+			for(int i = s.units.size()-1; i >= 0; i++){
+				int id = s.units.get(i);
 				if(!ids.contains(id)){
-					toRemove.add(id);
+					s.units.remove(i);
 				}
-			}
-			for(int id: toRemove){
-				s.units.remove(s.units.indexOf(id));
 			}
 			s.update();
 		}
 
 		for(Squad s: combatSquads){
-			ArrayList<Integer> toRemove = new ArrayList<Integer>();
-			for(int id: s.units){
+			for(int i = s.units.size()-1; i >= 0; i++){
+				int id = s.units.get(i);
 				if(!ids.contains(id)){
-					toRemove.add(id);
+					s.units.remove(i);
 				}
-			}
-			for(int id: toRemove){
-				s.units.remove(s.units.indexOf(id));
 			}
 			s.update();
 		}
