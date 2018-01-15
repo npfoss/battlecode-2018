@@ -1,17 +1,35 @@
+******* etiquette this year *******
+-still do all development interacting with dev branch
+-99.9% of the time, create new branch off dev if you want to modify code at all
+    -name it something useful
+    -one branch per feature
+    -possible to have one branch for big feature, and branches off that for sub-features if multiple people are working on it
+    -when done *and bug free*, submit PR to merge that branch with dev
+    -pester someone else to *review your PR*
+        -actually leave comments and update stuff as part of this process please
+        -ideally everything that goes in is the final draft
+    -squash and merge unless there's a compelling reason not to
+    -*delete* branch once merged
+-*when we're ready to upload a new bot* and *dev is better than master* (or we just want a new permanent snapshot to test against):
+    -PR dev into master (make sure no conflicts)
+    -squash and merge
+******* etiquette v1.0 - 1-11-18 1548
+
+
+
 //---branching philosophy---//
 (will be better defined after we discuss it)
 'master' branch should always be our best stable version, and be the one up on the site
 'dev' branch is what we branch, merge, pull request, etc on to improve the bot. will be pushed to master only when stable and better
 create new branches for new features! for example 'mobile-turrets'
-	make changes and add cool things on that branch. does NOT have to be be bug-free!
-	submit pull request back into 'dev' ONLY WHEN IT *IS* BUG FREE (and has been merged with the current 'dev' version)
+    make changes and add cool things on that branch. does NOT have to be be bug-free!
+    submit pull request back into 'dev' ONLY WHEN IT *IS* BUG FREE (and has been merged with the current 'dev' version)
 when the feature is done, PR, then delete the branch
 note1: this is not actually as complicated as we thought. yay
 
 //---commands---------------//
-git branch <branch name> //creates new branch **DO NEXT TWO COMMANDS IMMEDIATELY after you do this one**
-git checkout <branch name> //switch to that branch. (master is the main original one)
-git push --set-upstream origin <current branch name> //makes pushing and pulling use current branch on GitHub by default (always do this for new branches)
+git checkout -b <branch name> //create new branch and switch to it
+git push -u origin <current branch name> //makes pushing and pulling use current branch on GitHub by default (always do this for new branches)
 --or--
 git branch --set-upstream-to=origin/<remote branch> <current branch name> // for when the branch already exists remotely. ideally the two things in <> are the same
 git merge origin/<diff branch> //update current branch with changes from <diff branch> (effectively 'pull' but from <diff branch> instead of <current branch>) *will usually be origin/dev since that's what we'll be actively working on
