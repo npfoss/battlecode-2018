@@ -1,5 +1,7 @@
 import bc.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 /* please edit this it's just late at night
  updates enemy locations and buildings (where it last saw them etc)
     and what type (number of each)
@@ -18,8 +20,18 @@ public class InfoManager {
 
 	ArrayList<Unit> unassignedUnits;
 
-	// TODO: should probably track visible enemies too
+	// tracking enemies
+	ArrayList<Unit> enemyRockets;
+	ArrayList<Unit> enemyWorkers;
+	ArrayList<Unit> enemyFactories;
+	ArrayList<Unit> enemyRangers;
+	ArrayList<Unit> enemyMages;
+	ArrayList<Unit> enemyHealers;
+	ArrayList<Unit> enemyKnights;
 
+	//for knowing when you last saw a given enemy unit (unit id -> turn last seen)
+	HashMap<Integer,Integer> enemyLastSeen;
+	
 	// Squads
 	ArrayList<WorkerSquad> workerSquads;
 	ArrayList<RocketSquad> rocketSquads;
@@ -27,7 +39,7 @@ public class InfoManager {
 
 	// map grid containing when we last saw each tile
 	int[][] lastSeenGrid;
-	
+
 	// here lies map info (mostly for nav)
 	
 
@@ -39,12 +51,22 @@ public class InfoManager {
 		workerSquads = new ArrayList<WorkerSquad>();
 		rocketSquads = new ArrayList<RocketSquad>();
 		combatSquads = new ArrayList<CombatSquad>();
-		
+
 		myPlanet = gc.planet();
-		
+
 		int height = (int) gc.startingMap(myPlanet).getHeight();
 		int width = (int) gc.startingMap(myPlanet).getWidth();
 		lastSeenGrid = new int[width][height];
+		
+		enemyRockets = new ArrayList<Unit>();
+		enemyWorkers = new ArrayList<Unit>();
+		enemyFactories = new ArrayList<Unit>();
+		enemyRangers = new ArrayList<Unit>();
+		enemyMages = new ArrayList<Unit>();
+		enemyKnights = new ArrayList<Unit>();
+		enemyHealers = new ArrayList<Unit>();
+		
+		enemyLastSeen = new HashMap<Integer,Integer>();
 	}
 
 	public void update() {
@@ -58,69 +80,71 @@ public class InfoManager {
 
 		unassignedUnits = new ArrayList<Unit>();
 
-		//keeping track of units, squad management
-		VecUnit units = gc.myUnits();
-		ArrayList<Integer> ids = new ArrayList<Integer>();
+		//keeping track of our/enemy units, squad management
+		VecUnit units = gc.units();
+		HashSet<Integer> ids = new HashSet<Integer>();
 		for (int i = 0; i < units.size(); i++) {
 			Unit unit = units.get(i);
-			ids.add(unit.id());
-			switch (unit.unitType()) {
-			case Worker:
-				workers.add(unit);
-				if (!isInSquads1(unit, workerSquads) && !isInSquads2(unit, rocketSquads))
-					unassignedUnits.add(unit);
-				break;
-			case Factory:
-				factories.add(unit);
-				break;
-			default:
-				fighters.add(unit);
-				if (!isInSquads3(unit, combatSquads) && !isInSquads2(unit,rocketSquads))
-					unassignedUnits.add(unit);
-				break;
+			if(unit.team() == gc.team()){
+				ids.add(unit.id());
+				switch (unit.unitType()) {
+				case Worker:
+					workers.add(unit);
+					if (!isInSquads1(unit, workerSquads) && !isInSquads2(unit, rocketSquads))
+						unassignedUnits.add(unit);
+					break;
+				case Factory:
+					factories.add(unit);
+					break;
+				case Rocket:
+					rockets.add(unit);
+					if (!isInSquads2(unit, rocketSquads))
+						unassignedUnits.add(unit);
+					break;
+				default:
+					fighters.add(unit);
+					if (!isInSquads3(unit, combatSquads) && !isInSquads2(unit,rocketSquads))
+						unassignedUnits.add(unit);
+					break;
+				}
+			}
+			else{
+				addEnemyUnit(unit);
+				enemyLastSeen.put(unit.id(),(int) gc.round());
 			}
 		}
-		
+
 		//check for dead units + remove from squads
 		for(Squad s: workerSquads){
-			ArrayList<Integer> toRemove = new ArrayList<Integer>();
-			for(int id: s.units){
+			for(int i = s.units.size()-1; i >= 0; i--){
+				int id = s.units.get(i);
 				if(!ids.contains(id)){
-					toRemove.add(id);
+					s.units.remove(i);
 				}
-			}
-			for(int id: toRemove){
-				s.units.remove(s.units.indexOf(id));
 			}
 			s.update();
 		}
-		
+
 		for(Squad s: rocketSquads){
-			ArrayList<Integer> toRemove = new ArrayList<Integer>();
-			for(int id: s.units){
+			for(int i = s.units.size()-1; i >= 0; i--){
+				int id = s.units.get(i);
 				if(!ids.contains(id)){
-					toRemove.add(id);
+					s.units.remove(i);
 				}
-			}
-			for(int id: toRemove){
-				s.units.remove(s.units.indexOf(id));
 			}
 			s.update();
 		}
-		
+
 		for(Squad s: combatSquads){
-			ArrayList<Integer> toRemove = new ArrayList<Integer>();
-			for(int id: s.units){
+			for(int i = s.units.size()-1; i >= 0; i--){
+				int id = s.units.get(i);
 				if(!ids.contains(id)){
-					toRemove.add(id);
+					s.units.remove(i);
 				}
-			}
-			for(int id: toRemove){
-				s.units.remove(s.units.indexOf(id));
 			}
 			s.update();
 		}
-		
+
 		//updating map info
 		for(int x = 0; x < lastSeenGrid.length; x++){
 			for(int y = 0; y < lastSeenGrid[0].length; y++){
@@ -130,7 +154,52 @@ public class InfoManager {
 			}
 		}
 	}
-	// update arraylists of units, make sure squads don't have dead units, etc
+
+	private void addEnemyUnit(Unit unit){
+		switch (unit.unitType()){
+		case Rocket: enemyRockets = updateUnit(enemyRockets,unit);
+		case Factory: enemyFactories = updateUnit(enemyFactories,unit);
+		case Worker: enemyWorkers = updateUnit(enemyWorkers,unit);
+		case Ranger: enemyRangers = updateUnit(enemyRangers,unit);
+		case Mage: enemyMages = updateUnit(enemyMages,unit);
+		case Knight: enemyKnights = updateUnit(enemyKnights,unit);
+		case Healer: enemyHealers = updateUnit(enemyHealers,unit);
+		}	
+	}
+
+	//if you're about to deal the finishing blow to a unit, remove it from our tracking
+	//necessary to do by ID because Unit object changes every turn
+	public void removeEnemyUnit(Unit unit){
+		switch (unit.unitType()){
+		case Rocket: enemyRockets = removeByID(enemyRockets,unit.id());
+		case Factory: enemyFactories = removeByID(enemyFactories,unit.id());
+		case Worker: enemyWorkers = removeByID(enemyWorkers,unit.id());
+		case Ranger: enemyRangers = removeByID(enemyRangers,unit.id());
+		case Mage: enemyMages = removeByID(enemyMages,unit.id());
+		case Knight: enemyKnights = removeByID(enemyKnights,unit.id());
+		case Healer: enemyHealers = removeByID(enemyHealers,unit.id());
+		}	
+	}
+
+	private ArrayList<Unit> removeByID(ArrayList<Unit> al, int id){
+		al.remove(gc.unit(id));
+		return al;
+	}
+
+	private ArrayList<Unit> updateUnit(ArrayList<Unit> al, Unit unit){
+		Unit toRemove = unit;
+		boolean remove = false;
+		for(Unit u: al){
+			if(u.id()==unit.id()){
+				remove = true;
+				toRemove = u;
+				break;
+			}
+		}
+		if(remove) al.remove(toRemove);
+		al.add(unit);
+		return al;
+	}
 
 	public boolean isInSquads1(Unit unit, ArrayList<WorkerSquad> squad) {
 		for (Squad s : squad) {
@@ -162,7 +231,6 @@ public class InfoManager {
 		}
 		return false;
 	}
-
 
 
 /******** Map related functions below this line *******/
