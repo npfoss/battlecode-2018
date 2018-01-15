@@ -25,17 +25,22 @@ public class ProductionManager{
     	for(Unit factory : infoMan.factories) {
     		int id = factory.id();
     		//TODO: pick an intelligent direction
-    		if(gc.unit(id).structureGarrison().size() >0) {
+    		boolean didSomething = false;
+    		while(gc.unit(id).structureGarrison().size() >0) {
+    			didSomething = false;
     			for(Direction dirToUnload : Utils.orderedDirections)
     				if(gc.canUnload(factory.id(), dirToUnload)) {
     					gc.unload(id, dirToUnload);
+    					didSomething = true;
     				}
+    			if(!didSomething)
+    				break;
     		}
     		if(gc.canProduceRobot(id,UnitType.Ranger)) {
     			gc.produceRobot(id, UnitType.Ranger);
     		}
     	}
-        // go through the factories (in infoMan) and make them produce stuff
+    	// go through the factories (in infoMan) and make them produce stuff
 
     }
 }

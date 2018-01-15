@@ -8,6 +8,8 @@ public class WorkerSquad extends Squad {
 	}
 
 	public void update() {
+		if(requestedUnits.isEmpty())
+			requestedUnits.add(UnitType.Worker);
 	}
 	public void move(Nav nav) {
 		for(int id : units) {

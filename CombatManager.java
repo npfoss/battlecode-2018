@@ -23,10 +23,15 @@ public class CombatManager{
 	// remember, the squads will move on their own after you update everything
 	public void update(Strategy strat){
 		if(infoMan.combatSquads.size()==0) {
-			CombatSquad ws = new CombatSquad(gc);
-			ws.objective = Objective.EXPLORE;
-			infoMan.combatSquads.add(ws);
+			CombatSquad cs = new CombatSquad(gc);
+			cs.objective = Objective.EXPLORE;
+			cs.update();
+			infoMan.combatSquads.add(cs);
 		}
+
+		//TODO set units whose objective is NONE (meaning they completed it) to unassignedUnits
+		//Do that here
+
 		boolean didSomething = false;
 		while(infoMan.unassignedUnits.size() > 0) {
 			didSomething = false;

@@ -14,6 +14,8 @@ public class CombatSquad extends Squad{
 	public void move(Nav nav){
 		for(int id : units) {
 			Unit fighter = gc.unit(id);
+			if(fighter.location().isInSpace() || fighter.location().isInGarrison())
+				continue;
 			switch (objective) {
 			case EXPLORE:
 				VecUnit nearby = gc.senseNearbyUnits(fighter.location().mapLocation(),50);
