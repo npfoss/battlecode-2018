@@ -20,19 +20,25 @@ public class Nav{
         return start.directionTo(target);
     }
 
+    /*
+    actual direction you should move to go from start to target
+    takes into account movable obstructions like other robots
+    */
     public Direction dirToMove(MapLocation start, MapLocation target){
-        //System.out.println("begin");
-        Direction dirTowards = directionTowards(start, target);
-        //System.out.println("dir to target " + dirTowards);
-        
+        return dirToMove(start, directionTowards(start, target));
+    }
+
+    // overloaded for convenience
+    public Direction dirToMove(MapLocation start, Direction preferredDir){
+
         // now check if legal and stuff
-        if (infoMan.isLocationClear(start.add(dirTowards))){
-            return dirTowards;
+        if (infoMan.isLocationClear(start.add(preferredDir))){
+            return preferredDir;
         }
-        //System.out.println("ideal dir didn't work");
+        
         // if not, try slight deviations
-        Direction left = dirTowards;
-        Direction right = dirTowards;
+        Direction left = preferredDir;
+        Direction right = preferredDir;
         for (int i = 0; i < 3; i++){
             // try everything short of going backwards
             left = Utils.rotateLeft(left);
@@ -54,6 +60,7 @@ public class Nav{
         // Direction dirTowards = directionTowards(start, target);
         // now check if legal and safe and stuff
 
+        // for now (TODO)
         return dirToMove(start, target);
     }
 

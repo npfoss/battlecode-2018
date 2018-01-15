@@ -10,6 +10,9 @@ Creates (empty) WorkerSquad to build factory (workers assigned by WorkerManager)
 public class ProductionManager{
     InfoManager infoMan;
     GameController gc;
+
+    public ProductionManager(){}
+    
     public ProductionManager(InfoManager im, GameController g){
         infoMan = im;
         gc = g;

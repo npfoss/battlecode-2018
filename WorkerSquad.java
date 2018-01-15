@@ -22,7 +22,6 @@ public class WorkerSquad extends Squad {
 					break;
 				}
 			}
-
 			switch (objective) {
 			case BUILD:
 				if(targetLoc != null) {
