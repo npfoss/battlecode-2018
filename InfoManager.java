@@ -135,11 +135,13 @@ public class InfoManager {
 			s.update();
 		}
 
-		for(Squad s: combatSquads){
+		for(CombatSquad s: combatSquads){
 			for(int i = s.units.size()-1; i >= 0; i--){
 				int id = s.units.get(i);
 				if(!ids.contains(id)){
 					s.units.remove(i);
+					s.separatedUnits.remove(i);
+					s.swarmUnits.remove(i);
 				}
 			}
 			s.update();
