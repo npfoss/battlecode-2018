@@ -6,11 +6,11 @@ public class CombatSquad extends Squad{
 	//keep track of units into two groups: those with the main swarm and those separated from it
 	ArrayList<Integer> swarmUnits;
 	ArrayList<Integer> separatedUnits;
-	
+
 	public CombatSquad(GameController g) {
 		super(g);
 	}
-	
+
 	public void update(){
 		if(requestedUnits.isEmpty())
 			requestedUnits.add(UnitType.Ranger);
@@ -80,14 +80,14 @@ public class CombatSquad extends Squad{
 			}
 		}*/
 	}
-	
+
 	private boolean areWeDone(MapLocation swarmLoc){
 		switch(objective){
 		case ATTACK_LOC: return swarmLoc.distanceSquaredTo(targetLoc) < 9 && gc.senseNearbyUnitsByTeam(swarmLoc, 25, Utils.enemyTeam(gc)).size() == 0;
 		default: return false;
 		}
 	}
-	
+
 	private void moveToSwarm(Nav nav){
 		//TODO: micro more if you see enemies on the way
 		for(int uid: separatedUnits){
@@ -99,7 +99,7 @@ public class CombatSquad extends Squad{
 				gc.moveRobot(uid, moveDir);
 		}
 	}
-	
+
 	private void explore(Nav nav, MapLocation swarmLoc){
 		Direction dirToMove = Utils.orderedDirections[(int) (8*Math.random())];
 		MapLocation targetL = swarmLoc.addMultiple(dirToMove,5);
@@ -110,7 +110,7 @@ public class CombatSquad extends Squad{
 				gc.moveRobot(uid, moveDir);
 		}
 	}
-	
+
 	private void doSquadMicro(boolean retreat, MapLocation swarmLoc, Nav nav){
 		/*
 		 * General goals:
@@ -119,7 +119,7 @@ public class CombatSquad extends Squad{
 		 * 3. Minimize distance to targetLoc if not retreating and attacking
 		 * 4. Minimize distance to line between targetLoc and nearest enemy if defending
 		 * 5. Give special priority to minimizing damage taken by higher priority units (factories,etc.)
-	 	 */
+		 */
 		//for now, loop through units individually TODO: make this smarter
 		for(int uid: swarmUnits){
 			Unit u = gc.unit(uid);
@@ -196,14 +196,14 @@ public class CombatSquad extends Squad{
 			}
 		}
 	}
-	
+
 	private boolean shouldWeRetreat(MapLocation swarmLoc){
 		//TODO: make this better
 		int ourUnitCount = swarmUnits.size();
 		int theirUnitCount = (int) gc.senseNearbyUnitsByTeam(swarmLoc, 100, Utils.enemyTeam(gc)).size();
 		return theirUnitCount > ourUnitCount;
 	}
-	
-	
+
+
 
 }

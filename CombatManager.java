@@ -35,6 +35,7 @@ public class CombatManager{
 			cs.objective = Objective.ATTACK_LOC;
 			cs.targetLoc = loc;
 			cs.update();
+			infoMan.combatSquads.add(cs);
 		}
 	}
 
