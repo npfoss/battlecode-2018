@@ -20,6 +20,7 @@ public class CombatSquad extends Squad{
 		//reassign separated units to swarm if appropriate
 		if(units.size()==0)
 			return;
+		System.out.println("cs here");
 		if(swarmUnits.size()==0){
 			for(int id: separatedUnits){
 				swarmUnits.add(id);
