@@ -9,7 +9,6 @@ public class Squad{
     ArrayList<Integer> units;
     int urgency;
     MapLocation targetLoc;
-    UnitType toBuild;
     ArrayList<UnitType> requestedUnits;
     GameController gc;
 
@@ -19,7 +18,6 @@ public class Squad{
         units = new ArrayList<Integer>();
         urgency = 0;
         targetLoc = null;
-        toBuild = UnitType.Factory;
         requestedUnits = new ArrayList<UnitType>();
         objective = Objective.NONE;
         gc = g;
