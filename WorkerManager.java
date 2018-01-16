@@ -64,7 +64,7 @@ public class WorkerManager{
 				if(initialHub == null) {
 					//Pick a place to build the first factory
 					//TODO floodfill to see if all workers can reach location
-					initialHub = Utils.averageMapLocationEarth(gc,infoMan.workerSquads.get(0).units);
+					initialHub = Utils.averageMapLocation(gc,infoMan.workerSquads.get(0).units);
 					if(gc.startingMap(Planet.Earth).isPassableTerrainAt(initialHub)>0){
 						infoMan.workerSquads.get(0).targetLoc = initialHub;
 					}
@@ -72,7 +72,7 @@ public class WorkerManager{
 				//Temp solution build random factories
 				if(infoMan.workerSquads.get(0).objective == Objective.NONE) {
 					infoMan.workerSquads.get(0).objective = Objective.BUILD;
-							infoMan.workerSquads.get(0).targetLoc = null;
+					infoMan.workerSquads.get(0).targetLoc = null;
 				}
 				//TODO intelligently pick locations for the next factories
 				/*System.out.println("My objective is: " + ((infoMan.workerSquads.get(0).objective == Objective.BUILD) ? "Building" : "NONE"));
