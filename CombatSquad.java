@@ -99,6 +99,8 @@ public class CombatSquad extends Squad{
 			if(!gc.isMoveReady(uid))
 				continue;
 			Unit u = gc.unit(uid);
+			if(!u.location().isOnMap())
+				continue;
 			Direction moveDir = nav.dirToMove(u.location().mapLocation(),targetLoc);
 			if(gc.canMove(uid, moveDir))
 				gc.moveRobot(uid, moveDir);
