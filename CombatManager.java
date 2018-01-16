@@ -76,6 +76,7 @@ public class CombatManager{
 				for(UnitType u : cs.requestedUnits) {
 					for(Unit a : infoMan.unassignedUnits) {
 						if(a.unitType() == u) {
+							System.out.println("adding to cs");
 							cs.requestedUnits.remove(u);
 							int toAdd = infoMan.unassignedUnits.get(infoMan.unassignedUnits.indexOf(a)).id();
 							cs.units.add(toAdd);
