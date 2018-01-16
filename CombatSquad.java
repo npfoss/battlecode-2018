@@ -9,6 +9,8 @@ public class CombatSquad extends Squad{
 
 	public CombatSquad(GameController g) {
 		super(g);
+		swarmUnits = new ArrayList<Integer>();
+		separatedUnits = new ArrayList<Integer>();
 	}
 
 	public void update(){
