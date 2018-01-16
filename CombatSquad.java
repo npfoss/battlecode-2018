@@ -34,6 +34,8 @@ public class CombatSquad extends Squad{
 		int swarmThreshold = swarmUnits.size() + 1;
 		for(int i = separatedUnits.size()-1; i>=0; i--){
 			Unit u = gc.unit(separatedUnits.get(i));
+			if(!u.location().isOnMap())
+				continue;
 			if(u.location().mapLocation().distanceSquaredTo(swarmLoc) <= swarmThreshold){
 				separatedUnits.remove(i);
 				swarmUnits.add(u.id());
