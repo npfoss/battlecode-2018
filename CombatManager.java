@@ -60,8 +60,8 @@ public class CombatManager{
 				for(int uid: cs.units){
 					infoMan.unassignedUnits.add(gc.unit(uid));
 				}
+				toRemove.add(cs);
 			}
-			toRemove.add(cs);
 		}
 		
 		for(CombatSquad cs: toRemove)
