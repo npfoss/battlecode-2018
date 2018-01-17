@@ -93,7 +93,6 @@ public class Nav{
 
     public void generateBFSMap(MapLocation target){
         System.out.println("Generating map to " + target.toString());
-        // int start = infoMan.gc.getTimeLeftMs();
         int dist = 0;
         ArrayList<MapLocation> currentLocs = new ArrayList<MapLocation>();
         ArrayList<MapLocation> nextLocs = new ArrayList<MapLocation>();
@@ -132,6 +131,5 @@ public class Nav{
             currentLocs = nextLocs;
             nextLocs = new ArrayList<MapLocation>();
         }
-        // System.out.println("map took " + (start - infoMan.gc.getTimeLeftMs()) + " ms to generate");
     }
 }

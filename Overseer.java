@@ -1,8 +1,6 @@
 import bc.*;
 import java.util.ArrayList;
 
-// import java.util.HashMap;
-
 public class Overseer{
     GameController gc;
     MagicNumbers magicNums;
@@ -37,21 +35,11 @@ public class Overseer{
             researchMan = new ResearchManagerMars(gc, infoMan);
             rocketMan = new RocketDoNothing(gc, infoMan);
         }
-
-        // // delete pls
-        // HashMap<String, Integer> m = new HashMap<String, Integer>();
-        // MapLocation loc = new MapLocation(gc.planet(), 5, 5);
-        // m.put(loc.toString(), 19);
-        // MapLocation loc2 = new MapLocation(gc.planet(), 5, 5);
-        // System.out.println("88asdfasdfkjasdf: " + m.containsKey(loc2.toString()) + " " + loc2.toString());
-        // MapLocation loc3 = new MapLocation(gc.planet(), 6, 5);
-        // System.out.println("second one: " + m.containsKey(loc3.toString()) + " " + loc3.toString());
-
-        // //
     }
 
     public void takeTurn(){
         System.out.println("Current round: " + gc.round());
+        int start = gc.getTimeLeftMs();
         
         infoMan.update();
         strat = strat.update(infoMan);
@@ -72,6 +60,8 @@ public class Overseer{
         for(CombatSquad cs : infoMan.combatSquads){
             cs.move(nav);
         }
+
         gc.nextTurn();
+        System.out.println("turn took " + (start + 50 - gc.getTimeLeftMs()) + ". " + gc.getTimeLeftMs() + " ms left");
     }
 }
