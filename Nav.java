@@ -1,6 +1,21 @@
 import bc.*;
 import java.lang.Math;
 
+/* NOTES
+Max's reverse BFS alg
+maybe have units all claim tiles and optimize that?
+-or maybe look at the duck's code for pathing around units
+-only if current one is bad I think
+regions
+-reachability
+-number of tiles
+-amt of karbonite in it
+track eta to loc
+
+next:
+account for karbonite on adjacent impassible tiles for regional totals
+*/
+
 public class Nav{
     InfoManager infoMan;
     // should not have to use gc, do all that through infoMan (to cache results)

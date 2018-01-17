@@ -2,6 +2,7 @@ import bc.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+
 /* please edit this it's just late at night
  updates enemy locations and buildings (where it last saw them etc)
     and what type (number of each)
@@ -37,11 +38,9 @@ public class InfoManager {
 	ArrayList<RocketSquad> rocketSquads;
 	ArrayList<CombatSquad> combatSquads;
 
-	// map grid containing when we last saw each tile
-	int[][] lastSeenGrid;
-
 	// here lies map info (mostly for nav)
-	
+    ArrayList<Region> regions;
+    Tile[][] tiles;	
 
 	public InfoManager(GameController g) {
 		gc = g;
@@ -54,10 +53,6 @@ public class InfoManager {
 
 		myPlanet = gc.planet();
 
-		int height = (int) gc.startingMap(myPlanet).getHeight();
-		int width = (int) gc.startingMap(myPlanet).getWidth();
-		lastSeenGrid = new int[width][height];
-		
 		enemyRockets = new ArrayList<Unit>();
 		enemyWorkers = new ArrayList<Unit>();
 		enemyFactories = new ArrayList<Unit>();
@@ -67,6 +62,13 @@ public class InfoManager {
 		enemyHealers = new ArrayList<Unit>();
 		
 		enemyLastSeen = new HashMap<Integer,Integer>();
+
+        int height = (int) gc.startingMap(myPlanet).getHeight();
+        int width = (int) gc.startingMap(myPlanet).getWidth();
+
+        tiles = new Tile[width][height];
+        regions = new ArrayList<Region>();
+        initMap();
 	}
 
 	public void update() {
@@ -150,11 +152,17 @@ public class InfoManager {
 		}
 
 		//updating map info
-		for(int x = 0; x < lastSeenGrid.length; x++){
-			for(int y = 0; y < lastSeenGrid[0].length; y++){
-				MapLocation check = new MapLocation(myPlanet,x,y);
-				if(gc.canSenseLocation(check))
-					lastSeenGrid[x][y] = (int) gc.round();
+		for(int x = 0; x < tiles.length; x++){
+			for(int y = 0; y < tiles[0].length; y++){
+				MapLocation loc = new MapLocation(myPlanet, x, y);
+				if(gc.canSenseLocation(loc)){
+					tiles[x][y].roundLastUpdated = (int) gc.round();
+                    tiles[x][y].updateKarbonite(gc.karboniteAt(loc));
+                    // TODO: check if there's now a factory there
+                    //      (to update walkability)
+                    // TODO: figure out how dangerous the tile is
+
+                }
 			}
 		}
 	}
@@ -238,6 +246,55 @@ public class InfoManager {
 
 
 /******** Map related functions below this line *******/
+    
+    // initializes all the Tile and Region stuff
+    public void initMap(){
+        PlanetMap startingMap = gc.startingMap(myPlanet);
+        for (int x = 0; x < tiles.length; x++){
+            for (int y = 0; y < tiles[0].length; y++){
+                if (tiles[x][y] == null){
+                    // it hasn't been initialized yet (or isn't passable)
+                    MapLocation loc = new MapLocation(myPlanet, x, y);
+                    if (startingMap.isPassableTerrainAt(loc) > 0){
+                        // new region! floodfill it
+                        Region newRegion = new Region();
+                        floodfill(startingMap, newRegion, loc);
+                        regions.add(newRegion);
+                    } else {
+                        // impassible terrain
+                        tiles[x][y] = new Tile(x, y, false, startingMap.initialKarboniteAt(loc), null);
+                    }
+                }
+            }
+        }
+    }
+
+    // takes a passable maplocation, adds it and everything reachable
+    //      from it to the given region
+    public void floodfill(PlanetMap startingMap, Region region, MapLocation loc){
+        long karbs = startingMap.initialKarboniteAt(loc);
+        tiles[loc.getX()][loc.getY()] = new Tile(loc.getX(), loc.getY(), true, karbs, region);
+        region.tiles.add(tiles[loc.getX()][loc.getY()]);
+        region.karbonite += karbs;
+
+        // now floodfill
+        for (Direction dir : Utils.orderedDirections){
+            MapLocation neighbor = loc.add(dir);
+            if (isOnMap(neighbor)
+                    && tiles[neighbor.getX()][neighbor.getY()] == null
+                    && startingMap.isPassableTerrainAt(neighbor) > 0){
+                floodfill(startingMap, region, neighbor);
+            }
+        }
+    }
+
+    public boolean isOnMap(int x, int y){
+        return 0 <= x && 0 <= y && x < tiles.length && y < tiles[0].length;
+    }
+
+    public boolean isOnMap(MapLocation loc){
+        return isOnMap(loc.getX(), loc.getY());
+    }
 
     // this means on map, walkable, AND no unit currently in the way
     // returns false if we can't see that loc
@@ -251,9 +308,14 @@ public class InfoManager {
     }
 
     // means on the map, passable terrain, and none of our buildings there
-    public boolean isLocationWalkable(MapLocation loc) throws Exception {
+    public boolean isLocationWalkable(MapLocation loc) {
         // TODO: make it not throw errors when tile isn't visible (need mapinfo)
         // TODO: add the part about building (requires caching map info)
-        return gc.startingMap(gc.planet()).isPassableTerrainAt(loc) > 0;
+        return tiles[loc.getX()][loc.getY()].isWalkable;
+    }
+
+    // are two map locations reachable from each other? if in same region
+    public boolean isReachable(MapLocation loc1, MapLocation loc2){
+        return tiles[loc1.getX()][loc1.getY()].region == tiles[loc2.getX()][loc2.getY()].region;
     }
 }
