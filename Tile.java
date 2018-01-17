@@ -1,5 +1,6 @@
 import bc.*;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 public class Tile{
     int x;
@@ -12,6 +13,9 @@ public class Tile{
     int hittableBy;
     double possibleDamage;
     HashMap<MapLocation, Signpost> destToDir;
+    
+    //for combat: dist from tile to ID
+    TreeMap<Integer, Integer> nearbyEnemies; 
 
     public Tile(int ex, int why, boolean walkable, long karb, Region reg){
         x = ex;

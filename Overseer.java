@@ -21,7 +21,7 @@ public class Overseer{
 
         infoMan = new InfoManager(gc);
         workerMan = new WorkerManager(infoMan,gc);
-        combatMan = new CombatManager(infoMan,gc);
+        combatMan = new CombatManager(infoMan,gc,magicNums);
         nav = new Nav(infoMan);
 
         if(gc.planet() == Planet.Earth){

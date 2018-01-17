@@ -159,6 +159,8 @@ public class CombatSquad extends Squad{
 		 *- HashMap of friendly ID to planned move direction
 		 */
 		
+		
+		
 		/* below lies dumb micro
 		for(int uid: swarmUnits){
 			Unit u = gc.unit(uid);

@@ -9,10 +9,12 @@ Rearranges combat squads (and gives units to rocketsquads) as needed
 public class CombatManager{
 	InfoManager infoMan;
 	GameController gc;
-
-	public CombatManager(InfoManager im, GameController g){
+	MagicNumbers magicNums;
+	
+	public CombatManager(InfoManager im, GameController g, MagicNumbers mn){
 		infoMan = im;
 		gc = g;
+		magicNums = mn;
 		if(infoMan.myPlanet == Planet.Mars)
 			return;
 		VecUnit vu = gc.startingMap(infoMan.myPlanet).getInitial_units();
@@ -24,7 +26,7 @@ public class CombatManager{
 			MapLocation loc = u.location().mapLocation();
 			boolean stop = false;
 			for(MapLocation ml: enemyStartingLocs){
-				if(ml.distanceSquaredTo(loc)<50){
+				if(ml.distanceSquaredTo(loc) < magicNums.SQUAD_SEPARATION_THRESHOLD){
 					stop = true;
 					break;
 				}
