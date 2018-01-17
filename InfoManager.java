@@ -13,6 +13,7 @@ public class InfoManager {
 	GameController gc;
 	Comms comms;
 	Planet myPlanet;
+	MagicNumbers magicNums;
 
 	ArrayList<Unit> rockets;
 	ArrayList<Unit> workers;
@@ -33,6 +34,9 @@ public class InfoManager {
 	//for knowing when you last saw a given enemy unit (unit id -> turn last seen)
 	HashMap<Integer,Integer> enemyLastSeen;
 	
+	//for combat
+	HashMap<Integer,TargetUnit> targetUnits;
+	
 	// Squads
 	ArrayList<WorkerSquad> workerSquads;
 	ArrayList<RocketSquad> rocketSquads;
@@ -42,9 +46,10 @@ public class InfoManager {
     ArrayList<Region> regions;
     Tile[][] tiles;	
 
-	public InfoManager(GameController g) {
+	public InfoManager(GameController g, MagicNumbers mn) {
 		gc = g;
-
+		magicNums = mn;
+		
 		comms = new Comms(gc);
 
 		workerSquads = new ArrayList<WorkerSquad>();
@@ -63,6 +68,8 @@ public class InfoManager {
 		
 		enemyLastSeen = new HashMap<Integer,Integer>();
 
+		targetUnits = new HashMap<Integer,TargetUnit>();
+		
         int height = (int) gc.startingMap(myPlanet).getHeight();
         int width = (int) gc.startingMap(myPlanet).getWidth();
 
@@ -81,6 +88,8 @@ public class InfoManager {
 		fighters = new ArrayList<Unit>();
 
 		unassignedUnits = new ArrayList<Unit>();
+		
+		targetUnits.clear();
 
 		//keeping track of our/enemy units, squad management
 		VecUnit units = gc.units();
@@ -113,6 +122,8 @@ public class InfoManager {
 			else{
 				addEnemyUnit(unit);
 				enemyLastSeen.put(unit.id(),(int) gc.round());
+				TargetUnit tu = new TargetUnit(unit.id(),unit.health(),unit.damage(),unit.location().mapLocation());
+				targetUnits.put(unit.id(), tu);
 			}
 		}
 
@@ -154,14 +165,13 @@ public class InfoManager {
 		//updating map info
 		for(int x = 0; x < tiles.length; x++){
 			for(int y = 0; y < tiles[0].length; y++){
-				MapLocation loc = new MapLocation(myPlanet, x, y);
+				MapLocation loc = tiles[x][y].myLoc;
 				if(gc.canSenseLocation(loc)){
 					tiles[x][y].roundLastUpdated = (int) gc.round();
                     tiles[x][y].updateKarbonite(gc.karboniteAt(loc));
+                    tiles[x][y].enemiesUpdated = false;
                     // TODO: check if there's now a factory there
                     //      (to update walkability)
-                    // TODO: figure out how dangerous the tile is
-
                 }
 			}
 		}
@@ -262,7 +272,7 @@ public class InfoManager {
                         regions.add(newRegion);
                     } else {
                         // impassible terrain
-                        tiles[x][y] = new Tile(x, y, false, startingMap.initialKarboniteAt(loc), null);
+                        tiles[x][y] = new Tile(x, y, false, startingMap.initialKarboniteAt(loc), null, loc, magicNums);
                     }
                 }
             }
@@ -273,7 +283,7 @@ public class InfoManager {
     //      from it to the given region
     public void floodfill(PlanetMap startingMap, Region region, MapLocation loc){
         long karbs = startingMap.initialKarboniteAt(loc);
-        tiles[loc.getX()][loc.getY()] = new Tile(loc.getX(), loc.getY(), true, karbs, region);
+        tiles[loc.getX()][loc.getY()] = new Tile(loc.getX(), loc.getY(), true, karbs, region, loc, magicNums);
         region.tiles.add(tiles[loc.getX()][loc.getY()]);
         region.karbonite += karbs;
 

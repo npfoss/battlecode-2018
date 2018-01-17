@@ -134,7 +134,8 @@ public class CombatSquad extends Squad{
 		 *  determine which enemy units can be hit by each unit type.
 		 *- For each unit that is attack-ready, determine which units it can hit taking into account the fact that if it is
 		 *  move-ready it can move first, keeping a list of all enemies that can be hit.
-		 *- Iterate through all enemies we can hit in order of ascending health. For each one:
+		 *- First go through mages in order of least it can hit and take into account damage they can do
+		 *- Iterate through all enemies we can hit in order of ascending remaining health. For each one:
 		 *	- Iterate through all our units that can hit them this turn in order of ascending total enemies that one can hit.
 		 *	  If it needs to move to a tile, "claim" it as being occupied by it at the end of the turn. Update the "enemy hit list"
 		 *    of units next to the tile it claimed. If there is a unit on the tile it claimed, first make sure you're not
@@ -144,21 +145,25 @@ public class CombatSquad extends Squad{
 		 *  left is determining the moves of the remaining move-ready units.
 		 *- For each remaining unit, score each tile based on either taking as little damage as possible if we're retreating
 		 *  or getting as close as possible to the targetLoc if we're attacking (go from highest to least health order so that
-		 *  higher health units move toward the front) -- while minimizing damage enemies can do to us next turn
+		 *  higher health units move toward the front if we're attacking, opposite if retreating) while minimizing damage
 		 *- Process attacks of units that are attacking before moving
 		 *- Process all moves
 		 *- Process attacks of remaining attack ready units
 		 *
 		 *Data Structures:
 		 *- Tile to store which enemy units can be hit by each unit type and whether or not the tile is claimed
+		 *- CombatUnit to store all the various shit we need to store
+		 *- TargetUnit to store all the various enemy shit we need to store
+		 *
 		 *- HashMap of friendly ID to list of enemy IDs for which units we can hit for each friendly unit which can attack
 		 *- HashMap of enemy ID to list of friendly IDs which can hit it
+		 *- TreeMap of enemy ID to health remaining taking into account planned attacks
 		 *- HashMap of friendly ID to friendly ID which it has dependency on
 		 *- HashMap for friendly ID to enemy ID of attacks that should be processed before moving
 		 *- HashMap for friendly ID to enemy ID of attacks that should be processed after moving
 		 *- HashMap of friendly ID to planned move direction
 		 */
-		
+
 		
 		
 		/* below lies dumb micro

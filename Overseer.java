@@ -19,7 +19,7 @@ public class Overseer{
 
         strat = Strategy.UNSURE;
 
-        infoMan = new InfoManager(gc);
+        infoMan = new InfoManager(gc,magicNums);
         workerMan = new WorkerManager(infoMan,gc);
         combatMan = new CombatManager(infoMan,gc,magicNums);
         nav = new Nav(infoMan);
@@ -60,6 +60,8 @@ public class Overseer{
         for(CombatSquad cs : infoMan.combatSquads){
             cs.move(nav);
         }
+        
+        System.out.println("Time left: " + gc.getTimeLeftMs());
         gc.nextTurn();
     }
 }
