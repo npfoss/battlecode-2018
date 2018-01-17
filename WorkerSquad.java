@@ -2,24 +2,38 @@ import bc.*;
 import java.util.ArrayList;
 
 public class WorkerSquad extends Squad {
-	Boolean madeBlueprint = false;
+
+    UnitType toBuild;
 	public WorkerSquad(GameController g) {
 		super(g);
+        toBuild = UnitType.Factory;
 	}
 
 	public void update() {
 		if(requestedUnits.isEmpty())
 			requestedUnits.add(UnitType.Worker);
+		urgency = 64-8*units.size();
 	}
 	public void move(Nav nav) {
 		for(int id : units) {
 			Unit worker = gc.unit(id);
 			//For now we shall replicate once at the start.
-			if(gc.round() == 1)
-			for(Direction dirToReplicate : Utils.orderedDirections) {
-				if (gc.canReplicate(id, dirToReplicate)) {
-					gc.replicate(id, dirToReplicate);
-					break;
+			if(gc.round() == 1) {
+				if(targetLoc != null) {
+					for(Direction dirToReplicate : Utils.directionsToward(worker.location().mapLocation().directionTo(targetLoc))) {
+						if (gc.canReplicate(id, dirToReplicate)) {
+							gc.replicate(id, dirToReplicate);
+							break;
+						}
+					}
+				}
+				else {
+					for(Direction dirToReplicate : Utils.orderedDirections) {
+						if (gc.canReplicate(id, dirToReplicate)) {
+							gc.replicate(id, dirToReplicate);
+							break;
+						}
+					}
 				}
 			}
 			switch (objective) {
@@ -42,12 +56,11 @@ public class WorkerSquad extends Squad {
 					}
 					if(worker.location().mapLocation().isAdjacentTo(targetLoc)) {
 						//We're here! Lets make a blueprint/work on building it up.
-						if(!madeBlueprint) {
+						if(!(gc.hasUnitAtLocation(targetLoc) && gc.senseUnitAtLocation(targetLoc).unitType() == toBuild)) {
 							Direction dirToBuild = worker.location().mapLocation().directionTo(targetLoc);
 							if (gc.karbonite() > bc.bcUnitTypeBlueprintCost(toBuild)
 									&& gc.canBlueprint(id, toBuild, dirToBuild)) {
 								gc.blueprint(worker.id(), toBuild, dirToBuild);
-								madeBlueprint = true;
 							}
 						}
 						if(worker.location().mapLocation().isAdjacentTo(targetLoc)) {
@@ -59,17 +72,20 @@ public class WorkerSquad extends Squad {
 							}
 						}
 						//System.out.println(gc.senseUnitAtLocation(targetLoc).unitType());
-						if(gc.hasUnitAtLocation(targetLoc) && gc.senseUnitAtLocation(targetLoc).structureIsBuilt() != 0) {
+						if(gc.hasUnitAtLocation(targetLoc) && gc.senseUnitAtLocation(targetLoc).unitType() == toBuild && gc.senseUnitAtLocation(targetLoc).structureIsBuilt() != 0) {
 							objective = Objective.NONE;
 						}
 					}
 				}
 				else {
-					//we are told to build without a location??? angrily build in all directions.
+					//we are told to build without a location??? angrily build in a random direction directions.
 					VecUnit vu = gc.senseNearbyUnits(worker.location().mapLocation(), 2);
 					for (int i = 0; i < vu.size(); i++) {
 						if (gc.canBuild(id, vu.get(i).id())) {
 							gc.build(id, vu.get(i).id());
+						}
+						if(vu.get(i).structureIsBuilt()!=0) {
+							objective = Objective.NONE;
 						}
 					}
 					for(Direction dirToBuild : Utils.orderedDirections) {
@@ -79,11 +95,11 @@ public class WorkerSquad extends Squad {
 							break;
 						}
 					}
-					
-
 				}
 			break;
 		case MINE:
+			gc.disintegrateUnit(id);
+			System.out.println(gc.startingMap(Planet.Earth).getInitial_units().size());
 			break;
 		case BOARD_ROCKET:
 			break;

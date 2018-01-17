@@ -7,7 +7,40 @@ public class Utils{
     public static Direction[] orderedDirections =
         {Direction.East, Direction.Southeast, Direction.South, Direction.Southwest,
          Direction.West, Direction.Northwest, Direction.North, Direction.Northeast};
+    public static Direction[] orderedDiagonals =
+        {Direction.Southeast, Direction.Southwest,
+         Direction.Northwest, Direction.Northeast};
 
+    public static Direction[] directionsToward(Direction dir) {
+    	 Direction left = dir;
+         Direction right = dir;
+         Direction[] ret = new Direction[8];
+         ret[0] = dir;
+         int counter = 1;
+         for (int i = 0; i < 3; i++){
+             left = Utils.rotateLeft(left);
+             right = Utils.rotateRight(right);
+             ret[counter++] = left;
+             ret[counter++] = right;
+         }
+         ret[7] = oppositeDir(dir);
+         return ret;
+    }
+    
+    public static Direction oppositeDir(Direction dir){
+        switch(dir){
+            case North: return Direction.South;
+            case Northwest: return Direction.Southeast;
+            case West: return Direction.East;
+            case Southwest: return Direction.Northeast;
+            case South: return Direction.North;
+            case Southeast: return Direction.Northwest;
+            case East: return Direction.West;
+            case Northeast: return Direction.Southwest;
+        }
+        return Direction.Center;
+    } 
+    
     public static Direction rotateLeft(Direction dir){
         switch(dir){
             case North: return Direction.Northwest;
