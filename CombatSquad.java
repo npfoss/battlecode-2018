@@ -128,7 +128,29 @@ public class CombatSquad extends Squad{
 		 * 4. Minimize distance to line between targetLoc and nearest enemy if defending
 		 * 5. Give special priority to minimizing damage taken by higher priority units (factories,etc.)
 		 */
-		//for now, loop through units individually TODO: make this smarter
+		
+		/*Implementation: //TODO: deal with special abilities, healers in general if we build them
+		 *- For each tile reachable by our units on this turn that is passable and empty or occupied by our move-ready robot, 
+		 *  determine which enemy units can be hit by each unit type.
+		 *- For each unit that is attack-ready, determine which units it can hit taking into account the fact that if it is
+		 *  move-ready it can move first, keeping a list of all enemies that can be hit.
+		 *- Iterate through all enemies we can hit in order of ascending health. For each one:
+		 *	- Iterate through all our units that can hit them this turn in order of ascending total enemies that one can hit.
+		 *	  If it needs to move to a tile, "claim" it as being occupied by it at the end of the turn. Update the "enemy hit list"
+		 *    of units next to the tile it claimed. If there is a unit on the tile it claimed, first make sure you're not
+		 *    creating an unresolvable circular dependency. Then update a "dependency" that you need them to move before you can.
+		 *  - Once you've claimed enough firepower to kill the unit, move on and update the enemy hit lists accordingly.
+		 *- Once we've accounted for killing all enemy units that can be attacked or we run out of attack-ready units, all that's
+		 *  left is determining the moves of the remaining move-ready units.
+		 *- For each remaining unit, score each tile based on either taking as little damage as possible if we're retreating
+		 *  or getting as close as possible to the targetLoc if we're attacking (go from highest to least health order so that
+		 *  higher health units move toward the front)
+		 *- Process attacks of units that are attacking before moving
+		 *- Process all moves
+		 *- Process attacks of remaining attack ready units
+		 */
+		
+		/* below lies dumb micro
 		for(int uid: swarmUnits){
 			Unit u = gc.unit(uid);
 			MapLocation myLoc = u.location().mapLocation();
@@ -202,7 +224,7 @@ public class CombatSquad extends Squad{
 						gc.attack(uid, idToAttack);
 				}
 			}
-		}
+		}*/
 	}
 
 	private boolean shouldWeRetreat(MapLocation swarmLoc){
