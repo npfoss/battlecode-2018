@@ -144,7 +144,7 @@ public class CombatSquad extends Squad{
 		 *  left is determining the moves of the remaining move-ready units.
 		 *- For each remaining unit, score each tile based on either taking as little damage as possible if we're retreating
 		 *  or getting as close as possible to the targetLoc if we're attacking (go from highest to least health order so that
-		 *  higher health units move toward the front)
+		 *  higher health units move toward the front) -- while minimizing damage enemies can do to us next turn
 		 *- Process attacks of units that are attacking before moving
 		 *- Process all moves
 		 *- Process attacks of remaining attack ready units
