@@ -148,6 +148,15 @@ public class CombatSquad extends Squad{
 		 *- Process attacks of units that are attacking before moving
 		 *- Process all moves
 		 *- Process attacks of remaining attack ready units
+		 *
+		 *Data Structures:
+		 *- Tile to store which enemy units can be hit by each unit type and whether or not the tile is claimed
+		 *- HashMap of friendly ID to list of enemy IDs for which units we can hit for each friendly unit which can attack
+		 *- HashMap of enemy ID to list of friendly IDs which can hit it
+		 *- HashMap of friendly ID to friendly ID which it has dependency on
+		 *- HashMap for friendly ID to enemy ID of attacks that should be processed before moving
+		 *- HashMap for friendly ID to enemy ID of attacks that should be processed after moving
+		 *- HashMap of friendly ID to planned move direction
 		 */
 		
 		/* below lies dumb micro
