@@ -33,7 +33,7 @@ public class CombatManager{
 			}
 			if(stop)
 				continue;
-			CombatSquad cs = new CombatSquad(gc);
+			CombatSquad cs = new CombatSquad(gc,infoMan);
 			cs.objective = Objective.ATTACK_LOC;
 			cs.targetLoc = loc;
 			cs.update();
@@ -49,7 +49,7 @@ public class CombatManager{
 	// remember, the squads will move on their own after you update everything
 	public void update(Strategy strat){
 		if(infoMan.combatSquads.size()==0) {
-			CombatSquad cs = new CombatSquad(gc);
+			CombatSquad cs = new CombatSquad(gc,infoMan);
 			cs.objective = Objective.EXPLORE;
 			cs.update();
 			infoMan.combatSquads.add(cs);

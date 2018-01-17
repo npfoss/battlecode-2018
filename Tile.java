@@ -53,10 +53,10 @@ public class Tile{
     }
     
     public void removeEnemy(TargetUnit tu){
-    	enemiesWithinRangerRange.remove(tu.id);
-    	enemiesWithinKnightRange.remove(tu.id);
-    	enemiesWithinMageRange.remove(tu.id);
-    	enemiesWhichCouldHitUs.remove(tu.id);
+    	enemiesWithinRangerRange.remove(tu.ID);
+    	enemiesWithinKnightRange.remove(tu.ID);
+    	enemiesWithinMageRange.remove(tu.ID);
+    	enemiesWhichCouldHitUs.remove(tu.ID);
     }
     
     public void updateEnemies(GameController gc){
@@ -99,4 +99,13 @@ public class Tile{
     		}
     	}
     }
+
+	public HashSet<Integer> getEnemiesWithinRange(UnitType type) {
+		switch(type){
+		case Ranger: return enemiesWithinRangerRange;
+		case Knight: return enemiesWithinKnightRange;
+		case Mage: return enemiesWithinMageRange;
+		default: return new HashSet<Integer>();
+		}
+	}
 }

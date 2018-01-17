@@ -1,16 +1,19 @@
 import bc.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class CombatSquad extends Squad{
 
 	//keep track of units into two groups: those with the main swarm and those separated from it
 	ArrayList<Integer> swarmUnits;
 	ArrayList<Integer> separatedUnits;
+	InfoManager infoMan;
 
-	public CombatSquad(GameController g) {
+	public CombatSquad(GameController g, InfoManager im) {
 		super(g);
 		swarmUnits = new ArrayList<Integer>();
 		separatedUnits = new ArrayList<Integer>();
+		infoMan = im;
 	}
 
 	public void update(){
@@ -129,16 +132,8 @@ public class CombatSquad extends Squad{
 		 * 5. Give special priority to minimizing damage taken by higher priority units (factories,etc.)
 		 */
 		
-		/*Implementation: //TODO: deal with special abilities, healers in general if we build them
-		 *- For each unit that is attack-ready, determine which units it can hit taking into account the fact that if it is
-		 *  move-ready it can move first, keeping a list of all enemies that can be hit.
-		 *- First go through mages in order of least it can hit and take into account damage they can do
-		 *- Iterate through all enemies we can hit in order of ascending remaining health. For each one:
-		 *	- Iterate through all our units that can hit them this turn in order of ascending total enemies that one can hit.
-		 *	  If it needs to move to a tile, "claim" it as being occupied by it at the end of the turn. Update the "enemy hit list"
-		 *    of units next to the tile it claimed. If there is a unit on the tile it claimed, first make sure you're not
-		 *    creating an unresolvable circular dependency. Then update a "dependency" that you need them to move before you can.
-		 *  - Once you've claimed enough firepower to kill the unit, move on and update the enemy hit lists accordingly.
+	     //TODO: deal with special abilities, healers in general if we build them , take into acount mages
+		 /*
 		 *- Once we've accounted for killing all enemy units that can be attacked or we run out of attack-ready units, all that's
 		 *  left is determining the moves of the remaining move-ready units.
 		 *- For each remaining unit, score each tile based on either taking as little damage as possible if we're retreating
@@ -162,7 +157,63 @@ public class CombatSquad extends Squad{
 		 *- HashMap of friendly ID to planned move direction
 		 */
 		
-		//Create HashMap of CombatUnits for each unit that is either move or attack ready
+		//Create ArrayList of CombatUnits for each unit that is either move or attack ready
+		ArrayList<CombatUnit> combatants = new ArrayList<CombatUnit>();
+		for(int uid: swarmUnits){
+			Unit u = gc.unit(uid);
+			if(u.movementHeat()<10 || u.attackHeat()<10){
+				CombatUnit cu = new CombatUnit(uid,u.damage(),u.health(),u.attackHeat()<10,u.movementHeat()<10,u.location().mapLocation(),u.unitType());
+				combatants.add(cu);
+			}
+		}
+		
+		/* For each unit that is attack-ready, determine which units it can hit taking into account the fact that if it is
+		 * move-ready it can move first, keeping a list of all enemies that can be hit.
+		 */
+		HashSet<Integer> targets = new HashSet<Integer>();
+		int[] dx = {-1,-1,-1,0,0,0,1,1,1};
+		int[] dy = {-1,0,1,-1,0,1,-1,0,1};
+		int x,y,nx,ny;
+		for(CombatUnit cu: combatants){
+			if(cu.canAttack){
+				x = cu.myLoc.getX();
+				y = cu.myLoc.getY();
+				if(cu.canMove){
+					for(int i=0; i<9; i++){
+						nx = x + dx[i];
+						ny = y + dy[i];
+						if(!infoMan.tiles[nx][ny].accessible)
+							continue;
+						HashSet<Integer> options = infoMan.tiles[nx][ny].getEnemiesWithinRange(cu.type);
+						for(int opt: options){
+							cu.addOption(opt,infoMan.tiles[nx][ny]);
+							targets.add(opt);
+							TargetUnit tu = infoMan.targetUnits.get(opt);
+							tu.whoCanHitMe.add(cu.ID);
+							infoMan.targetUnits.put(opt, tu);
+						}
+					}
+				}
+				else{
+					HashSet<Integer> options = infoMan.tiles[x][y].getEnemiesWithinRange(cu.type);
+					for(int opt: options){
+						cu.addOption(opt,infoMan.tiles[x][y]);
+						targets.add(opt);
+						TargetUnit tu = infoMan.targetUnits.get(opt);
+						tu.whoCanHitMe.add(cu.ID);
+						infoMan.targetUnits.put(opt, tu);
+					}
+				}
+			}
+		}
+		
+		/*  - Iterate through all enemies we can hit in order of ascending remaining health. For each one:
+		 *	- Iterate through all our units that can hit them this turn in order of ascending total enemies that one can hit.
+		 *	  If it needs to move to a tile, "claim" it as being occupied by it at the end of the turn. Update the "enemy hit list"
+		 *    of units next to the tile it claimed. If there is a unit on the tile it claimed, first make sure you're not
+		 *    creating an unresolvable circular dependency. Then update a "dependency" that you need them to move before you can.
+		 *  - Once you've claimed enough firepower to kill the unit, move on and update the enemy hit lists accordingly.*/
+		
 		
 		/* below lies dumb micro
 		for(int uid: swarmUnits){

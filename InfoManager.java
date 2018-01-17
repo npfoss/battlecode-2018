@@ -122,7 +122,7 @@ public class InfoManager {
 			else{
 				addEnemyUnit(unit);
 				enemyLastSeen.put(unit.id(),(int) gc.round());
-				TargetUnit tu = new TargetUnit(unit.id(),unit.health(),unit.damage(),unit.location().mapLocation());
+				TargetUnit tu = new TargetUnit(unit.id(),unit.health(),unit.damage(),unit.location().mapLocation(),unit.unitType());
 				targetUnits.put(unit.id(), tu);
 			}
 		}
