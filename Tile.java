@@ -11,7 +11,7 @@ public class Tile{
     int roundLastUpdated;
     int hittableBy;
     double possibleDamage;
-    HashMap<MapLocation, Signpost> destToDir;
+    HashMap<String, Signpost> destToDir; //note: string is maploc.toString()
 
     public Tile(int ex, int why, boolean walkable, long karb, Region reg){
         x = ex;
@@ -23,7 +23,7 @@ public class Tile{
         roundLastUpdated = 0;
         hittableBy = 0;
         possibleDamage = 0;
-        destToDir = new HashMap<MapLocation, Signpost>();
+        destToDir = new HashMap<String, Signpost>();
     }
 
     public void updateKarbonite(long newKarb){
