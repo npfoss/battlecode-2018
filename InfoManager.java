@@ -140,8 +140,8 @@ public class InfoManager {
 				int id = s.units.get(i);
 				if(!ids.contains(id)){
 					s.units.remove(i);
-					s.separatedUnits.remove(i);
-					s.swarmUnits.remove(i);
+					s.separatedUnits.remove(s.separatedUnits.indexOf(id));
+					s.swarmUnits.remove(s.swarmUnits.indexOf(id));
 				}
 			}
 			s.update();
