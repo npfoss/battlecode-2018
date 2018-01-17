@@ -43,6 +43,7 @@ public class CombatSquad extends Squad{
 				swarmThreshold++;
 			}
 		}
+		System.out.println("swarm size = " + swarmUnits.size() + " swarmLoc = " + swarmLoc + " targetLoc = " + targetLoc);
 		moveToSwarm(nav);
 		boolean retreat = shouldWeRetreat(swarmLoc);
 		switch(objective){
