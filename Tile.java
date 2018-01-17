@@ -24,6 +24,7 @@ public class Tile{
     HashSet<Integer> enemiesWithinMageRange;
     boolean claimed;
     boolean enemiesUpdated;
+    boolean accessible; //contains no unit or our unit that is move ready
     
     public Tile(int ex, int why, boolean walkable, long karb, Region reg, MapLocation ml, MagicNumbers mn){
         x = ex;
@@ -39,6 +40,7 @@ public class Tile{
         enemiesWithinRangerRange = new HashSet<Integer>();
         enemiesWithinKnightRange = new HashSet<Integer>();
         enemiesWithinMageRange = new HashSet<Integer>();
+        accessible = false;
         claimed = false;
         enemiesUpdated = false;
     }
@@ -62,6 +64,18 @@ public class Tile{
     		return;
     	enemiesUpdated = true;
     	claimed = false;
+    	if(!gc.hasUnitAtLocation(myLoc)){
+        	accessible = false;
+        }
+        else if(!gc.hasUnitAtLocation(myLoc)){
+        	accessible = true;
+        }
+        else{
+        	Unit u = gc.senseUnitAtLocation(myLoc);
+        	if(u.team() == gc.team() && u.movementHeat() < 10)
+        		accessible = true;
+        	accessible = false;
+        }
     	VecUnit enemies = gc.senseNearbyUnitsByTeam(myLoc, 72, Utils.enemyTeam(gc));
     	for(int i = 0; i < enemies.size(); i++){
     		Unit enemy = enemies.get(i);

@@ -130,8 +130,6 @@ public class CombatSquad extends Squad{
 		 */
 		
 		/*Implementation: //TODO: deal with special abilities, healers in general if we build them
-		 *- For each tile reachable by our units on this turn that is passable and empty or occupied by our move-ready robot, 
-		 *  determine which enemy units can be hit by each unit type.
 		 *- For each unit that is attack-ready, determine which units it can hit taking into account the fact that if it is
 		 *  move-ready it can move first, keeping a list of all enemies that can be hit.
 		 *- First go through mages in order of least it can hit and take into account damage they can do
@@ -163,8 +161,8 @@ public class CombatSquad extends Squad{
 		 *- HashMap for friendly ID to enemy ID of attacks that should be processed after moving
 		 *- HashMap of friendly ID to planned move direction
 		 */
-
 		
+		//Create HashMap of CombatUnits for each unit that is either move or attack ready
 		
 		/* below lies dumb micro
 		for(int uid: swarmUnits){
