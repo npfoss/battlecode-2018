@@ -272,7 +272,7 @@ public class InfoManager {
                         regions.add(newRegion);
                     } else {
                         // impassible terrain
-                        tiles[x][y] = new Tile(x, y, false, startingMap.initialKarboniteAt(loc), null, loc, magicNums);
+                        tiles[x][y] = new Tile(x, y, false, startingMap.initialKarboniteAt(loc), null, loc, magicNums, this);
                     }
                 }
             }
@@ -283,7 +283,7 @@ public class InfoManager {
     //      from it to the given region
     public void floodfill(PlanetMap startingMap, Region region, MapLocation loc){
         long karbs = startingMap.initialKarboniteAt(loc);
-        tiles[loc.getX()][loc.getY()] = new Tile(loc.getX(), loc.getY(), true, karbs, region, loc, magicNums);
+        tiles[loc.getX()][loc.getY()] = new Tile(loc.getX(), loc.getY(), true, karbs, region, loc, magicNums, this);
         region.tiles.add(tiles[loc.getX()][loc.getY()]);
         region.karbonite += karbs;
 

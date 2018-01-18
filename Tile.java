@@ -11,6 +11,7 @@ public class Tile{
     Region region;
     MapLocation myLoc;
     MagicNumbers magicNums;
+    InfoManager infoMan;
 
     int roundLastUpdated;
     HashSet<Integer> enemiesWhichCouldHitUs;
@@ -26,7 +27,7 @@ public class Tile{
     boolean enemiesUpdated;
     boolean accessible; //contains no unit or our unit that is move ready
     
-    public Tile(int ex, int why, boolean walkable, long karb, Region reg, MapLocation ml, MagicNumbers mn){
+    public Tile(int ex, int why, boolean walkable, long karb, Region reg, MapLocation ml, MagicNumbers mn, InfoManager im){
         x = ex;
         y = why;
         isWalkable = walkable;
@@ -34,6 +35,7 @@ public class Tile{
         region = reg;
         myLoc = ml;
         magicNums = mn;
+        infoMan = im;
         roundLastUpdated = 0;
         possibleDamage = 0;
         destToDir = new HashMap<MapLocation, Signpost>();
@@ -57,6 +59,7 @@ public class Tile{
     	enemiesWithinKnightRange.remove(tu.ID);
     	enemiesWithinMageRange.remove(tu.ID);
     	enemiesWhichCouldHitUs.remove(tu.ID);
+    	possibleDamage -= tu.damageDealingPower;
     }
     
     public void updateEnemies(GameController gc){
@@ -77,16 +80,24 @@ public class Tile{
         	accessible = false;
         }
     	VecUnit enemies = gc.senseNearbyUnitsByTeam(myLoc, 72, Utils.enemyTeam(gc));
+    	boolean didSomething;
     	for(int i = 0; i < enemies.size(); i++){
     		Unit enemy = enemies.get(i);
     		MapLocation ml = enemy.location().mapLocation();
     		long dist = myLoc.distanceSquaredTo(ml);
-    		if(magicNums.RANGER_MIN_RANGE <= dist && dist <= magicNums.RANGER_RANGE)
+    		didSomething = false;
+    		if(magicNums.RANGER_MIN_RANGE <= dist && dist <= magicNums.RANGER_RANGE){
     			enemiesWithinRangerRange.add(enemy.id());
-    		if(dist <= magicNums.KNIGHT_RANGE)
+    			didSomething = true;
+    		}
+    		if(dist <= magicNums.KNIGHT_RANGE){
     			enemiesWithinKnightRange.add(enemy.id());
-    		if(dist <= magicNums.MAGE_RANGE)
+    			didSomething = true;
+    		}
+    		if(dist <= magicNums.MAGE_RANGE){
     			enemiesWithinMageRange.add(enemy.id());
+    			didSomething = true;
+    		}
     		//figure out if they can hit this tile next turn given that they can move once
     		int xDif = Math.abs(ml.getX() - x);
     		int yDif = Math.abs(ml.getY() - y);
@@ -96,6 +107,12 @@ public class Tile{
     		   !(enemy.unitType() == UnitType.Ranger && farthestTheyCanGet <= enemy.rangerCannotAttackRange())){
     			enemiesWhichCouldHitUs.add(enemy.id());
     			possibleDamage += enemy.damage();
+    			didSomething = true;
+    		}
+    		if(didSomething){
+    			TargetUnit tu = infoMan.targetUnits.get(enemy.id());
+    			tu.tilesWhichHitMe.add(this);
+    			infoMan.targetUnits.put(enemy.id(), tu);
     		}
     	}
     }
