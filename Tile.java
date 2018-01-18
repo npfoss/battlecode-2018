@@ -16,7 +16,7 @@ public class Tile{
     int roundLastUpdated;
     HashSet<Integer> enemiesWhichCouldHitUs;
     int possibleDamage;
-    HashMap<MapLocation, Signpost> destToDir;
+    HashMap<String, Signpost> destToDir;
     
     //for combat
     
@@ -38,7 +38,7 @@ public class Tile{
         infoMan = im;
         roundLastUpdated = 0;
         possibleDamage = 0;
-        destToDir = new HashMap<MapLocation, Signpost>();
+        destToDir = new HashMap<String, Signpost>();
         enemiesWithinRangerRange = new HashSet<Integer>();
         enemiesWithinKnightRange = new HashSet<Integer>();
         enemiesWithinMageRange = new HashSet<Integer>();

@@ -35,11 +35,11 @@ public class Overseer{
             researchMan = new ResearchManagerMars(gc, infoMan);
             rocketMan = new RocketDoNothing(gc, infoMan);
         }
-
     }
 
     public void takeTurn(){
         System.out.println("Current round: " + gc.round());
+        int start = gc.getTimeLeftMs();
         
         infoMan.update();
         strat = strat.update(infoMan);
@@ -60,8 +60,7 @@ public class Overseer{
         for(CombatSquad cs : infoMan.combatSquads){
             cs.move(nav);
         }
-        
-        System.out.println("Time left: " + gc.getTimeLeftMs());
         gc.nextTurn();
+        System.out.println("turn took " + (start + 50 - gc.getTimeLeftMs()) + ". " + gc.getTimeLeftMs() + " ms left");
     }
 }
