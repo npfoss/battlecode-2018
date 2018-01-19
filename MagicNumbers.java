@@ -1,4 +1,4 @@
-import bc.UnitType;
+import bc.*;
 
 public class MagicNumbers{
     /* Options - global constants/adjustment stuff

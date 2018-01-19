@@ -29,7 +29,7 @@ public class CombatSquad extends Squad{
 		//reassign separated units to swarm if appropriate
 		if(units.size()==0)
 			return;
-		System.out.println("cs here");
+		//System.out.println("cs here");
 		if(objective == Objective.EXPLORE){
 			explore(nav);
 			objective = objective.NONE;

@@ -68,7 +68,6 @@ public class Tile{
     	enemiesWithinMageRange.remove(tu);
     	enemiesWhichCouldHitUs.remove(tu);
     	possibleDamage -= tu.damageDealingPower;
-    	infoMan.tiles[x][y] = this;
     }
     
     public void updateTarget(TargetUnit tu){
@@ -121,6 +120,7 @@ public class Tile{
     			distFromNearestHostile = (int)dist;
     		}
     		didSomething = false;
+    		System.out.println("here");
     		if(magicNums.RANGER_MIN_RANGE <= dist && dist <= magicNums.RANGER_RANGE){
     			enemiesWithinRangerRange.add(tu);
     			didSomething = true;
