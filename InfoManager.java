@@ -14,6 +14,7 @@ public class InfoManager {
 	Comms comms;
 	Planet myPlanet;
 	MagicNumbers magicNums;
+	int height, width;
 
 	ArrayList<Unit> rockets;
 	ArrayList<Unit> workers;
@@ -70,8 +71,8 @@ public class InfoManager {
 
 		targetUnits = new HashMap<Integer,TargetUnit>();
 		
-        int height = (int) gc.startingMap(myPlanet).getHeight();
-        int width = (int) gc.startingMap(myPlanet).getWidth();
+        height = (int) gc.startingMap(myPlanet).getHeight();
+        width = (int) gc.startingMap(myPlanet).getWidth();
 
         tiles = new Tile[width][height];
         regions = new ArrayList<Region>();
@@ -122,7 +123,8 @@ public class InfoManager {
 			else{
 				addEnemyUnit(unit);
 				enemyLastSeen.put(unit.id(),(int) gc.round());
-				TargetUnit tu = new TargetUnit(unit.id(),unit.health(),unit.damage(),unit.location().mapLocation(),unit.unitType());
+				TargetUnit tu = new TargetUnit(unit.id(),unit.health(),unit.damage(),
+						unit.location().mapLocation(),unit.unitType(),unit.attackRange(), unit.knightDefense());
 				targetUnits.put(unit.id(), tu);
 			}
 		}
@@ -132,7 +134,7 @@ public class InfoManager {
 			for(int i = s.units.size()-1; i >= 0; i--){
 				int id = s.units.get(i);
 				if(!ids.contains(id)){
-					s.units.remove(i);
+					s.units.remove(id);
 				}
 			}
 			s.update();
@@ -142,7 +144,7 @@ public class InfoManager {
 			for(int i = s.units.size()-1; i >= 0; i--){
 				int id = s.units.get(i);
 				if(!ids.contains(id)){
-					s.units.remove(i);
+					s.units.remove(id);
 				}
 			}
 			s.update();
@@ -152,11 +154,22 @@ public class InfoManager {
 			for(int i = s.units.size()-1; i >= 0; i--){
 				int id = s.units.get(i);
 				if(!ids.contains(id)){
-					s.units.remove(i);
+					s.units.remove(id);
 					if(s.separatedUnits.contains(id))
 						s.separatedUnits.remove(s.separatedUnits.indexOf(id));
-					if(s.swarmUnits.contains(id))
-						s.swarmUnits.remove(s.swarmUnits.indexOf(id));
+					else{
+						CombatUnit toRemove  = new CombatUnit();
+						boolean remove = false;
+						for(CombatUnit cu: s.combatUnits){
+							if(cu.ID == id){
+								toRemove = cu;
+								remove = true;
+								break;
+							}
+						}
+						if(remove)
+							s.combatUnits.remove(toRemove);
+					}
 				}
 			}
 			s.update();

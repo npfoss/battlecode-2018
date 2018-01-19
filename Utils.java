@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.TreeSet;
 
 import bc.*;
 
@@ -105,6 +107,32 @@ public class Utils{
     	}
     	return new MapLocation(gc.planet(),x/units.size(), y/units.size());
     }
+    
+    public static MapLocation averageMapLocation(GameController gc, TreeSet<CombatUnit> units) {
+    	if(units.size() == 0)
+    		return null;
+    	int x = 0;
+    	int y = 0;
+    	for(CombatUnit cu : units) {
+    		x += cu.myLoc.getX();
+    		y += cu.myLoc.getY();
+    	}
+    	return new MapLocation(gc.planet(),x/units.size(), y/units.size());
+    }
+    
+    public static TreeSet<TargetUnit> getTargetUnits(MapLocation ml, int radius, boolean hostileOnly, InfoManager infoMan){
+    	TreeSet<TargetUnit> ret = new TreeSet<TargetUnit>(new ascendingHealthComp());
+    	for(TargetUnit tu: infoMan.targetUnits.values()){
+    		if((!hostileOnly || isTypeHostile(tu.type)) && tu.myLoc.distanceSquaredTo(ml) <= radius)
+    			ret.add(tu);
+    	}
+    	return ret;
+    }
+    
+    public static boolean isTypeHostile(UnitType ut){
+    	return ut == UnitType.Knight || ut == UnitType.Ranger || ut == UnitType.Mage;
+    }
+    
     public static Team enemyTeam(GameController gc){
     	return (gc.team() == Team.Blue ? Team.Red : Team.Blue);
     }

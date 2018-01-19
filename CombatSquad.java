@@ -8,13 +8,14 @@ import java.util.HashMap;
 public class CombatSquad extends Squad{
 
 	//keep track of units into two groups: those with the main swarm and those separated from it
-	ArrayList<Integer> swarmUnits;
+	TreeSet<CombatUnit> combatUnits;
 	ArrayList<Integer> separatedUnits;
 	InfoManager infoMan;
+	MapLocation swarmLoc;
 
 	public CombatSquad(GameController g, InfoManager im) {
 		super(g);
-		swarmUnits = new ArrayList<Integer>();
+		combatUnits = new TreeSet<CombatUnit>(new AscendingStepsComp());
 		separatedUnits = new ArrayList<Integer>();
 		infoMan = im;
 	}
@@ -29,36 +30,41 @@ public class CombatSquad extends Squad{
 		if(units.size()==0)
 			return;
 		System.out.println("cs here");
-		if(swarmUnits.size()==0){
+		if(objective == Objective.EXPLORE){
+			explore(nav);
+			objective = objective.NONE;
+			return;
+		}
+		if(combatUnits.size()==0){
 			for(int id: separatedUnits){
-				swarmUnits.add(id);
+				Unit u = gc.unit(id);
+				CombatUnit cu = new CombatUnit(id,u.damage(),u.health(),u.movementHeat()<10,u.attackHeat()<10,
+						u.location().mapLocation(),u.unitType(),nav.optimalStepsTo(u.location().mapLocation(), targetLoc));
+				combatUnits.add(cu);
 			}
 			separatedUnits.clear();
 		}
-		MapLocation swarmLoc = Utils.averageMapLocation(gc, swarmUnits);
+		MapLocation swarmLoc = Utils.averageMapLocation(gc, combatUnits);
 		//TODO: think about if this is actually a good threshold
-		int swarmThreshold = swarmUnits.size() + 1;
+		int swarmThreshold = combatUnits.size() + 1;
 		for(int i = separatedUnits.size()-1; i>=0; i--){
 			Unit u = gc.unit(separatedUnits.get(i));
 			if(!u.location().isOnMap())
 				continue;
 			if(u.location().mapLocation().distanceSquaredTo(swarmLoc) <= swarmThreshold){
 				separatedUnits.remove(i);
-				swarmUnits.add(u.id());
-				swarmLoc = Utils.averageMapLocation(gc, swarmUnits);
+				CombatUnit cu = new CombatUnit(u.id(),u.damage(),u.health(),u.movementHeat()<10,u.attackHeat()<10,
+						u.location().mapLocation(),u.unitType(),nav.optimalStepsTo(u.location().mapLocation(), targetLoc));
+				combatUnits.add(cu);
 				swarmThreshold++;
 			}
 		}
-		System.out.println("swarm size = " + swarmUnits.size() + " swarmLoc = " + swarmLoc + " targetLoc = " + targetLoc);
+		System.out.println("swarm size = " + combatUnits.size() + " swarmLoc = " + swarmLoc + " targetLoc = " + targetLoc);
 		moveToSwarm(nav);
-		boolean retreat = shouldWeRetreat(swarmLoc);
-		//TODO: just nav if we don't really see any enemy units
-		switch(objective){
-		case EXPLORE: explore(nav, swarmLoc);
-		default: doSquadMicro(retreat,swarmLoc,nav);
-		}
+		boolean retreat = shouldWeRetreat();
+		doSquadMicro(retreat,nav);
 		//check if we're done with our objective
-		boolean done = areWeDone(swarmLoc);
+		boolean done = areWeDone();
 		if(done){
 			objective = Objective.NONE;
 		}
@@ -94,7 +100,7 @@ public class CombatSquad extends Squad{
 		}*/
 	}
 
-	private boolean areWeDone(MapLocation swarmLoc){
+	private boolean areWeDone(){
 		switch(objective){
 		case ATTACK_LOC: return swarmLoc.distanceSquaredTo(targetLoc) < 9 && gc.senseNearbyUnitsByTeam(swarmLoc, 25, Utils.enemyTeam(gc)).size() == 0;
 		default: return false;
@@ -115,18 +121,15 @@ public class CombatSquad extends Squad{
 		}
 	}
 
-	private void explore(Nav nav, MapLocation swarmLoc){
+	private void explore(Nav nav){
 		Direction dirToMove = Utils.orderedDirections[(int) (8*Math.random())];
-		MapLocation targetL = swarmLoc.addMultiple(dirToMove,5);
-		for(int uid: swarmUnits){
-			Unit u = gc.unit(uid);
-			Direction moveDir = nav.dirToMove(u.location().mapLocation(),targetL);
-			if(gc.canMove(uid, moveDir))
-				gc.moveRobot(uid, moveDir);
+		for(int uid: units){
+			if(gc.canMove(uid, dirToMove))
+				gc.moveRobot(uid, dirToMove);
 		}
 	}
 
-	private void doSquadMicro(boolean retreat, MapLocation swarmLoc, Nav nav){
+	private void doSquadMicro(boolean retreat, Nav nav){
 		/*
 		 * General goals:
 		 * 1. Maximize priority of enemy units killed
@@ -134,7 +137,47 @@ public class CombatSquad extends Squad{
 		 * 3. Minimize possible damage done to us next turn.
 		 * 4. If not retreating, minimize distance between us and the enemy.
 		 */
-		 
+
+		TreeSet<CombatUnit> healers = new TreeSet<CombatUnit>(new AscendingStepsComp());
+		TreeSet<CombatUnit> rangers = new TreeSet<CombatUnit>(new AscendingStepsComp());
+		TreeSet<CombatUnit> knights = new TreeSet<CombatUnit>(new AscendingStepsComp());
+		TreeSet<CombatUnit> mages = new TreeSet<CombatUnit>(new AscendingStepsComp());
+
+		//update combat units and tiles near them
+		int[] dx = {-1,-1,-1,0,0,0,1,1,1};
+		int[] dy = {-1,0,1,-1,0,1,-1,0,1};
+		int x,y,nx,ny;
+		for(CombatUnit cu: combatUnits){
+			cu.update(gc);
+			if(cu.canMove){
+				x = cu.myLoc.getX();
+				y = cu.myLoc.getY();
+				for(int i = 0; i < 9; i++){
+					nx = x + dx[i];
+					ny = y + dy[i];
+					if(nx >= infoMan.width || nx<0 || ny >= infoMan.height || ny<0 || !infoMan.tiles[nx][ny].isWalkable)
+						continue;
+					infoMan.tiles[nx][ny].updateContains(gc);
+					infoMan.tiles[nx][ny].containsUpdated = true;
+					if(infoMan.tiles[nx][ny].containsUnit)
+						continue;
+					infoMan.tiles[nx][ny].updateEnemies(gc);
+				}
+			}
+			switch(cu.type){
+			case Ranger: rangers.add(cu);
+			case Knight: knights.add(cu);
+			case Healer: healers.add(cu);
+			default: mages.add(cu);
+			}
+		}
+
+		doKnightMicro(knights,retreat,swarmLoc,nav);
+		doMageMicro(mages,retreat,swarmLoc,nav);
+		doRangerMicro(rangers,retreat,swarmLoc,nav);
+		doHealerMicro(healers,retreat,swarmLoc,nav);
+
+
 		/* Below lies too complicated micro
 		 * 
 		 *
@@ -160,7 +203,7 @@ public class CombatSquad extends Squad{
 		 *- HashMap for friendly ID to enemy ID of attacks that should be processed after moving
 		 *- HashMap of friendly ID to planned move direction
 		 *
-		
+
 		//Create ArrayList of CombatUnits for each unit that is either move or attack ready
 		HashMap<Integer,CombatUnit> combatants = new HashMap<Integer,CombatUnit>();
 		TreeSet<CombatUnit> attackReadyCombatants = new TreeSet<CombatUnit>(new AscendingOptionsComp());
@@ -173,7 +216,7 @@ public class CombatSquad extends Squad{
 					attackReadyCombatants.add(cu);
 			}
 		}
-		
+
 		/* For each unit that is attack-ready, determine which units it can hit taking into account the fact that if it is
 		 * move-ready it can move first, keeping a list of all enemies that can be hit.
 		 *
@@ -212,14 +255,14 @@ public class CombatSquad extends Squad{
 			}
 			combatants.put(cu.ID, cu);
 		}
-		
-		*  - Iterate through all enemies we can hit in order of ascending remaining health. For each one:
+
+		 *  - Iterate through all enemies we can hit in order of ascending remaining health. For each one:
 		 *	- Iterate through all our units that can hit them this turn in order of ascending total enemies that one can hit.
 		 *	  If it needs to move to a tile, "claim" it as being occupied by it at the end of the turn. Update the "enemy hit list"
 		 *    of units next to the tile it claimed. If there is a unit on the tile it claimed, first make sure you're not
 		 *    creating an unresolvable circular dependency. Then update a "dependency" that you need them to move before you can.
 		 *  - Once you've claimed enough firepower to kill the unit, move on and update the enemy hit lists accordingly.*
-		
+
 		for(TargetUnit target: targets){
 			for(CombatUnit cu: target.whoCanHitMe){
 				//determine move
@@ -229,8 +272,8 @@ public class CombatSquad extends Squad{
 				int damageDone = (int) (cu.damage - gc.unit(target.ID).knightDefense());
 			}
 		}
-		*/
-		
+		 */
+
 		/* below lies dumb micro
 		for(int uid: swarmUnits){
 			Unit u = gc.unit(uid);
@@ -308,25 +351,181 @@ public class CombatSquad extends Squad{
 		}*/
 	}
 
-	private boolean shouldWeRetreat(MapLocation swarmLoc){
+	private void doHealerMicro(TreeSet<CombatUnit> healers, boolean retreat, MapLocation swarmLoc, Nav nav) {
+		// TODO Auto-generated method stub
+	}
+
+	private void doRangerMicro(TreeSet<CombatUnit> rangers, boolean retreat, MapLocation swarmLoc, Nav nav) {
+		//first go through rangers which can attack already
+		for(CombatUnit cu: rangers.descendingSet()){
+			if(!cu.canAttack)
+				continue;
+			Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
+			if(myTile.enemiesWithinRangerRange.size() > 0){
+				gc.attack(cu.ID, myTile.enemiesWithinRangerRange.first().ID);
+				updateDamage(cu,myTile.enemiesWithinRangerRange.first());
+				cu.canAttack = false;
+			}
+		}
+
+		//now if retreating, run away
+		if(retreat){
+			for(CombatUnit cu: rangers.descendingSet()){
+				if(cu.canMove)
+					cu = runAway(cu);
+			}
+			return;
+		}
+
+		//otherwise, do moves and attacks heuristically
+		for(CombatUnit cu: rangers){
+			if(!cu.canMove){
+				continue;
+			}
+			if(cu.canAttack){
+				cu = rangerMoveAndAttack(cu,nav);
+			}
+			else{
+				cu = rangerMove(cu,nav);
+			}
+		}
+	}
+
+
+
+	private CombatUnit rangerMove(CombatUnit cu, Nav nav) {
+		Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
+		//if we're not near any enemies nav, otherwise run away
+		if(myTile.distFromNearestHostile == 100){
+			Direction d = nav.dirToMove(cu.myLoc, targetLoc);
+			gc.moveRobot(cu.ID, d);
+			cu.myLoc = cu.myLoc.add(d);
+			cu.canMove = false;
+			return cu;
+		}
+		return runAway(cu);
+	}
+
+	private CombatUnit rangerMoveAndAttack(CombatUnit cu, Nav nav) {
+		int[] dx = {-1,-1,-1,0,0,0,1,1,1};
+		int[] dy = {-1,0,1,-1,0,1,-1,0,1};
+		int x,y,nx,ny;
+		x = cu.myLoc.getX();
+		y = cu.myLoc.getY();
+		int toAttack = -1;
+		int bestIndex = -1;
+		int bestScore = -10000;
+		int score;
+		for(int i = 0; i < 9; i++){
+			nx = x + dx[i];
+			ny = y + dy[i];
+			if(nx<0||nx>=infoMan.width||ny<0||ny>=infoMan.height)
+				continue;
+			Tile t = infoMan.tiles[nx][ny];
+			if(!t.isWalkable || t.containsUnit || t.enemiesWithinRangerRange.size()==0)
+				continue;
+			score = (int) (t.distFromNearestHostile - t.myLoc.distanceSquaredTo(swarmLoc));
+			if(score>bestScore){
+				bestScore = score;
+				bestIndex = i;
+				toAttack = t.enemiesWithinRangerRange.first().ID;
+			}
+		}
+		if(toAttack != -1){
+			//we found someone to attack
+			Direction toMove = indexToDirection(bestIndex);
+			if(toMove != Direction.Center){
+				gc.moveRobot(cu.ID, toMove);
+				cu.myLoc = new MapLocation(infoMan.myPlanet,x+dx[bestIndex],y+dy[bestIndex]);
+				cu.canMove = false;
+			}
+			gc.attack(cu.ID, toAttack);
+			updateDamage(cu,infoMan.targetUnits.get(toAttack));
+			cu.canAttack = false;
+			return cu;
+		}
+		//otherwise just nav there
+		Direction d = nav.dirToMove(cu.myLoc, targetLoc);
+		gc.moveRobot(cu.ID, d);
+		cu.myLoc = cu.myLoc.add(d);
+		cu.canMove = false;
+		return cu;
+	}
+
+	private CombatUnit runAway(CombatUnit cu) {
+		int[] dx = {-1,-1,-1,0,0,0,1,1,1};
+		int[] dy = {-1,0,1,-1,0,1,-1,0,1};
+		int x,y,nx,ny;
+		x = cu.myLoc.getX();
+		y = cu.myLoc.getY();
+		int bestIndex = -1;
+		int bestScore = -10000;
+		int score;
+		for(int i = 0; i < 9; i++){
+			nx = x + dx[i];
+			ny = y + dy[i];
+			if(nx<0||nx>=infoMan.width||ny<0||ny>=infoMan.height)
+				continue;
+			Tile t = infoMan.tiles[nx][ny];
+			if(!t.isWalkable || t.containsUnit)
+				continue;
+			score = (int) (t.distFromNearestHostile*2 - t.myLoc.distanceSquaredTo(swarmLoc));
+			if(score>bestScore){
+				bestScore = score;
+				bestIndex = i;
+			}
+		}
+		Direction toMove = indexToDirection(bestIndex);
+		if(toMove != Direction.Center){
+			gc.moveRobot(cu.ID, toMove);
+			cu.myLoc = new MapLocation(infoMan.myPlanet,x+dx[bestIndex],y+dy[bestIndex]);
+		}
+		return cu;
+	}
+
+	private Direction indexToDirection(int i){
+		switch(i){
+		case 0: return Direction.Southwest;
+		case 1: return Direction.West;
+		case 2: return Direction.Northwest;
+		case 3: return Direction.South;
+		case 4: return Direction.Center;
+		case 5: return Direction.North;
+		case 6: return Direction.Southeast;
+		case 7: return Direction.East;
+		case 8: return Direction.Northeast;
+		default: return Direction.Center;
+		}
+	}
+
+	private void doMageMicro(TreeSet<CombatUnit> mages, boolean retreat, MapLocation swarmLoc, Nav nav) {
+		// TODO Auto-generated method stub
+	}
+
+	private void doKnightMicro(TreeSet<CombatUnit> knights, boolean retreat, MapLocation swarmLoc, Nav nav) {
+		// TODO Auto-generated method stub
+	}
+
+	private void updateDamage(CombatUnit cu, TargetUnit tu){
+		int damageDone = (int) (cu.damage - tu.defense);
+		if(damageDone >= tu.health){
+			infoMan.targetUnits.remove(tu.ID);
+			for(Tile t: tu.tilesWhichHitMe){
+				t.removeEnemy(tu);
+			}
+		}
+		tu.health -= damageDone;
+		for(Tile t: tu.tilesWhichHitMe){
+			t.updateTarget(tu);
+		}
+		infoMan.targetUnits.put(tu.ID, tu);
+	}
+
+	private boolean shouldWeRetreat(){
 		//TODO: make this better
-		int ourUnitCount = swarmUnits.size();
+		int ourUnitCount = combatUnits.size();
 		int theirUnitCount = (int) gc.senseNearbyUnitsByTeam(swarmLoc, 100, Utils.enemyTeam(gc)).size();
-		return theirUnitCount > ourUnitCount;
+		return theirUnitCount > ourUnitCount * 1.1;
 	}
 
-
-}
-
-class ascendingHealthComp implements Comparator<TargetUnit> {
-
-	@Override
-	public int compare(TargetUnit o1, TargetUnit o2) {
-		if(o1.ID == o2.ID)
-			return 0;
-		if(o1.health > o2.health)
-			return 1;
-		return -1;
-	}
-	
 }

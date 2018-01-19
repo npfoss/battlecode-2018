@@ -2,6 +2,7 @@ import bc.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 public class Tile{
     int x;
@@ -12,20 +13,23 @@ public class Tile{
     MapLocation myLoc;
     MagicNumbers magicNums;
     InfoManager infoMan;
+    boolean containsUnit;
 
     int roundLastUpdated;
-    HashSet<Integer> enemiesWhichCouldHitUs;
+    TreeSet<TargetUnit> enemiesWhichCouldHitUs;
     int possibleDamage;
     HashMap<String, Signpost> destToDir;
+    int distFromNearestHostile;
     
     //for combat
     
-    HashSet<Integer> enemiesWithinRangerRange; //list of IDs
-    HashSet<Integer> enemiesWithinKnightRange;
-    HashSet<Integer> enemiesWithinMageRange;
-    boolean claimed;
+    TreeSet<TargetUnit> enemiesWithinRangerRange;
+    TreeSet<TargetUnit> enemiesWithinKnightRange;
+    TreeSet<TargetUnit> enemiesWithinMageRange;
+    //boolean claimed;
     boolean enemiesUpdated;
-    boolean accessible; //contains no unit or our unit that is move ready
+    boolean containsUpdated;
+    //boolean accessible; //contains no unit or our unit that is move ready
     
     public Tile(int ex, int why, boolean walkable, long karb, Region reg, MapLocation ml, MagicNumbers mn, InfoManager im){
         x = ex;
@@ -39,12 +43,16 @@ public class Tile{
         roundLastUpdated = 0;
         possibleDamage = 0;
         destToDir = new HashMap<String, Signpost>();
-        enemiesWithinRangerRange = new HashSet<Integer>();
-        enemiesWithinKnightRange = new HashSet<Integer>();
-        enemiesWithinMageRange = new HashSet<Integer>();
-        accessible = false;
-        claimed = false;
+        enemiesWhichCouldHitUs = new TreeSet<TargetUnit>(new ascendingHealthComp());
+        enemiesWithinRangerRange = new TreeSet<TargetUnit>(new ascendingHealthComp());
+        enemiesWithinKnightRange = new TreeSet<TargetUnit>(new ascendingHealthComp());
+        enemiesWithinMageRange = new TreeSet<TargetUnit>(new ascendingHealthComp());
+        //accessible = false;
+        //claimed = false;
         enemiesUpdated = false;
+        containsUnit = false;
+        containsUpdated = false;
+        distFromNearestHostile = 100;
     }
 
     public void updateKarbonite(long newKarb){
@@ -55,17 +63,40 @@ public class Tile{
     }
     
     public void removeEnemy(TargetUnit tu){
-    	enemiesWithinRangerRange.remove(tu.ID);
-    	enemiesWithinKnightRange.remove(tu.ID);
-    	enemiesWithinMageRange.remove(tu.ID);
-    	enemiesWhichCouldHitUs.remove(tu.ID);
+    	enemiesWithinRangerRange.remove(tu);
+    	enemiesWithinKnightRange.remove(tu);
+    	enemiesWithinMageRange.remove(tu);
+    	enemiesWhichCouldHitUs.remove(tu);
     	possibleDamage -= tu.damageDealingPower;
+    	infoMan.tiles[x][y] = this;
+    }
+    
+    public void updateTarget(TargetUnit tu){
+    	if(enemiesWithinRangerRange.remove(tu)){
+    		enemiesWithinRangerRange.add(tu);
+    	}
+    	if(enemiesWithinKnightRange.remove(tu)){
+    		enemiesWithinKnightRange.add(tu);
+    	}
+    	if(enemiesWithinMageRange.remove(tu)){
+    		enemiesWithinMageRange.add(tu);
+    	}
+    	if(enemiesWhichCouldHitUs.remove(tu)){
+    		enemiesWhichCouldHitUs.add(tu);
+    	}
+    }
+    
+    public void updateContains(GameController gc){
+    	if(containsUpdated)
+    		return;
+    	containsUnit = gc.hasUnitAtLocation(myLoc);
     }
     
     public void updateEnemies(GameController gc){
     	if(enemiesUpdated)
     		return;
     	enemiesUpdated = true;
+    	/*
     	claimed = false;
     	if(!gc.hasUnitAtLocation(myLoc)){
         	accessible = false;
@@ -79,23 +110,27 @@ public class Tile{
         		accessible = true;
         	accessible = false;
         }
-    	VecUnit enemies = gc.senseNearbyUnitsByTeam(myLoc, 72, Utils.enemyTeam(gc));
+        */
+    	TreeSet<TargetUnit> enemies = Utils.getTargetUnits(myLoc, 72, false, infoMan);
+    	distFromNearestHostile = 100;
     	boolean didSomething;
-    	for(int i = 0; i < enemies.size(); i++){
-    		Unit enemy = enemies.get(i);
-    		MapLocation ml = enemy.location().mapLocation();
+    	for(TargetUnit tu: enemies){
+    		MapLocation ml = tu.myLoc;
     		long dist = myLoc.distanceSquaredTo(ml);
+    		if(Utils.isTypeHostile(tu.type) && dist<distFromNearestHostile){
+    			distFromNearestHostile = (int)dist;
+    		}
     		didSomething = false;
     		if(magicNums.RANGER_MIN_RANGE <= dist && dist <= magicNums.RANGER_RANGE){
-    			enemiesWithinRangerRange.add(enemy.id());
+    			enemiesWithinRangerRange.add(tu);
     			didSomething = true;
     		}
     		if(dist <= magicNums.KNIGHT_RANGE){
-    			enemiesWithinKnightRange.add(enemy.id());
+    			enemiesWithinKnightRange.add(tu);
     			didSomething = true;
     		}
     		if(dist <= magicNums.MAGE_RANGE){
-    			enemiesWithinMageRange.add(enemy.id());
+    			enemiesWithinMageRange.add(tu);
     			didSomething = true;
     		}
     		//figure out if they can hit this tile next turn given that they can move once
@@ -103,26 +138,24 @@ public class Tile{
     		int yDif = Math.abs(ml.getY() - y);
     		int closestTheyCanGet = (xDif-1) * (xDif-1) + (yDif-1) * (yDif-1);
     		int farthestTheyCanGet = (xDif+1) * (xDif+1) + (yDif+1) * (yDif+1);
-    		if(closestTheyCanGet <= enemy.attackRange() && 
-    		   !(enemy.unitType() == UnitType.Ranger && farthestTheyCanGet <= enemy.rangerCannotAttackRange())){
-    			enemiesWhichCouldHitUs.add(enemy.id());
-    			possibleDamage += enemy.damage();
-    			didSomething = true;
+    		if(closestTheyCanGet <= tu.range && 
+    		   !(tu.type == UnitType.Ranger && farthestTheyCanGet <= magicNums.RANGER_MIN_RANGE)){
+    			enemiesWhichCouldHitUs.add(tu);
+    			possibleDamage += tu.damageDealingPower;
     		}
     		if(didSomething){
-    			TargetUnit tu = infoMan.targetUnits.get(enemy.id());
     			tu.tilesWhichHitMe.add(this);
-    			infoMan.targetUnits.put(enemy.id(), tu);
+    			infoMan.targetUnits.put(tu.ID, tu);
     		}
     	}
     }
 
-	public HashSet<Integer> getEnemiesWithinRange(UnitType type) {
+	public TreeSet<TargetUnit> getEnemiesWithinRange(UnitType type) {
 		switch(type){
 		case Ranger: return enemiesWithinRangerRange;
 		case Knight: return enemiesWithinKnightRange;
 		case Mage: return enemiesWithinMageRange;
-		default: return new HashSet<Integer>();
+		default: return new TreeSet<TargetUnit>();
 		}
 	}
 }
