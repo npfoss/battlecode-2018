@@ -192,6 +192,7 @@ public class InfoManager {
 					tiles[x][y].roundLastUpdated = (int) gc.round();
                     tiles[x][y].updateKarbonite(gc.karboniteAt(loc));
                     tiles[x][y].enemiesUpdated = false;
+                    tiles[x][y].containsUpdated = false;
                     // TODO: check if there's now a factory there
                     //      (to update walkability)
                 }

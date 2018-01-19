@@ -95,6 +95,11 @@ public class Tile{
     	if(enemiesUpdated)
     		return;
     	enemiesUpdated = true;
+    	enemiesWithinRangerRange.clear();
+    	enemiesWithinMageRange.clear();
+    	enemiesWithinKnightRange.clear();
+    	enemiesWhichCouldHitUs.clear();
+    	possibleDamage = 0;
     	/*
     	claimed = false;
     	if(!gc.hasUnitAtLocation(myLoc)){
@@ -120,7 +125,7 @@ public class Tile{
     			distFromNearestHostile = (int)dist;
     		}
     		didSomething = false;
-    		System.out.println("here");
+    		//System.out.println("here");
     		if(magicNums.RANGER_MIN_RANGE <= dist && dist <= magicNums.RANGER_RANGE){
     			enemiesWithinRangerRange.add(tu);
     			didSomething = true;
