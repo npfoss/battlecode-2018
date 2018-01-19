@@ -19,22 +19,27 @@ public class Overseer{
 
         strat = Strategy.UNSURE;
 
+        if(gc.planet() == Planet.Earth){
+        	 magicNums = new MagicNumbersEarth();
+        }
+        else
+        	magicNums = new MagicNumbersMars();
+        
         infoMan = new InfoManager(gc,magicNums);
         workerMan = new WorkerManager(infoMan,gc);
         combatMan = new CombatManager(infoMan,gc,magicNums);
         nav = new Nav(infoMan);
-
+        
         if(gc.planet() == Planet.Earth){
-            magicNums = new MagicNumbersEarth();
             prodMan = new ProductionManager(infoMan, gc);
             researchMan = new ResearchManagerEarth(gc, infoMan);
             rocketMan = new RocketManager(gc, infoMan);
         } else {
-            magicNums = new MagicNumbersMars();
             prodMan = new ProductionManagerDoNothing();
             researchMan = new ResearchManagerMars(gc, infoMan);
             rocketMan = new RocketDoNothing(gc, infoMan);
         }
+
     }
 
     public void takeTurn(){
