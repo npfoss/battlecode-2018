@@ -127,10 +127,13 @@ public class InfoManager {
 				if(unit.unitType() == UnitType.Knight)
 					defense = unit.knightDefense();
 				int damage = 0;
-				if(unit.unitType() != UnitType.Factory && unit.unitType() != UnitType.Rocket)
+				long range = 0;
+				if(unit.unitType() != UnitType.Factory && unit.unitType() != UnitType.Rocket){
 					damage = unit.damage();
+					range = unit.attackRange();
+				}
 				TargetUnit tu = new TargetUnit(unit.id(),unit.health(),damage,
-						unit.location().mapLocation(),unit.unitType(),unit.attackRange(), defense);
+						unit.location().mapLocation(),unit.unitType(),range,defense);
 				targetUnits.put(unit.id(), tu);
 			}
 		}

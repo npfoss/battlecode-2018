@@ -133,6 +133,8 @@ public class Tile{
     			enemiesWithinMageRange.add(tu);
     			didSomething = true;
     		}
+    		if(!Utils.isTypeHostile(tu.type))
+    			continue;
     		//figure out if they can hit this tile next turn given that they can move once
     		int xDif = Math.abs(ml.getX() - x);
     		int yDif = Math.abs(ml.getY() - y);
