@@ -152,6 +152,7 @@ public class CombatSquad extends Squad{
 			if(cu.canMove){
 				x = cu.myLoc.getX();
 				y = cu.myLoc.getY();
+				System.out.println("microing unit " + cu.ID + " x = " + x + " y = " + y);
 				for(int i = 0; i < 9; i++){
 					nx = x + dx[i];
 					ny = y + dy[i];
@@ -436,7 +437,7 @@ public class CombatSquad extends Squad{
 			Direction toMove = indexToDirection(bestIndex);
 			if(toMove != Direction.Center){
 				gc.moveRobot(cu.ID, toMove);
-				cu.myLoc = new MapLocation(infoMan.myPlanet,x+dx[bestIndex],y+dy[bestIndex]);
+				cu.myLoc = cu.myLoc.add(toMove);
 				cu.canMove = false;
 			}
 			gc.attack(cu.ID, toAttack);
@@ -478,7 +479,7 @@ public class CombatSquad extends Squad{
 		Direction toMove = indexToDirection(bestIndex);
 		if(toMove != Direction.Center){
 			gc.moveRobot(cu.ID, toMove);
-			cu.myLoc = new MapLocation(infoMan.myPlanet,x+dx[bestIndex],y+dy[bestIndex]);
+			cu.myLoc = cu.myLoc.add(toMove);
 		}
 		return cu;
 	}
