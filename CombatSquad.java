@@ -171,7 +171,7 @@ public class CombatSquad extends Squad{
 			x = cu.myLoc.getX();
 			y = cu.myLoc.getY();
 			if(cu.canMove){
-				System.out.println("microing unit " + cu.ID + " x = " + x + " y = " + y);
+				//System.out.println("microing unit " + cu.ID + " x = " + x + " y = " + y);
 				for(int i = 0; i < 9; i++){
 					nx = x + dx[i];
 					ny = y + dy[i];
@@ -382,8 +382,8 @@ public class CombatSquad extends Squad{
 			if(!cu.canAttack)
 				continue;
 			Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
-			System.out.println("trying to atack somoeone.");
-			System.out.flush();
+			//System.out.println("trying to atack somoeone.");
+			//System.out.flush();
 			if(myTile.enemiesWithinRangerRange.size() > 0){
 				gc.attack(cu.ID, myTile.enemiesWithinRangerRange.first().ID);
 				updateDamage(cu,myTile.enemiesWithinRangerRange.first());
@@ -518,8 +518,8 @@ public class CombatSquad extends Squad{
 		if(d==Direction.Center)
 			return cu;
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].containsUnit = false;
-		System.out.println("moving to " + cu.myLoc.getX() + " " + cu.myLoc.getY());
-		System.out.flush();
+		//System.out.println("moving to " + cu.myLoc.getX() + " " + cu.myLoc.getY());
+		//System.out.flush();
 		cu.canMove = false;
 		cu.myLoc = cu.myLoc.add(d);
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].containsUnit = true;
