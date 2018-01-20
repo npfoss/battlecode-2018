@@ -434,9 +434,7 @@ public class CombatSquad extends Squad{
 		if(toAttack != -1){
 			//we found someone to attack
 			Direction toMove = indexToDirection(bestIndex);
-			if(toMove != Direction.Center){
-				cu = moveAndUpdate(cu,toMove);
-			}
+			cu = moveAndUpdate(cu,toMove);
 			gc.attack(cu.ID, toAttack);
 			updateDamage(cu,infoMan.targetUnits.get(toAttack));
 			cu.canAttack = false;
@@ -470,9 +468,7 @@ public class CombatSquad extends Squad{
 			}
 		}
 		Direction toMove = indexToDirection(bestIndex);
-		if(toMove != Direction.Center){
-			cu = moveAndUpdate(cu,toMove);
-		}
+		cu = moveAndUpdate(cu,toMove);
 		return cu;
 	}
 
@@ -500,6 +496,8 @@ public class CombatSquad extends Squad{
 	}
 
 	private CombatUnit moveAndUpdate(CombatUnit cu, Direction d){
+		if(d==Direction.Center)
+			return cu;
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].containsUnit = false;
 		System.out.println("moving to " + cu.myLoc.getX() + " " + cu.myLoc.getY());
 		System.out.flush();
