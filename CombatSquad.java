@@ -67,13 +67,14 @@ public class CombatSquad extends Squad{
 				}
 			}
 		}
+		update();
 	}
 
 	public void update(){
 		if(requestedUnits.isEmpty())
 			requestedUnits.add(UnitType.Ranger);
 		swarmLoc = targetLoc;
-		if(units.size() > 0)
+		if(combatUnits.size() > 0)
 			swarmLoc = Utils.averageMapLocation(gc, combatUnits);
 		numEnemyUnits = Utils.getTargetUnits(swarmLoc, 100, false, infoMan).size();
 		if(units.size() == 0)
@@ -134,6 +135,7 @@ public class CombatSquad extends Squad{
 			System.out.flush();
 			objective = Objective.NONE;
 		}
+		update();
 		/*
 		for(int id : units) {
 			Unit fighter = gc.unit(id);
@@ -590,9 +592,7 @@ public class CombatSquad extends Squad{
 
 	private boolean shouldWeRetreat(){
 		//TODO: make this better
-		int ourUnitCount = combatUnits.size();
-		int theirUnitCount = (int) gc.senseNearbyUnitsByTeam(swarmLoc, 100, Utils.enemyTeam(gc)).size();
-		return theirUnitCount > ourUnitCount * 1.1;
+		return numEnemyUnits > combatUnits.size() * 1.1;
 	}
 
 }
