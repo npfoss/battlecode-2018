@@ -15,16 +15,18 @@ public class CombatSquad extends Squad{
 	int numEnemyUnits;
 	MagicNumbers magicNums;
 	int[] unitCounts;
+	int[] unitCompGoal;
 	final int[] dx = {-1,-1,-1,0,0,0,1,1,1};
 	final int[] dy = {-1,0,1,-1,0,1,-1,0,1};
 
-	public CombatSquad(GameController g, InfoManager im, MagicNumbers mn) {
+	public CombatSquad(GameController g, InfoManager im, MagicNumbers mn, int[] ucg) {
 		super(g);
 		combatUnits = new TreeSet<CombatUnit>(new AscendingStepsComp());
 		separatedUnits = new ArrayList<Integer>();
 		infoMan = im;
 		magicNums = mn;
 		unitCounts = new int[]{0,0,0,0}; //knight,mage,ranger,healer
+		unitCompGoal = ucg;
 	}
 	
 	public void addUnit(Unit u){
@@ -71,12 +73,14 @@ public class CombatSquad extends Squad{
 	}
 
 	public void update(){
-		if(requestedUnits.isEmpty())
-			requestedUnits.add(UnitType.Ranger);
 		swarmLoc = targetLoc;
 		if(combatUnits.size() > 0)
 			swarmLoc = Utils.averageMapLocation(gc, combatUnits);
 		numEnemyUnits = Utils.getTargetUnits(swarmLoc, 100, false, infoMan).size();
+		if(infoMan.myPlanet == Planet.Mars)
+			return;
+		if(requestedUnits.isEmpty())
+			requestedUnits.add(getRequestedUnit());
 		if(units.size() == 0)
 			urgency = 100;
 		else
@@ -85,6 +89,27 @@ public class CombatSquad extends Squad{
 			urgency = 0;
 		if(urgency>100)
 			urgency = 100;
+	}
+
+	private UnitType getRequestedUnit() {
+		int bestIndex = 0;
+		int bestScore = 10000;
+		for(int i = 0; i < 4; i++){
+			if(unitCompGoal[i]==0)
+				continue;
+			int score = unitCounts[i]/unitCompGoal[i];
+			if(score<bestScore){
+				bestScore = score;
+				bestIndex = i;
+			}
+		}
+		switch(bestIndex){
+		case 0: return UnitType.Knight;
+		case 1: return UnitType.Mage;
+		case 2: return UnitType.Ranger;
+		case 3: return UnitType.Healer;
+		default: return UnitType.Knight;
+		}
 	}
 
 	public void move(Nav nav){

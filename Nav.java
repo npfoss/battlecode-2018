@@ -44,7 +44,10 @@ public class Nav{
     takes into account movable obstructions like other robots
     */
     public Direction dirToMove(MapLocation start, MapLocation target){
-        return dirToMove(start, directionTowards(start, target));
+    	if(infoMan.isReachable(start, target))
+    		return dirToMove(start, directionTowards(start, target));
+    	else
+    		return dirToMove(start, start.directionTo(target));
     }
 
     // overloaded for convenience
