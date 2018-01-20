@@ -127,7 +127,7 @@ public class CombatManager{
 				return;
 		}
 		CombatSquad cs = new CombatSquad(gc,infoMan,magicNums,strat.combatComposition);
-		cs.objective = Objective.ATTACK_LOC;
+		cs.objective = obj;
 		cs.targetLoc = targetLoc;
 		cs.update();
 		infoMan.combatSquads.add(cs);
