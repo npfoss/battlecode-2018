@@ -515,6 +515,7 @@ public class CombatSquad extends Squad{
 			for(Tile t: tu.tilesWhichHitMe){
 				t.removeEnemy(tu);
 			}
+			return;
 		}
 		tu.health -= damageDone;
 		for(Tile t: tu.tilesWhichHitMe){
