@@ -466,8 +466,12 @@ public class CombatSquad extends Squad{
 			}
 		}
 		
+		System.out.println("research level = " + gc.researchInfo().getLevel(UnitType.Ranger));
+		
 		if(!doSnipeCalcs)
 			return;
+		
+		System.out.println("here");
 		
 		ArrayList<CombatUnit> snipers = new ArrayList<CombatUnit>();
 		for(CombatUnit cu: rangers){
@@ -617,12 +621,14 @@ public class CombatSquad extends Squad{
 			infoMan.removeEnemyUnit(tu.ID, tu.type);
 			for(Tile t: tu.tilesWhichHitMe){
 				t.removeEnemy(tu);
+				infoMan.tiles[t.x][t.y] = t;
 			}
 			return;
 		}
 		tu.health -= damageDone;
 		for(Tile t: tu.tilesWhichHitMe){
 			t.updateTarget(tu);
+			infoMan.tiles[t.x][t.y] = t;
 		}
 		infoMan.targetUnits.put(tu.ID, tu);
 	}
