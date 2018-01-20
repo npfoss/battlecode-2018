@@ -123,6 +123,8 @@ public class InfoManager {
 			else{
 				addEnemyUnit(unit);
 				enemyLastSeen.put(unit.id(),(int) gc.round());
+				if(!unit.location().isOnMap())
+					continue;
 				long defense = 0;
 				if(unit.unitType() == UnitType.Knight)
 					defense = unit.knightDefense();

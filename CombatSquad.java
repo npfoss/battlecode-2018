@@ -160,10 +160,14 @@ public class CombatSquad extends Squad{
 						continue;
 					infoMan.tiles[nx][ny].updateContains(gc);
 					infoMan.tiles[nx][ny].containsUpdated = true;
-					if(infoMan.tiles[nx][ny].containsUnit)
-						continue;
 					infoMan.tiles[nx][ny].updateEnemies(gc);
 				}
+			}
+			else if(cu.canAttack){
+				x = cu.myLoc.getX();
+				y = cu.myLoc.getY();
+				infoMan.tiles[x][y].updateContains(gc);
+				infoMan.tiles[x][y].updateEnemies(gc);
 			}
 			switch(cu.type){
 			case Ranger: rangers.add(cu);
@@ -497,6 +501,7 @@ public class CombatSquad extends Squad{
 	}
 
 	private CombatUnit moveAndUpdate(CombatUnit cu, Direction d){
+		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].containsUnit = false;
 		gc.moveRobot(cu.ID, d);
 		cu.canMove = false;
 		cu.myLoc = cu.myLoc.add(d);
