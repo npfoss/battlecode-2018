@@ -55,6 +55,8 @@ public class CombatSquad extends Squad{
 		if(combatUnits.size()==0){
 			for(int id: separatedUnits){
 				Unit u = gc.unit(id);
+				if(!u.location().isOnMap())
+					continue;
 				CombatUnit cu = new CombatUnit(id,u.damage(),u.health(),u.movementHeat()<10,u.attackHeat()<10,
 						u.location().mapLocation(),u.unitType(),nav.optimalStepsTo(u.location().mapLocation(), targetLoc));
 				combatUnits.add(cu);
