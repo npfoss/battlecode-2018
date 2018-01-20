@@ -466,12 +466,11 @@ public class CombatSquad extends Squad{
 			}
 		}
 		
-		System.out.println("research level = " + gc.researchInfo().getLevel(UnitType.Ranger));
-		
 		if(!doSnipeCalcs)
 			return;
 		
-		System.out.println("here");
+		//System.out.println("doing snipe calcs");
+		//System.out.flush();
 		
 		ArrayList<CombatUnit> snipers = new ArrayList<CombatUnit>();
 		for(CombatUnit cu: rangers){
