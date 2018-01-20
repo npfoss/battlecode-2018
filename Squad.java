@@ -38,7 +38,7 @@ public class Squad{
          @Override
          public int compare(Squad s1, Squad s2)
          {
-             return s1.urgency - s2.urgency;
+             return Integer.compare(s2.urgency, s1.urgency);
          }        
      };
      return comp;

@@ -12,19 +12,34 @@ public class CombatSquad extends Squad{
 	ArrayList<Integer> separatedUnits;
 	InfoManager infoMan;
 	MapLocation swarmLoc;
+	int numEnemyUnits;
+	MagicNumbers magicNums;
 	final int[] dx = {-1,-1,-1,0,0,0,1,1,1};
 	final int[] dy = {-1,0,1,-1,0,1,-1,0,1};
 
-	public CombatSquad(GameController g, InfoManager im) {
+	public CombatSquad(GameController g, InfoManager im, MagicNumbers mn) {
 		super(g);
 		combatUnits = new TreeSet<CombatUnit>(new AscendingStepsComp());
 		separatedUnits = new ArrayList<Integer>();
 		infoMan = im;
+		magicNums = mn;
 	}
 
 	public void update(){
 		if(requestedUnits.isEmpty())
 			requestedUnits.add(UnitType.Ranger);
+		swarmLoc = targetLoc;
+		if(combatUnits.size() > 0)
+			swarmLoc = Utils.averageMapLocation(gc, combatUnits);
+		numEnemyUnits = Utils.getTargetUnits(swarmLoc, 100, false, infoMan).size();
+		if(combatUnits.size() == 0)
+			urgency = 100;
+		else
+			urgency = (numEnemyUnits * 2 - combatUnits.size() + 5) * 10;
+		if(urgency < 0)
+			urgency = 0;
+		if(urgency>100)
+			urgency = 100;
 	}
 
 	public void move(Nav nav){
@@ -46,17 +61,18 @@ public class CombatSquad extends Squad{
 			}
 			separatedUnits.clear();
 		}
-		swarmLoc = Utils.averageMapLocation(gc, combatUnits);
 		//TODO: think about if this is actually a good threshold
 		int swarmThreshold = combatUnits.size()*2 + 10;
 		for(int i = separatedUnits.size()-1; i>=0; i--){
 			Unit u = gc.unit(separatedUnits.get(i));
 			if(!u.location().isOnMap())
 				continue;
-			if(u.location().mapLocation().distanceSquaredTo(swarmLoc) <= swarmThreshold){
+			MapLocation ml = u.location().mapLocation();
+			if(ml.distanceSquaredTo(swarmLoc) <= swarmThreshold ||
+				Utils.getTargetUnits(ml, 50, false, infoMan).size() > 0){
 				separatedUnits.remove(i);
 				CombatUnit cu = new CombatUnit(u.id(),u.damage(),u.health(),u.movementHeat()<10,u.attackHeat()<10,
-						u.location().mapLocation(),u.unitType(),nav.optimalStepsTo(u.location().mapLocation(), targetLoc));
+						ml,u.unitType(),nav.optimalStepsTo(ml, targetLoc));
 				combatUnits.add(cu);
 				swarmThreshold++;
 			}
@@ -104,7 +120,8 @@ public class CombatSquad extends Squad{
 
 	private boolean areWeDone(){
 		switch(objective){
-		case ATTACK_LOC: return gc.senseNearbyUnitsByTeam(targetLoc, 5, gc.team()).size() > 0 && gc.senseNearbyUnitsByTeam(targetLoc, 25, Utils.enemyTeam(gc)).size() == 0;
+		case ATTACK_LOC: return gc.senseNearbyUnitsByTeam(targetLoc, 5, gc.team()).size() > 0 && Utils.getTargetUnits(targetLoc, magicNums.SQUAD_SEPARATION_THRESHOLD,false,infoMan).size() == 0;
+		case DEFEND_LOC: return Utils.getTargetUnits(targetLoc, 100,false,infoMan).size() == 0;
 		default: return false;
 		}
 	}
