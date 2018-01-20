@@ -159,7 +159,6 @@ public class CombatSquad extends Squad{
 					if(nx >= infoMan.width || nx<0 || ny >= infoMan.height || ny<0 || !infoMan.tiles[nx][ny].isWalkable)
 						continue;
 					infoMan.tiles[nx][ny].updateContains(gc);
-					infoMan.tiles[nx][ny].containsUpdated = true;
 					infoMan.tiles[nx][ny].updateEnemies(gc);
 				}
 			}
@@ -502,11 +501,12 @@ public class CombatSquad extends Squad{
 
 	private CombatUnit moveAndUpdate(CombatUnit cu, Direction d){
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].containsUnit = false;
-		gc.moveRobot(cu.ID, d);
 		System.out.println("moving to " + cu.myLoc.getX() + " " + cu.myLoc.getY());
+		System.out.flush();
 		cu.canMove = false;
 		cu.myLoc = cu.myLoc.add(d);
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].containsUnit = true;
+		gc.moveRobot(cu.ID, d);
 		return cu;
 	}
 	

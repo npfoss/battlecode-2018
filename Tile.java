@@ -88,6 +88,7 @@ public class Tile{
     public void updateContains(GameController gc){
     	if(containsUpdated)
     		return;
+    	containsUpdated = true;
     	containsUnit = gc.hasUnitAtLocation(myLoc);
     }
     
