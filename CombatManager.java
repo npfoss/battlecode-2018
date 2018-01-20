@@ -38,6 +38,7 @@ public class CombatManager{
 			cs.targetLoc = loc;
 			cs.update();
 			infoMan.combatSquads.add(cs);
+			enemyStartingLocs.add(loc);
 		}
 	}
 

@@ -126,7 +126,7 @@ public class CombatSquad extends Squad{
 	private void explore(Nav nav){
 		Direction dirToMove = Utils.orderedDirections[(int) (8*Math.random())];
 		for(int uid: units){
-			if(gc.canMove(uid, dirToMove))
+			if(gc.canMove(uid, dirToMove) && gc.unit(uid).movementHeat() < 10)
 				gc.moveRobot(uid, dirToMove);
 		}
 	}
