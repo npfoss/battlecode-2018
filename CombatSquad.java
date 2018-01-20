@@ -443,6 +443,7 @@ public class CombatSquad extends Squad{
 		//now if retreating, run away
 		if(retreat){
 			for(CombatUnit cu: rangers.descendingSet()){
+				System.out.println("steps = " + cu.stepsFromTarget);
 				if(cu.canMove)
 					cu = runAway(cu);
 			}
