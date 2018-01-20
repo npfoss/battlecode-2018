@@ -41,7 +41,7 @@ public class WorkerSquad extends Squad {
 			switch (objective) {
 			case BUILD:
 				if(targetLoc != null) {
-					// System.out.println("Trying to build something useful");
+					System.out.println("Trying to build something useful at: " + targetLoc.getX() + ", " + targetLoc.getY());
 					if(!worker.location().mapLocation().isAdjacentTo(targetLoc) && gc.isMoveReady(id)) {
 						//Move towards the target location
 						Direction movedir = nav.dirToMove(worker.location().mapLocation(),targetLoc);

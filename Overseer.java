@@ -50,7 +50,7 @@ public class Overseer{
         strat = strat.update(infoMan);
         researchMan.update(strat);
         rocketMan.update();
-        workerMan.update(strat);
+        workerMan.update(strat,nav);
         combatMan.update(strat);
         prodMan.update(strat);
 
