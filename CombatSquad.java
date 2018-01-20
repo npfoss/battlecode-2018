@@ -124,7 +124,8 @@ public class CombatSquad extends Squad{
 				swarmThreshold++;
 			}
 		}
-		System.out.println("swarm size = " + combatUnits.size() + " obj = " + objective + " swarmLoc = " + swarmLoc + " targetLoc = " + targetLoc);
+		System.out.println("swarm size = " + combatUnits.size() + " obj = " + objective + " swarmLoc = " + swarmLoc + " targetLoc = " + targetLoc  
+				+ " urgency = " + urgency);
 		moveToSwarm(nav);
 		boolean retreat = shouldWeRetreat();
 		doSquadMicro(retreat,nav);
