@@ -48,7 +48,7 @@ public class CombatSquad extends Squad{
 		}
 		swarmLoc = Utils.averageMapLocation(gc, combatUnits);
 		//TODO: think about if this is actually a good threshold
-		int swarmThreshold = combatUnits.size() + 1;
+		int swarmThreshold = combatUnits.size()*2 + 10;
 		for(int i = separatedUnits.size()-1; i>=0; i--){
 			Unit u = gc.unit(separatedUnits.get(i));
 			if(!u.location().isOnMap())
