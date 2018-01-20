@@ -36,8 +36,8 @@ public class CombatUnit {
 	public void update(GameController gc){
 		Unit u = gc.unit(ID);
 		health = u.health();
-		canAttack = u.attackHeat() < 10;
-		canMove = u.movementHeat() < 10;
+		canAttack = u.attackHeat() < 10 && !(type == UnitType.Ranger && u.rangerIsSniping() != 0);
+		canMove = u.movementHeat() < 10 && !(type == UnitType.Ranger && u.rangerIsSniping() != 0);
 	}
 	
 	public boolean equals(Object o){

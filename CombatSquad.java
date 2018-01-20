@@ -86,6 +86,8 @@ public class CombatSquad extends Squad{
 		//check if we're done with our objective
 		boolean done = areWeDone();
 		if(done){
+			System.out.println("setting obj to none");
+			System.out.flush();
 			objective = Objective.NONE;
 		}
 		/*
