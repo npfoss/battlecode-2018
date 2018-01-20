@@ -13,6 +13,7 @@ public class CombatUnit {
 	int dependencyID;
 	boolean canAttack;
 	boolean canMove;
+	boolean canSnipe;
 	int stepsFromTarget;
 	MapLocation myLoc;
 	UnitType type;
@@ -27,6 +28,7 @@ public class CombatUnit {
 		health = h;
 		canAttack = ca;
 		canMove = cm;
+		canSnipe = false;
 		dependencyID = -1;
 		myLoc = ml;
 		type = ut;
@@ -38,6 +40,7 @@ public class CombatUnit {
 		health = u.health();
 		canAttack = u.attackHeat() < 10 && !(type == UnitType.Ranger && u.rangerIsSniping() != 0);
 		canMove = u.movementHeat() < 10 && !(type == UnitType.Ranger && u.rangerIsSniping() != 0);
+		canSnipe = (gc.researchInfo().getLevel(UnitType.Ranger) == 3 && type == UnitType.Ranger && u.abilityCooldown() < 10 && u.rangerIsSniping() == 0);
 	}
 	
 	public boolean equals(Object o){

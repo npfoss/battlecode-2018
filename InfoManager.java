@@ -135,7 +135,7 @@ public class InfoManager {
 					range = unit.attackRange();
 				}
 				TargetUnit tu = new TargetUnit(unit.id(),unit.health(),damage,
-						unit.location().mapLocation(),unit.unitType(),range,defense);
+						unit.location().mapLocation(),unit.unitType(),range,defense, this);
 				targetUnits.put(unit.id(), tu);
 			}
 		}

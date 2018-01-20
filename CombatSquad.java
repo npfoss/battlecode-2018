@@ -443,7 +443,6 @@ public class CombatSquad extends Squad{
 		//now if retreating, run away
 		if(retreat){
 			for(CombatUnit cu: rangers.descendingSet()){
-				System.out.println("steps = " + cu.stepsFromTarget);
 				if(cu.canMove)
 					cu = runAway(cu);
 			}
@@ -451,7 +450,11 @@ public class CombatSquad extends Squad{
 		}
 
 		//otherwise, do moves and attacks heuristically
+		boolean doSnipeCalcs = false;
 		for(CombatUnit cu: rangers){
+			if(cu.canSnipe){
+				doSnipeCalcs = true;
+			}
 			if(!cu.canMove){
 				continue;
 			}
@@ -462,6 +465,38 @@ public class CombatSquad extends Squad{
 				cu = rangerMove(cu,nav);
 			}
 		}
+		
+		if(!doSnipeCalcs)
+			return;
+		
+		ArrayList<CombatUnit> snipers = new ArrayList<CombatUnit>();
+		for(CombatUnit cu: rangers){
+			if(!cu.canSnipe)
+				continue;
+			boolean wantToSnipe = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].possibleDamage == 0;
+			if(wantToSnipe)
+				snipers.add(cu);
+		}
+		
+		if(snipers.size()==0)
+			return;
+		
+		TreeSet<TargetUnit> snipees = new TreeSet<TargetUnit>(new DescendingSnipePriorityComp());
+		for(TargetUnit tu: infoMan.targetUnits.values()){
+			tu.updateSnipePriority(swarmLoc);
+			snipees.add(tu);
+		}
+		for(TargetUnit tu: snipees){
+			if(tu.snipeDamageToDo <= snipers.size()*30){
+				System.out.println("sniping " + tu.myLoc);
+				System.out.flush();
+				for(int i = 0; i <= tu.snipeDamageToDo/30.0; i++){
+					gc.beginSnipe(snipers.get(0).ID, tu.myLoc);
+					snipers.remove(0);
+				}
+			}
+		}
+		
 	}
 
 	private CombatUnit rangerMove(CombatUnit cu, Nav nav) {
