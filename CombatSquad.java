@@ -104,7 +104,7 @@ public class CombatSquad extends Squad{
 
 	private boolean areWeDone(){
 		switch(objective){
-		case ATTACK_LOC: return swarmLoc.distanceSquaredTo(targetLoc) < 9 && gc.senseNearbyUnitsByTeam(swarmLoc, 25, Utils.enemyTeam(gc)).size() == 0;
+		case ATTACK_LOC: return gc.senseNearbyUnitsByTeam(swarmLoc, 5, gc.team()).size() == 0 && gc.senseNearbyUnitsByTeam(swarmLoc, 25, Utils.enemyTeam(gc)).size() == 0;
 		default: return false;
 		}
 	}
