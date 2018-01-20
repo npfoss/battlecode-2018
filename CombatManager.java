@@ -55,7 +55,7 @@ public class CombatManager{
 		//defend factories and rockets
 		for(Unit u: infoMan.factories){
 			MapLocation ml = u.location().mapLocation();
-			if(Utils.getTargetUnits(ml, 100, true, infoMan).size()==0){
+			if(Utils.getTargetUnits(ml, 100, true, infoMan).size()>0){
 				addCombatSquad(ml,Objective.DEFEND_LOC);
 			}
 		}
@@ -63,7 +63,7 @@ public class CombatManager{
 		if(infoMan.myPlanet == Planet.Earth){
 			for(Unit u: infoMan.rockets){
 				MapLocation ml = u.location().mapLocation();
-				if(Utils.getTargetUnits(ml, 100, true, infoMan).size()==0){
+				if(Utils.getTargetUnits(ml, 100, true, infoMan).size()>0){
 					addCombatSquad(ml,Objective.DEFEND_LOC);
 				}
 			}
@@ -94,13 +94,9 @@ public class CombatManager{
 				for(UnitType u : cs.requestedUnits) {
 					for(Unit a : infoMan.unassignedUnits) {
 						if(a.unitType() == u) {
-							System.out.println("adding to cs");
-							cs.requestedUnits.remove(u);
-							int toAdd = infoMan.unassignedUnits.get(infoMan.unassignedUnits.indexOf(a)).id();
-							cs.units.add(toAdd);
-							cs.separatedUnits.add(toAdd);
-							infoMan.unassignedUnits.remove(a);
-							cs.update();
+							//System.out.println("adding to cs");
+							Unit toAdd = infoMan.unassignedUnits.get(infoMan.unassignedUnits.indexOf(a));
+							cs.addUnit(toAdd);
 							tryAgain = true;
 							didSomething = true;
 						}

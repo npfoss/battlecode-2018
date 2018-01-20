@@ -165,22 +165,7 @@ public class InfoManager {
 			for(int i = s.units.size()-1; i >= 0; i--){
 				int id = s.units.get(i);
 				if(!ids.contains(id)){
-					s.units.remove(i);
-					if(s.separatedUnits.contains(id))
-						s.separatedUnits.remove(s.separatedUnits.indexOf(id));
-					else{
-						CombatUnit toRemove  = new CombatUnit();
-						boolean remove = false;
-						for(CombatUnit cu: s.combatUnits){
-							if(cu.ID == id){
-								toRemove = cu;
-								remove = true;
-								break;
-							}
-						}
-						if(remove)
-							s.combatUnits.remove(toRemove);
-					}
+					s.removeUnit(i,id);
 				}
 			}
 			s.update();

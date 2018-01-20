@@ -14,6 +14,7 @@ public class CombatSquad extends Squad{
 	MapLocation swarmLoc;
 	int numEnemyUnits;
 	MagicNumbers magicNums;
+	int[] unitCounts;
 	final int[] dx = {-1,-1,-1,0,0,0,1,1,1};
 	final int[] dy = {-1,0,1,-1,0,1,-1,0,1};
 
@@ -23,19 +24,62 @@ public class CombatSquad extends Squad{
 		separatedUnits = new ArrayList<Integer>();
 		infoMan = im;
 		magicNums = mn;
+		unitCounts = new int[]{0,0,0,0}; //knight,mage,ranger,healer
+	}
+	
+	public void addUnit(Unit u){
+		requestedUnits.remove(u);
+		units.add(u.id());
+		separatedUnits.add(u.id());
+		infoMan.unassignedUnits.remove(u);
+		switch(u.unitType()){
+		case Knight:unitCounts[0]++; break;
+		case Mage:unitCounts[1]++; break;
+		case Ranger:unitCounts[2]++; break;
+		case Healer:unitCounts[3]++; break;
+		default: break;
+		}
+		update();
+	}
+	
+	public void removeUnit(int index, int id){
+		units.remove(index);
+		if(separatedUnits.contains(id))
+			separatedUnits.remove(separatedUnits.indexOf(id));
+		else{
+			CombatUnit toRemove  = new CombatUnit();
+			boolean remove = false;
+			for(CombatUnit cu: combatUnits){
+				if(cu.ID == id){
+					toRemove = cu;
+					remove = true;
+					break;
+				}
+			}
+			if(remove){
+				combatUnits.remove(toRemove);
+				switch(toRemove.type){
+				case Knight:unitCounts[0]--; break;
+				case Mage:unitCounts[1]--; break;
+				case Ranger:unitCounts[2]--; break;
+				case Healer:unitCounts[3]--; break;
+				default: break;
+				}
+			}
+		}
 	}
 
 	public void update(){
 		if(requestedUnits.isEmpty())
 			requestedUnits.add(UnitType.Ranger);
 		swarmLoc = targetLoc;
-		if(combatUnits.size() > 0)
+		if(units.size() > 0)
 			swarmLoc = Utils.averageMapLocation(gc, combatUnits);
 		numEnemyUnits = Utils.getTargetUnits(swarmLoc, 100, false, infoMan).size();
-		if(combatUnits.size() == 0)
+		if(units.size() == 0)
 			urgency = 100;
 		else
-			urgency = (numEnemyUnits * 2 - combatUnits.size() + 5) * 10;
+			urgency = (numEnemyUnits * 2 - units.size() + 5) * 10;
 		if(urgency < 0)
 			urgency = 0;
 		if(urgency>100)
@@ -79,7 +123,7 @@ public class CombatSquad extends Squad{
 				swarmThreshold++;
 			}
 		}
-		System.out.println("swarm size = " + combatUnits.size() + " swarmLoc = " + swarmLoc + " targetLoc = " + targetLoc);
+		System.out.println("swarm size = " + combatUnits.size() + " obj = " + objective + " swarmLoc = " + swarmLoc + " targetLoc = " + targetLoc);
 		moveToSwarm(nav);
 		boolean retreat = shouldWeRetreat();
 		doSquadMicro(retreat,nav);
@@ -188,10 +232,10 @@ public class CombatSquad extends Squad{
 				infoMan.tiles[x][y].updateEnemies(gc);
 			}
 			switch(cu.type){
-			case Ranger: rangers.add(cu);
-			case Knight: knights.add(cu);
-			case Healer: healers.add(cu);
-			default: mages.add(cu);
+			case Ranger: rangers.add(cu); break;
+			case Knight: knights.add(cu); break;
+			case Healer: healers.add(cu); break;
+			default: mages.add(cu); 
 			}
 		}
 
@@ -415,8 +459,6 @@ public class CombatSquad extends Squad{
 			}
 		}
 	}
-
-
 
 	private CombatUnit rangerMove(CombatUnit cu, Nav nav) {
 		Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
