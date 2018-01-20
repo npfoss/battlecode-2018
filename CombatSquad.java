@@ -149,9 +149,9 @@ public class CombatSquad extends Squad{
 		int x,y,nx,ny;
 		for(CombatUnit cu: combatUnits){
 			cu.update(gc);
+			x = cu.myLoc.getX();
+			y = cu.myLoc.getY();
 			if(cu.canMove){
-				x = cu.myLoc.getX();
-				y = cu.myLoc.getY();
 				System.out.println("microing unit " + cu.ID + " x = " + x + " y = " + y);
 				for(int i = 0; i < 9; i++){
 					nx = x + dx[i];
@@ -163,8 +163,6 @@ public class CombatSquad extends Squad{
 				}
 			}
 			else if(cu.canAttack){
-				x = cu.myLoc.getX();
-				y = cu.myLoc.getY();
 				infoMan.tiles[x][y].updateContains(gc);
 				infoMan.tiles[x][y].updateEnemies(gc);
 			}
@@ -176,10 +174,10 @@ public class CombatSquad extends Squad{
 			}
 		}
 
-		doKnightMicro(knights,retreat,swarmLoc,nav);
-		doMageMicro(mages,retreat,swarmLoc,nav);
-		doRangerMicro(rangers,retreat,swarmLoc,nav);
-		doHealerMicro(healers,retreat,swarmLoc,nav);
+		doKnightMicro(knights,retreat,nav);
+		doMageMicro(mages,retreat,nav);
+		doRangerMicro(rangers,retreat,nav);
+		doHealerMicro(healers,retreat,nav);
 
 
 		/* Below lies too complicated micro
@@ -355,16 +353,18 @@ public class CombatSquad extends Squad{
 		}*/
 	}
 
-	private void doHealerMicro(TreeSet<CombatUnit> healers, boolean retreat, MapLocation swarmLoc, Nav nav) {
+	private void doHealerMicro(TreeSet<CombatUnit> healers, boolean retreat, Nav nav) {
 		// TODO Auto-generated method stub
 	}
 
-	private void doRangerMicro(TreeSet<CombatUnit> rangers, boolean retreat, MapLocation swarmLoc, Nav nav) {
+	private void doRangerMicro(TreeSet<CombatUnit> rangers, boolean retreat, Nav nav) {
 		//first go through rangers which can attack already
 		for(CombatUnit cu: rangers.descendingSet()){
 			if(!cu.canAttack)
 				continue;
 			Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
+			System.out.println("trying to atack somoeone.");
+			System.out.flush();
 			if(myTile.enemiesWithinRangerRange.size() > 0){
 				gc.attack(cu.ID, myTile.enemiesWithinRangerRange.first().ID);
 				updateDamage(cu,myTile.enemiesWithinRangerRange.first());
@@ -487,11 +487,11 @@ public class CombatSquad extends Squad{
 		}
 	}
 
-	private void doMageMicro(TreeSet<CombatUnit> mages, boolean retreat, MapLocation swarmLoc, Nav nav) {
+	private void doMageMicro(TreeSet<CombatUnit> mages, boolean retreat, Nav nav) {
 		// TODO Auto-generated method stub
 	}
 
-	private void doKnightMicro(TreeSet<CombatUnit> knights, boolean retreat, MapLocation swarmLoc, Nav nav) {
+	private void doKnightMicro(TreeSet<CombatUnit> knights, boolean retreat, Nav nav) {
 		// TODO Auto-generated method stub
 	}
 
