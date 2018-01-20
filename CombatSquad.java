@@ -25,7 +25,7 @@ public class CombatSquad extends Squad{
 						gc.attack(fighter.id(),other.id());
 					}
 				}
-				Direction dirToMove = Utils.orderedDirections[(int) (8*Math.random())];
+				Direction dirToMove = nav.dirToExplore(fighter.location().mapLocation());
 				if(gc.isMoveReady(id) && gc.canMove(id, dirToMove)&&!gc.unit(id).location().isInGarrison())
 					gc.moveRobot(id, dirToMove);
 				fighter = gc.unit(id);

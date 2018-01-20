@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import bc.*;
 
@@ -67,6 +68,31 @@ public class Utils{
         }
         return Direction.Center;
     }
+
+    public static Direction oppositeDirection(Direction dir){
+        switch(dir){
+            case North: return Direction.South;
+            case South: return Direction.North;
+            case East: return Direction.West;
+            case West: return Direction.East;
+            case Northeast: return Direction.Southwest;
+            case Southwest: return Direction.Northeast;
+            case Northwest: return Direction.Southeast;
+            case Southeast: return Direction.Northwest;
+        }
+        return Direction.Center;
+    }
+
+    public static boolean isDiagonalDirection(Direction dir){
+        switch(dir){
+            case Northeast:
+            case Northwest:
+            case Southeast:
+            case Southwest: return true;
+        }
+        return false;
+    }
+
     public static MapLocation averageMapLocationEarth(GameController gc, ArrayList<Integer> units) {
     	if(units.size() == 0)
     		return null;

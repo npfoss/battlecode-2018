@@ -299,19 +299,20 @@ public class InfoManager {
             return isLocationWalkable(loc) && gc.isOccupiable(loc) > 0;
         } catch (Exception e) {
             System.out.println("isLocationClear threw Exception. help");
+            e.printStackTrace(System.out);
             return false;
         }
     }
 
     // means on the map, passable terrain, and none of our buildings there
     public boolean isLocationWalkable(MapLocation loc) {
-        // TODO: make it not throw errors when tile isn't visible (need mapinfo)
-        // TODO: add the part about building (requires caching map info)
-        return tiles[loc.getX()][loc.getY()].isWalkable;
+        return isOnMap(loc) && tiles[loc.getX()][loc.getY()].isWalkable;
     }
 
     // are two map locations reachable from each other? if in same region
     public boolean isReachable(MapLocation loc1, MapLocation loc2){
-        return tiles[loc1.getX()][loc1.getY()].region == tiles[loc2.getX()][loc2.getY()].region;
+        // may need to turn on commented bits if we accidentally
+        //      check illegal locs sometimes
+        return /*isOnMap(loc1) && isOnMap(loc2) &&*/ tiles[loc1.getX()][loc1.getY()].region == tiles[loc2.getX()][loc2.getY()].region;
     }
 }
