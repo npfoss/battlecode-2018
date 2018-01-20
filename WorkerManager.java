@@ -78,7 +78,7 @@ public class WorkerManager{
 				if(gc.round() == 1) {
 					//Pick a place to build the first factory
 					if(infoMan.workerSquads.get(0).units.size() > 1) {
-						startingFactory1 = Utils.averageMapLocationEarth(gc,infoMan.workerSquads.get(0).units);
+						startingFactory1 = Utils.averageMapLocation(gc,infoMan.workerSquads.get(0).units);
 						if(gc.startingMap(Planet.Earth).isPassableTerrainAt(startingFactory1)>0){
 							infoMan.workerSquads.get(0).targetLoc = startingFactory1;
 						}
@@ -91,7 +91,7 @@ public class WorkerManager{
 					if(infoMan.workerSquads.size() > 1) {
 						//Pick a place to build a second factory
 						if(infoMan.workerSquads.get(0).units.size() > 1) {
-							startingFactory2 = Utils.averageMapLocationEarth(gc,infoMan.workerSquads.get(0).units);
+							startingFactory2 = Utils.averageMapLocation(gc,infoMan.workerSquads.get(0).units);
 							if(gc.startingMap(Planet.Earth).isPassableTerrainAt(startingFactory1)>0){
 								infoMan.workerSquads.get(0).targetLoc = startingFactory1;
 							}
@@ -105,7 +105,6 @@ public class WorkerManager{
 						//Pick a place to build a third factory
 						//This means it should build in any possible direction
 						infoMan.workerSquads.get(0).targetLoc = null;
-
 					}
 				}
 
