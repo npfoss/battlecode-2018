@@ -12,6 +12,8 @@ public class CombatSquad extends Squad{
 	ArrayList<Integer> separatedUnits;
 	InfoManager infoMan;
 	MapLocation swarmLoc;
+	final int[] dx = {-1,-1,-1,0,0,0,1,1,1};
+	final int[] dy = {-1,0,1,-1,0,1,-1,0,1};
 
 	public CombatSquad(GameController g, InfoManager im) {
 		super(g);
@@ -144,8 +146,6 @@ public class CombatSquad extends Squad{
 		TreeSet<CombatUnit> mages = new TreeSet<CombatUnit>(new AscendingStepsComp());
 
 		//update combat units and tiles near them
-		int[] dx = {-1,-1,-1,0,0,0,1,1,1};
-		int[] dy = {-1,0,1,-1,0,1,-1,0,1};
 		int x,y,nx,ny;
 		for(CombatUnit cu: combatUnits){
 			cu.update(gc);
@@ -399,17 +399,13 @@ public class CombatSquad extends Squad{
 		//if we're not near any enemies nav, otherwise run away
 		if(myTile.distFromNearestHostile == 100){
 			Direction d = nav.dirToMove(cu.myLoc, targetLoc);
-			gc.moveRobot(cu.ID, d);
-			cu.myLoc = cu.myLoc.add(d);
-			cu.canMove = false;
+			cu = moveAndUpdate(cu,d);
 			return cu;
 		}
 		return runAway(cu);
 	}
 
 	private CombatUnit rangerMoveAndAttack(CombatUnit cu, Nav nav) {
-		int[] dx = {-1,-1,-1,0,0,0,1,1,1};
-		int[] dy = {-1,0,1,-1,0,1,-1,0,1};
 		int x,y,nx,ny;
 		x = cu.myLoc.getX();
 		y = cu.myLoc.getY();
@@ -436,9 +432,7 @@ public class CombatSquad extends Squad{
 			//we found someone to attack
 			Direction toMove = indexToDirection(bestIndex);
 			if(toMove != Direction.Center){
-				gc.moveRobot(cu.ID, toMove);
-				cu.myLoc = cu.myLoc.add(toMove);
-				cu.canMove = false;
+				cu = moveAndUpdate(cu,toMove);
 			}
 			gc.attack(cu.ID, toAttack);
 			updateDamage(cu,infoMan.targetUnits.get(toAttack));
@@ -447,15 +441,11 @@ public class CombatSquad extends Squad{
 		}
 		//otherwise just nav there
 		Direction d = nav.dirToMove(cu.myLoc, targetLoc);
-		gc.moveRobot(cu.ID, d);
-		cu.myLoc = cu.myLoc.add(d);
-		cu.canMove = false;
+		cu = moveAndUpdate(cu,d);
 		return cu;
 	}
 
 	private CombatUnit runAway(CombatUnit cu) {
-		int[] dx = {-1,-1,-1,0,0,0,1,1,1};
-		int[] dy = {-1,0,1,-1,0,1,-1,0,1};
 		int x,y,nx,ny;
 		x = cu.myLoc.getX();
 		y = cu.myLoc.getY();
@@ -478,8 +468,7 @@ public class CombatSquad extends Squad{
 		}
 		Direction toMove = indexToDirection(bestIndex);
 		if(toMove != Direction.Center){
-			gc.moveRobot(cu.ID, toMove);
-			cu.myLoc = cu.myLoc.add(toMove);
+			cu = moveAndUpdate(cu,toMove);
 		}
 		return cu;
 	}
@@ -507,6 +496,14 @@ public class CombatSquad extends Squad{
 		// TODO Auto-generated method stub
 	}
 
+	private CombatUnit moveAndUpdate(CombatUnit cu, Direction d){
+		gc.moveRobot(cu.ID, d);
+		cu.canMove = false;
+		cu.myLoc = cu.myLoc.add(d);
+		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].containsUnit = true;
+		return cu;
+	}
+	
 	private void updateDamage(CombatUnit cu, TargetUnit tu){
 		int damageDone = (int) (cu.damage - tu.defense);
 		if(damageDone >= tu.health){
