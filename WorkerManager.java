@@ -25,7 +25,7 @@ public class WorkerManager{
 	public boolean okayToBuild(MapLocation loc) {
 if(!gc.startingMap(Planet.Earth).onMap(loc))
 		return false;
-		if(!(gc.startingMap(Planet.Earth).isPassableTerrainAt(loc) > 0 && !(gc.hasUnitAtLocation(loc)&& (gc.senseUnitAtLocation(loc).unitType() == UnitType.Factory|| gc.senseUnitAtLocation(loc).unitType() == UnitType.Rocket)))) {
+		if(!(gc.startingMap(Planet.Earth).isPassableTerrainAt(loc) > 0 && !(gc.hasUnitAtLocation(loc)))){//&& (gc.senseUnitAtLocation(loc).unitType() == UnitType.Factory|| gc.senseUnitAtLocation(loc).unitType() == UnitType.Rocket)))) {
 			return false;
 		}
 		MapLocation n = loc.add(Direction.North);
@@ -56,7 +56,7 @@ if(!gc.startingMap(Planet.Earth).onMap(loc))
 		return bn && bs && be && bw;
 	}
 
-	public void update(Strategy strat){
+	public void update(Strategy strat,Nav nav){
 		switch(strat) {
 		case RUSH:
 			//Earth and Mars should probably do different things
@@ -80,7 +80,7 @@ if(!gc.startingMap(Planet.Earth).onMap(loc))
 							for(Unit a : infoMan.unassignedUnits) {
 								if(a.unitType() == u) {
 									//todo add this once Nate writes isReachab
-									if(ws.units.size() == 0 || infoMan.isReachable(gc.unit(ws.units.get(0)).location().mapLocation(),a.location().mapLocation()) && gc.unit(ws.units.get(0)).location().mapLocation().distanceSquaredTo(a.location().mapLocation()) < 40){
+									if(ws.units.size() == 0 || infoMan.isReachable(gc.unit(ws.units.get(0)).location().mapLocation(),a.location().mapLocation()) && nav.optimalStepsTo(gc.unit(ws.units.get(0)).location().mapLocation(),a.location().mapLocation()) < 10){
 										ws.requestedUnits.remove(ws.requestedUnits.indexOf(u));
 										ws.units.add(infoMan.unassignedUnits.get(infoMan.unassignedUnits.indexOf(a)).id());
 										infoMan.unassignedUnits.remove(infoMan.unassignedUnits.indexOf(a));
@@ -172,7 +172,7 @@ if(!gc.startingMap(Planet.Earth).onMap(loc))
 				//System.out.println("My objective is: " + ((infoMan.workerSquads.get(0).objective == Objective.BUILD) ? "Building" : "NONE"));
 				//System.out.println(infoMan.factories.size());
 
-				if(infoMan.factories.size() < 4) {
+				if(infoMan.factories.size() < 3) {
 					for(WorkerSquad ws : infoMan.workerSquads) {
 						if(ws.objective == Objective.NONE && ws.units.size() > 0) {
 							System.out.println("Trying to build a third factory");
@@ -188,19 +188,6 @@ if(!gc.startingMap(Planet.Earth).onMap(loc))
 									}
 								}
 							}
-
-							/*for(Direction dirToNextFactory : Utils.orderedDiagonals){
-								MapLocation possibleNext = ws.targetLoc.addMultiple(dirToNextFactory, 2);
-								System.out.println("Trying to pick a direction!");
-								if(gc.startingMap(Planet.Earth).onMap(possibleNext) && gc.startingMap(Planet.Earth).isPassableTerrainAt(possibleNext)>0) {
-									if(!(gc.canSenseLocation(possibleNext) && gc.hasUnitAtLocation(possibleNext) && gc.senseUnitAtLocation(possibleNext).unitType() == UnitType.Factory)){
-									ws.targetLoc = possibleNext;
-									ws.objective = Objective.BUILD;
-									System.out.println("Setting");
-									break;
-									}
-								}
-							}*/
 						}
 					}
 				}
