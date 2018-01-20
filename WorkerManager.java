@@ -129,6 +129,7 @@ if(!gc.startingMap(Planet.Earth).onMap(loc))
 									break;
 								}
 							}
+
 						}
 					}
 
@@ -144,6 +145,7 @@ if(!gc.startingMap(Planet.Earth).onMap(loc))
 									System.out.println("Trying to build a second factory");
 									break;
 								}
+
 							}
 						}
 					}
@@ -160,6 +162,7 @@ if(!gc.startingMap(Planet.Earth).onMap(loc))
 								}
 							}
 						}
+
 
 					}
 				}
