@@ -512,6 +512,7 @@ public class CombatSquad extends Squad{
 		int damageDone = (int) (cu.damage - tu.defense);
 		if(damageDone >= tu.health){
 			infoMan.targetUnits.remove(tu.ID);
+			infoMan.removeEnemyUnit(tu.ID, tu.type);
 			for(Tile t: tu.tilesWhichHitMe){
 				t.removeEnemy(tu);
 			}
