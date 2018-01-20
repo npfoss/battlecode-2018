@@ -13,19 +13,19 @@ public class Utils{
         {Direction.Southeast, Direction.Southwest,
          Direction.Northwest, Direction.Northeast};
 
-    public static Direction[] directionsToward(Direction dir) {
+    public static Direction[] directionsTowardButNotIncluding(Direction dir) {
     	 Direction left = dir;
          Direction right = dir;
-         Direction[] ret = new Direction[8];
-         ret[0] = dir;
-         int counter = 1;
+         Direction[] ret = new Direction[7];
+         //ret[0] = dir;
+         int counter = 0;
          for (int i = 0; i < 3; i++){
              left = Utils.rotateLeft(left);
              right = Utils.rotateRight(right);
              ret[counter++] = left;
              ret[counter++] = right;
          }
-         ret[7] = oppositeDir(dir);
+         ret[6] = oppositeDir(dir);
          return ret;
     }
     
