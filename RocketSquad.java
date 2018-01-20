@@ -27,9 +27,7 @@ public class RocketSquad extends Squad{
 				Direction movedir = nav.dirToMoveSafely(astronaut.location().mapLocation(),targetLoc);
 				if (movedir != Direction.Center) {
 					gc.moveRobot(id, movedir);
-					astronaut = gc.unit(id);
 				}
-
 			}
 		}
 	}
