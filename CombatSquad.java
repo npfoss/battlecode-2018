@@ -503,6 +503,7 @@ public class CombatSquad extends Squad{
 	private CombatUnit moveAndUpdate(CombatUnit cu, Direction d){
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].containsUnit = false;
 		gc.moveRobot(cu.ID, d);
+		System.out.println("moving to " + cu.myLoc.getX() + " " + cu.myLoc.getY());
 		cu.canMove = false;
 		cu.myLoc = cu.myLoc.add(d);
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].containsUnit = true;
