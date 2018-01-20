@@ -494,8 +494,8 @@ public class CombatSquad extends Squad{
 				System.out.println("sniping " + tu.myLoc);
 				System.out.flush();
 				for(int i = 0; i <= tu.snipeDamageToDo/30.0; i++){
-					gc.beginSnipe(snipers.get(0).ID, tu.myLoc);
-					snipers.remove(0);
+					gc.beginSnipe(snipers.get(snipers.size()-1).ID, tu.myLoc);
+					snipers.remove(snipers.size()-1);
 				}
 			}
 		}
@@ -540,6 +540,8 @@ public class CombatSquad extends Squad{
 			//we found someone to attack
 			Direction toMove = indexToDirection(bestIndex);
 			cu = moveAndUpdate(cu,toMove);
+			System.out.println("moving in direction " + bestIndex + " to loc " + cu.myLoc + " and attacking loc " + infoMan.targetUnits.get(toAttack).myLoc);
+			System.out.flush();
 			gc.attack(cu.ID, toAttack);
 			updateDamage(cu,infoMan.targetUnits.get(toAttack));
 			cu.canAttack = false;
