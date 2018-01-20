@@ -63,7 +63,7 @@ if(!gc.startingMap(Planet.Earth).onMap(loc))
 			if(gc.planet() == Planet.Earth) {
 				// create new squads if necessary
 				if(infoMan.workerSquads.size()==0) {
-					WorkerSquad ws = new WorkerSquad(gc);
+					WorkerSquad ws = new WorkerSquad(gc,infoMan);
 					ws.objective = Objective.BUILD;
 					ws.update();
 					infoMan.workerSquads.add(ws);
@@ -101,7 +101,7 @@ if(!gc.startingMap(Planet.Earth).onMap(loc))
 					if(!tryAgain) {
 						for(Unit a : infoMan.unassignedUnits) {
 							if(a.unitType() == UnitType.Worker) {
-								WorkerSquad wsn = new WorkerSquad(gc);
+								WorkerSquad wsn = new WorkerSquad(gc,infoMan);
 								wsn.objective = Objective.BUILD;
 								wsn.units.add(infoMan.unassignedUnits.get(infoMan.unassignedUnits.indexOf(a)).id());
 								infoMan.unassignedUnits.remove(infoMan.unassignedUnits.indexOf(a));
@@ -120,8 +120,9 @@ if(!gc.startingMap(Planet.Earth).onMap(loc))
 					//Pick a place to build the first factory
 					if(true) {
 						int maxDist = 2;
-						while(startingFactory1 == null && maxDist < 25) {
-							VecMapLocation v =  gc.allLocationsWithin(gc.unit(infoMan.workerSquads.get(0).units.get(0)).location().mapLocation(), maxDist++);
+						while(startingFactory1 == null && maxDist < 33) {
+							VecMapLocation v =  gc.allLocationsWithin(gc.unit(infoMan.workerSquads.get(0).units.get(0)).location().mapLocation(), maxDist);
+							maxDist = maxDist*2;
 							for(int i= 0; i < v.size(); i++) {
 								if(okayToBuild(v.get(i))) {
 									startingFactory1 = v.get(i);
@@ -136,8 +137,9 @@ if(!gc.startingMap(Planet.Earth).onMap(loc))
 					if(infoMan.workerSquads.size() > 1) {
 						//Pick a place to build a second factory
 						int maxDist = 2;
-						while(startingFactory2 == null && maxDist < 25) {
-							VecMapLocation v =  gc.allLocationsWithin(gc.unit(infoMan.workerSquads.get(1).units.get(0)).location().mapLocation(), maxDist++);
+						while(startingFactory2 == null && maxDist < 33) {
+							VecMapLocation v =  gc.allLocationsWithin(gc.unit(infoMan.workerSquads.get(1).units.get(0)).location().mapLocation(), maxDist);
+							maxDist = maxDist*2;
 							for(int i= 0; i < v.size(); i++) {
 								if(okayToBuild(v.get(i))) {
 									startingFactory2 = v.get(i);
@@ -152,8 +154,9 @@ if(!gc.startingMap(Planet.Earth).onMap(loc))
 					if(infoMan.workerSquads.size() > 2) {
 						//Pick a place to build a third factory
 						int maxDist = 2;
-						while(startingFactory3 == null && maxDist < 25) {
-							VecMapLocation v =  gc.allLocationsWithin(gc.unit(infoMan.workerSquads.get(2).units.get(0)).location().mapLocation(), maxDist++);
+						while(startingFactory3 == null && maxDist < 33) {
+							VecMapLocation v =  gc.allLocationsWithin(gc.unit(infoMan.workerSquads.get(2).units.get(0)).location().mapLocation(), maxDist);
+							maxDist = maxDist*2;
 							for(int i= 0; i < v.size(); i++) {
 								if(okayToBuild(v.get(i))) {
 									startingFactory3 = v.get(i);
@@ -172,13 +175,14 @@ if(!gc.startingMap(Planet.Earth).onMap(loc))
 				//System.out.println("My objective is: " + ((infoMan.workerSquads.get(0).objective == Objective.BUILD) ? "Building" : "NONE"));
 				//System.out.println(infoMan.factories.size());
 
-				if(infoMan.factories.size() < 3) {
+				if(infoMan.factories.size() < 3 && gc.karbonite() > 100) {
 					for(WorkerSquad ws : infoMan.workerSquads) {
-						if(ws.objective == Objective.NONE && ws.units.size() > 0) {
+						if((ws.objective == Objective.NONE  || ws.objective == Objective.MINE) && ws.units.size() > 0) {
 							System.out.println("Trying to build a third factory");
 							int maxDist = 2;
-							while(ws.objective == Objective.NONE && maxDist < 40) {
-								VecMapLocation v =  gc.allLocationsWithin(gc.unit(ws.units.get(0)).location().mapLocation(), maxDist++);
+							while(maxDist < 65) {
+								VecMapLocation v =  gc.allLocationsWithin(gc.unit(ws.units.get(0)).location().mapLocation(), maxDist);
+								maxDist = maxDist*2;
 								for(int i= 0; i < v.size(); i++) {
 									if(okayToBuild(v.get(i))) {
 										ws.targetLoc = v.get(i);
