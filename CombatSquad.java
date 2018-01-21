@@ -653,6 +653,7 @@ public class CombatSquad extends Squad{
     		if(!infoMan.isOnMap(nx, ny))
     			continue;
     		if(infoMan.tiles[nx][ny].myUnit != -1 && combatUnits.containsKey(infoMan.tiles[nx][ny].myUnit)){
+    			Utils.log("found someone");
     			ret.add(combatUnits.get(infoMan.tiles[nx][ny].myUnit));
     		}
     	}
