@@ -649,6 +649,8 @@ public class CombatSquad extends Squad{
     	for(int i = 0; i < healdx.length; i++){
     		nx = x + healdx[i];
     		ny = y + healdy[i];
+    		if(!infoMan.isOnMap(nx, ny))
+    			continue;
     		if(infoMan.tiles[nx][ny].myUnit != -1){
     			ret.add(combatUnits.get(infoMan.tiles[nx][ny].myUnit));
     		}
