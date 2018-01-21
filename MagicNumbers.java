@@ -7,7 +7,7 @@ public class MagicNumbers{
     int SQUAD_SEPARATION_THRESHOLD = 50;
     int RANGER_MIN_RANGE = 11;
     int RANGER_RANGE = 50;
-    int KNIGHT_RANGE = 1;
+    int KNIGHT_RANGE = 2;
     int MAGE_RANGE = 30;
     int HEALER_RANGE = 30;
     double g;

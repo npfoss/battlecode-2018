@@ -8,7 +8,7 @@ import java.util.HashMap;
 public class CombatSquad extends Squad{
 
 	//keep track of units into two groups: those with the main swarm and those separated from it
-	TreeSet<CombatUnit> combatUnits;
+	static TreeSet<CombatUnit> combatUnits;
 	ArrayList<Integer> separatedUnits;
 	InfoManager infoMan;
 	MapLocation swarmLoc;
@@ -241,7 +241,7 @@ public class CombatSquad extends Squad{
 		//update combat units and tiles near them
 		int x,y,nx,ny;
 		for(CombatUnit cu: combatUnits){
-			cu.update(gc);
+			cu.update(gc,nav.optimalStepsTo(cu.myLoc, targetLoc));
 			x = cu.myLoc.getX();
 			y = cu.myLoc.getY();
 			if(cu.canMove){
@@ -267,12 +267,12 @@ public class CombatSquad extends Squad{
 			}
 		}
 
-		doKnightMicro(knights,retreat,nav);
-		doMageMicro(mages,retreat,nav);
-		doRangerMicro(rangers,retreat,nav);
+		knights =doKnightMicro(knights,retreat,nav);
+		mages = doMageMicro(mages,retreat,nav);
+		rangers = doRangerMicro(rangers,retreat,nav);
 		doHealerMicro(healers,retreat,nav);
-
-
+		doSnipes(rangers,retreat,nav);
+		
 		/* Below lies too complicated micro
 		 * 
 		 *
@@ -446,59 +446,7 @@ public class CombatSquad extends Squad{
 		}*/
 	}
 
-	private void doHealerMicro(TreeSet<CombatUnit> healers, boolean retreat, Nav nav) {
-		// TODO Auto-generated method stub
-	}
-
-	private void doRangerMicro(TreeSet<CombatUnit> rangers, boolean retreat, Nav nav) {
-		//first go through rangers which can attack already
-		for(CombatUnit cu: rangers.descendingSet()){
-			if(!cu.canAttack)
-				continue;
-			Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
-			//System.out.println("trying to attack somoeone.");
-			//System.out.flush();
-			if(myTile.enemiesWithinRangerRange.size() > 0){
-				//System.out.println("type = " + myTile.enemiesWithinRangerRange.first().type + " priority = " + myTile.enemiesWithinRangerRange.first().priority);
-				//System.out.flush();
-				gc.attack(cu.ID, myTile.enemiesWithinRangerRange.first().ID);
-				updateDamage(cu,myTile.enemiesWithinRangerRange.first());
-				cu.canAttack = false;
-			}
-		}
-
-		//now if retreating, run away
-		if(retreat){
-			for(CombatUnit cu: rangers.descendingSet()){
-				if(cu.canMove)
-					cu = runAway(cu);
-			}
-			return;
-		}
-
-		//otherwise, do moves and attacks heuristically
-		boolean doSnipeCalcs = false;
-		for(CombatUnit cu: rangers){
-			if(cu.canSnipe){
-				doSnipeCalcs = true;
-			}
-			if(!cu.canMove){
-				continue;
-			}
-			if(cu.canAttack){
-				cu = rangerMoveAndAttack(cu,nav);
-			}
-			else{
-				cu = rangerMove(cu,nav);
-			}
-		}
-		
-		if(!doSnipeCalcs)
-			return;
-		
-		//System.out.println("doing snipe calcs");
-		//System.out.flush();
-		
+	private void doSnipes(TreeSet<CombatUnit> rangers, boolean retreat, Nav nav) {
 		ArrayList<CombatUnit> snipers = new ArrayList<CombatUnit>();
 		for(CombatUnit cu: rangers){
 			if(!cu.canSnipe)
@@ -526,10 +474,156 @@ public class CombatSquad extends Squad{
 				}
 			}
 		}
+	}
+
+	private void doHealerMicro(TreeSet<CombatUnit> healers, boolean retreat, Nav nav) {
+		//go through healers which can heal and heal units which are low on health and close to combat
+		for(CombatUnit cu: healers.descendingSet()){
+			if(cu.canAttack){
+				cu = healSomeone(cu);
+			}
+		}
+		
+		//overcharge then retreat if retreating, otherwise move up then overcharge
+		if(retreat){
+			for(CombatUnit cu: healers.descendingSet()){
+				if(cu.canOvercharge){
+					cu = performOvercharge(cu,retreat,nav);
+				}
+				if(cu.canMove){
+					cu = runAway(cu);
+				}
+			}
+		}
+		
+		for(CombatUnit cu: healers){
+			if(cu.canMove){
+				cu = combatMove(cu,nav);
+			}
+			if(cu.canOvercharge){
+				cu = performOvercharge(cu,retreat,nav);
+			}
+		}
+	}
+
+	private CombatUnit performOvercharge(CombatUnit cu, boolean retreat, Nav nav) {
+		TreeSet<CombatUnit> overchargees = getCombatUnits(cu.myLoc,magicNums.HEALER_RANGE);
+		int toO = -1;
+		CombatUnit tO = new CombatUnit();
+		int bestScore = -10000;
+		int score = 0;
+		for(CombatUnit o: overchargees){
+			switch(o.type){
+			case Healer: continue;
+			case Ranger: score = (int) (gc.unit(o.ID).abilityHeat()/50 - o.stepsFromTarget); break;
+			case Knight: score = (int) (gc.unit(o.ID).abilityHeat()/50 - o.stepsFromTarget); break;
+			case Mage: score = (int) (gc.unit(o.ID).abilityHeat()/50 - o.stepsFromTarget);
+			}
+			if(score > bestScore){
+				tO = o;
+				toO = o.ID;
+				bestScore = score;
+			}
+		}
+		if(toO != -1){
+			gc.overcharge(cu.ID, toO);
+			cu.canOvercharge = false;
+			combatUnits.remove(tO);
+			TreeSet<CombatUnit> temp = new TreeSet<CombatUnit>();
+			temp.add(tO);
+			switch(tO.type){
+			case Ranger: temp = doRangerMicro(temp,retreat,nav); break;
+			case Knight: temp = doRangerMicro(temp,retreat,nav); break;
+			case Mage: temp = doRangerMicro(temp,retreat,nav); break;
+			default:
+			}
+			combatUnits.add(temp.first());
+		}
+		return cu;
+	}
+
+	private CombatUnit healSomeone(CombatUnit cu) {
+		TreeSet<CombatUnit> healees = getCombatUnits(cu.myLoc,magicNums.HEALER_RANGE);
+		int toHeal = -1;
+		CombatUnit tH = new CombatUnit();
+		int bestScore = -10000;
+		for(CombatUnit h: healees){
+			if(h.health + 10 >= h.maxHealth)
+				continue;
+			int score = (int) (-h.stepsFromTarget - h.health/10);
+			if(score > bestScore){
+				tH = h;
+				toHeal = h.ID;
+				bestScore = score;
+			}
+		}
+		if(toHeal != -1){
+			gc.heal(cu.ID, toHeal);
+			cu.canAttack = false;
+			combatUnits.remove(tH);
+			switch((int)(gc.researchInfo().getLevel(UnitType.Healer))){
+			case 0: tH.health += 10;
+			case 1: tH.health += 12;
+			default: tH.health += 17;
+			}
+			combatUnits.add(tH);
+		}
+		return cu;
+	}
+	
+	private static TreeSet<CombatUnit> getCombatUnits(MapLocation ml, int radius){
+    	TreeSet<CombatUnit> ret = new TreeSet<CombatUnit>(new AscendingStepsComp());
+    	for(CombatUnit cu: combatUnits){
+    		if(cu.myLoc.distanceSquaredTo(ml) <= radius)
+    			ret.add(cu);
+    	}
+    	return ret;
+    }
+
+	private TreeSet<CombatUnit> doRangerMicro(TreeSet<CombatUnit> rangers, boolean retreat, Nav nav) {
+		//first go through rangers which can attack already
+		for(CombatUnit cu: rangers.descendingSet()){
+			if(!cu.canAttack)
+				continue;
+			Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
+			//System.out.println("trying to attack somoeone.");
+			//System.out.flush();
+			if(myTile.enemiesWithinRangerRange.size() > 0){
+				//System.out.println("type = " + myTile.enemiesWithinRangerRange.first().type + " priority = " + myTile.enemiesWithinRangerRange.first().priority);
+				//System.out.flush();
+				gc.attack(cu.ID, myTile.enemiesWithinRangerRange.first().ID);
+				updateDamage(cu,myTile.enemiesWithinRangerRange.first());
+				cu.canAttack = false;
+			}
+		}
+
+		//now if retreating, run away
+		if(retreat){
+			for(CombatUnit cu: rangers.descendingSet()){
+				if(cu.canMove)
+					cu = runAway(cu);
+			}
+			return rangers;
+		}
+
+		//otherwise, do moves and attacks heuristically
+		for(CombatUnit cu: rangers){
+			if(!cu.canMove){
+				continue;
+			}
+			if(cu.canAttack){
+				cu = rangerMoveAndAttack(cu,nav);
+			}
+			else{
+				cu = combatMove(cu,nav);
+			}
+		}
+		
+		return rangers;
 		
 	}
 
-	private CombatUnit rangerMove(CombatUnit cu, Nav nav) {
+	private CombatUnit combatMove(CombatUnit cu, Nav nav) {
 		Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
 		//if we're not near any enemies nav, otherwise run away
 		if(myTile.distFromNearestHostile == 100){
@@ -621,12 +715,14 @@ public class CombatSquad extends Squad{
 		}
 	}
 
-	private void doMageMicro(TreeSet<CombatUnit> mages, boolean retreat, Nav nav) {
+	private TreeSet<CombatUnit> doMageMicro(TreeSet<CombatUnit> mages, boolean retreat, Nav nav) {
 		// TODO Auto-generated method stub
+		return mages;
 	}
 
-	private void doKnightMicro(TreeSet<CombatUnit> knights, boolean retreat, Nav nav) {
+	private TreeSet<CombatUnit> doKnightMicro(TreeSet<CombatUnit> knights, boolean retreat, Nav nav) {
 		// TODO Auto-generated method stub
+		return knights;
 	}
 
 	private CombatUnit moveAndUpdate(CombatUnit cu, Direction d){
