@@ -87,6 +87,7 @@ public class CombatSquad extends Squad{
 	}
 
 	public void update(){
+		Utils.log("hi " + objective);
 		if(objective == Objective.EXPLORE){
 			requestedUnits.clear();
 			requestedUnits.add(UnitType.Ranger);
@@ -179,7 +180,7 @@ public class CombatSquad extends Squad{
 				//System.out.println("adding " + cu.ID + " 2");
 				//System.out.flush();
 				combatUnits.put(cu.ID,cu);
-				swarmThreshold++;
+				swarmThreshold+=2;
 			}
 		}
 		System.out.println("swarm size = " + combatUnits.size() + " obj = " + objective + " swarmLoc = " + swarmLoc + " targetLoc = " + targetLoc  
