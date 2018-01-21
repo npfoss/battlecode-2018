@@ -456,11 +456,13 @@ public class CombatSquad extends Squad{
 			if(!cu.canAttack)
 				continue;
 			Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
-			//System.out.println("trying to atack somoeone.");
+			//System.out.println("trying to attack somoeone.");
 			//System.out.flush();
 			if(myTile.enemiesWithinRangerRange.size() > 0){
 				gc.attack(cu.ID, myTile.enemiesWithinRangerRange.first().ID);
 				updateDamage(cu,myTile.enemiesWithinRangerRange.first());
+				System.out.println("type = " + myTile.enemiesWithinKnightRange.first().type + " priority = " + myTile.enemiesWithinRangerRange.first().priority);
+				System.out.flush();
 				cu.canAttack = false;
 			}
 		}

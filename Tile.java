@@ -139,6 +139,10 @@ public class Tile{
     			enemiesWithinMageRange.add(tu);
     			didSomething = true;
     		}
+    		if(didSomething){
+    			tu.tilesWhichHitMe.add(this);
+    			infoMan.targetUnits.put(tu.ID, tu);
+    		}
     		if(!Utils.isTypeHostile(tu.type))
     			continue;
     		//figure out if they can hit this tile next turn given that they can move once
@@ -150,10 +154,6 @@ public class Tile{
     		   !(tu.type == UnitType.Ranger && farthestTheyCanGet <= magicNums.RANGER_MIN_RANGE)){
     			enemiesWhichCouldHitUs.add(tu);
     			possibleDamage += tu.damageDealingPower;
-    		}
-    		if(didSomething){
-    			tu.tilesWhichHitMe.add(this);
-    			infoMan.targetUnits.put(tu.ID, tu);
     		}
     	}
     }
