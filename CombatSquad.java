@@ -140,10 +140,9 @@ public class CombatSquad extends Squad{
 			return;
 		//System.out.println("cs here");
 		if(objective == Objective.EXPLORE){
-			System.out.println("swarm size = " + units.size() + " obj = " + objective + " urgency = " + urgency);
-			System.out.flush();
+			Utils.log("swarm size = " + units.size() + " obj = " + objective + " urgency = " + urgency);
 			explore(nav);
-			if(units.size() < 50 || gc.round() % 10 == 0)
+			if(infoMan.combatSquads.size() > 1)
 				objective = objective.NONE;
 			return;
 		}
@@ -246,8 +245,8 @@ public class CombatSquad extends Squad{
 	}
 
 	private void explore(Nav nav){
-		Direction dirToMove = Utils.orderedDirections[(int) (8*Math.random())];
 		for(int uid: units){
+			Direction dirToMove = Utils.orderedDirections[(int) (8*Math.random())];
 			if(gc.canMove(uid, dirToMove) && gc.unit(uid).movementHeat() < 10)
 				gc.moveRobot(uid, dirToMove);
 		}

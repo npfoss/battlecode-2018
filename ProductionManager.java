@@ -42,7 +42,7 @@ public class ProductionManager{
     		infoMan.combatSquads.sort(Squad.byUrgency());
     		infoMan.rocketSquads.sort(Squad.byUrgency());
     		Squad toFill = null;
-    		if(infoMan.combatSquads.size()>0)
+    		if(infoMan.combatSquads.size()>0 && infoMan.fighters.size() < 150)
     			toFill = infoMan.combatSquads.get(0);
     		if(infoMan.rocketSquads.size()>0 && (toFill == null || infoMan.rocketSquads.get(0).urgency > toFill.urgency))
     			toFill = infoMan.rocketSquads.get(0);

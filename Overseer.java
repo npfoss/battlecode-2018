@@ -42,7 +42,7 @@ public class Overseer{
     }
 
     public void takeTurn(){
-        System.out.println("Current round: " + gc.round());
+        Utils.log("Current round: " + gc.round());
         int start = gc.getTimeLeftMs();
         
         infoMan.update();
@@ -65,6 +65,6 @@ public class Overseer{
             cs.move(nav);
         }
         gc.nextTurn();
-        System.out.println("turn took " + (start + 50 - gc.getTimeLeftMs()) + ". " + gc.getTimeLeftMs() + " ms left");
+        Utils.log("turn took " + (start + 50 - gc.getTimeLeftMs()) + ". " + gc.getTimeLeftMs() + " ms left");
     }
 }

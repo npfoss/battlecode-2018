@@ -73,20 +73,17 @@ public class CombatManager{
 			}
 		}
 		
+		if(infoMan.combatSquads.size()==1 && infoMan.combatSquads.get(0).objective == Objective.EXPLORE){
+			for(TargetUnit tu: infoMan.targetUnits.values()){
+				addCombatSquad(tu.myLoc,Objective.ATTACK_LOC, strat);
+			}
+		}
+		
 		if(infoMan.combatSquads.size() == 0) {
-			//go after enemies
-			if(infoMan.targetUnits.size() > 0){
-				for(TargetUnit tu: infoMan.targetUnits.values()){
-					addCombatSquad(tu.myLoc,Objective.ATTACK_LOC, strat);
-				}
-			}
-			//otherwise find one
-			else{
-				CombatSquad cs = new CombatSquad(gc,infoMan,magicNums,strat.combatComposition);
-				cs.objective = Objective.EXPLORE;
-				cs.update();
-				infoMan.combatSquads.add(cs);
-			}
+			CombatSquad cs = new CombatSquad(gc,infoMan,magicNums,strat.combatComposition);
+			cs.objective = Objective.EXPLORE;
+			cs.update();
+			infoMan.combatSquads.add(cs);
 		}
 
 		boolean didSomething = false;
@@ -95,27 +92,23 @@ public class CombatManager{
 			infoMan.combatSquads.sort(Squad.byUrgency());
 			boolean tryAgain = false;
 			for(CombatSquad cs : infoMan.combatSquads) {
-				for(UnitType u : cs.requestedUnits) {
-					for(int i : infoMan.unassignedUnits) {
-						Unit a = gc.unit(i);
-						if(a.unitType() == u) {
-							if(cs.targetLoc != null && 
-							((!turnUnassigned.containsKey(a.id()) && gc.round() == 1) || (turnUnassigned.containsKey(a.id()) && turnUnassigned.get(a.id()) == gc.round()))){
-								MapLocation ml = cs.targetLoc;
-								if(a.location().isOnMap())
-									ml = a.location().mapLocation();
-								else
-									ml = gc.unit(a.location().structure()).location().mapLocation();
-								if(!infoMan.isReachable(cs.targetLoc, ml))
-									continue;
-							}
-							//System.out.println("adding to cs");
-							cs.addUnit(a);
-							tryAgain = true;
-							didSomething = true;
+				for(int i : infoMan.unassignedUnits) {
+					Unit a = gc.unit(i);
+					if(cs.requestedUnits.contains(a.unitType())) {
+						if(cs.targetLoc != null && 
+						((!turnUnassigned.containsKey(a.id()) && gc.round() == 1) || (turnUnassigned.containsKey(a.id()) && turnUnassigned.get(a.id()) == gc.round()))){
+							MapLocation ml = cs.targetLoc;
+							if(a.location().isOnMap())
+								ml = a.location().mapLocation();
+							else
+								ml = gc.unit(a.location().structure()).location().mapLocation();
+							if(!infoMan.isReachable(cs.targetLoc, ml))
+								continue;
 						}
-						if(tryAgain)
-							break;
+						//System.out.println("adding to cs");
+						cs.addUnit(a);
+						tryAgain = true;
+						didSomething = true;
 					}
 					if(tryAgain)
 						break;
