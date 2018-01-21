@@ -10,10 +10,12 @@ Creates (empty) WorkerSquad to build factory (workers assigned by WorkerManager)
 public class ProductionManager{
     InfoManager infoMan;
     GameController gc;
+    MagicNumbers magicNums;
 
     public ProductionManager(){}
     
-    public ProductionManager(InfoManager im, GameController g){
+    public ProductionManager(InfoManager im, GameController g, MagicNumbers mn){
+    	magicNums = mn;
         infoMan = im;
         gc = g;
     }
@@ -42,7 +44,7 @@ public class ProductionManager{
     		infoMan.combatSquads.sort(Squad.byUrgency());
     		infoMan.rocketSquads.sort(Squad.byUrgency());
     		Squad toFill = null;
-    		if(infoMan.combatSquads.size()>0 && infoMan.fighters.size() < 150)
+    		if(infoMan.combatSquads.size()>0 && infoMan.fighters.size() < magicNums.MAX_FIGHTER_COUNT)
     			toFill = infoMan.combatSquads.get(0);
     		if(infoMan.rocketSquads.size()>0 && (toFill == null || infoMan.rocketSquads.get(0).urgency > toFill.urgency))
     			toFill = infoMan.rocketSquads.get(0);

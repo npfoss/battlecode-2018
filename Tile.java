@@ -14,6 +14,7 @@ public class Tile{
     MagicNumbers magicNums;
     InfoManager infoMan;
     boolean containsUnit;
+    int myUnit; //id of combat unit on tile
 
     int roundLastUpdated;
     TreeSet<TargetUnit> enemiesWhichCouldHitUs;
@@ -53,6 +54,7 @@ public class Tile{
         containsUnit = false;
         containsUpdated = false;
         distFromNearestHostile = 100;
+        myUnit = -1;
     }
 
     public void updateKarbonite(long newKarb){

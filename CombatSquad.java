@@ -10,7 +10,7 @@ public class CombatSquad extends Squad{
 	//keep track of units into two groups: those with the main swarm and those separated from it
 	static HashMap<Integer,CombatUnit> combatUnits; //ID to CombatUnit
 	ArrayList<Integer> separatedUnits;
-	InfoManager infoMan;
+	static InfoManager infoMan;
 	MapLocation swarmLoc;
 	int numEnemyUnits;
 	MagicNumbers magicNums;
@@ -153,6 +153,7 @@ public class CombatSquad extends Squad{
 					continue;
 				CombatUnit cu = new CombatUnit(id,u.damage(),u.health(),u.movementHeat()<10,u.attackHeat()<10,
 						u.location().mapLocation(),u.unitType(),nav.optimalStepsTo(u.location().mapLocation(), targetLoc));
+				infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].myUnit = cu.ID;
 				//System.out.println("adding " + cu.ID + " 1");
 				//System.out.flush();
 				combatUnits.put(cu.ID,cu);
@@ -171,6 +172,7 @@ public class CombatSquad extends Squad{
 				separatedUnits.remove(i);
 				CombatUnit cu = new CombatUnit(u.id(),u.damage(),u.health(),u.movementHeat()<10,u.attackHeat()<10,
 						ml,u.unitType(),nav.optimalStepsTo(ml, targetLoc));
+				infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].myUnit = cu.ID;
 				//System.out.println("adding " + cu.ID + " 2");
 				//System.out.flush();
 				combatUnits.put(cu.ID,cu);
@@ -546,7 +548,7 @@ public class CombatSquad extends Squad{
 	}
 
 	private CombatUnit performOvercharge(CombatUnit cu, boolean retreat, Nav nav) {
-		TreeSet<CombatUnit> overchargees = getCombatUnits(cu.myLoc,magicNums.HEALER_RANGE);
+		TreeSet<CombatUnit> overchargees = getUnitsToHeal(cu.myLoc);
 		int toO = -1;
 		CombatUnit tO = new CombatUnit();
 		double bestScore = -10000;
@@ -598,7 +600,7 @@ public class CombatSquad extends Squad{
 	}
 
 	private CombatUnit healSomeone(CombatUnit cu) {
-		TreeSet<CombatUnit> healees = getCombatUnits(cu.myLoc,magicNums.HEALER_RANGE);
+		TreeSet<CombatUnit> healees = getUnitsToHeal(cu.myLoc);
 		int toHeal = -1;
 		CombatUnit tH = new CombatUnit();
 		double bestScore = -10000;
@@ -629,11 +631,26 @@ public class CombatSquad extends Squad{
 		return cu;
 	}
 	
-	private static TreeSet<CombatUnit> getCombatUnits(MapLocation ml, int radius){
+	private static final int[] healdx = {0,0,0,0,0,1,1,1,1,1,1,2,2,2,2,2,2,3,3,3,3,3,4,4,4,4,5,5,5,
+										 0,0,0,0,0,1,1,1,1,1,2,2,2,2,2,3,3,3,3,4,4,4,5,5,
+										 -1,-1,-1,-1,-1,-1,-2,-2,-2,-2,-2,-2,-3,-3,-3,-3,-3,-4,-4,-4,-4,-5,-5,-5,
+										 -1,-1,-1,-1,-1,-2,-2,-2,-2,-2,-3,-3,-3,-3,-4,-4,-4,-5,-5};
+	private static final int[] healdy = {1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,0,1,2,3,0,1,2,
+										 -1,-2,-3,-4,-5,-1,-2,-3,-4,-5,-1,-2,-3,-4,-5,-1,-2,-3,-4,-1,-2,-3,-1,-2,
+										 1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,0,1,2,3,0,1,2,
+										 -1,-2,-3,-4,-5,-1,-2,-3,-4,-5,-1,-2,-3,-4,-1,-2,-3,-1,-2};
+
+	private static TreeSet<CombatUnit> getUnitsToHeal(MapLocation ml){
+		int x = ml.getX();
+		int y = ml.getY();
+		int nx,ny;
     	TreeSet<CombatUnit> ret = new TreeSet<CombatUnit>(new AscendingStepsComp());
-    	for(CombatUnit cu: combatUnits.values()){
-    		if(cu.myLoc.distanceSquaredTo(ml) <= radius)
-    			ret.add(cu);
+    	for(int i = 0; i < healdx.length; i++){
+    		nx = x + healdx[i];
+    		ny = y + healdy[i];
+    		if(infoMan.tiles[nx][ny].myUnit != -1){
+    			ret.add(combatUnits.get(infoMan.tiles[nx][ny].myUnit));
+    		}
     	}
     	return ret;
     }
@@ -858,11 +875,13 @@ public class CombatSquad extends Squad{
 		if(d==Direction.Center)
 			return cu;
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].containsUnit = false;
+		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].myUnit = -1;
 		//System.out.println("moving to " + cu.myLoc.getX() + " " + cu.myLoc.getY());
 		//System.out.flush();
 		cu.canMove = false;
 		cu.myLoc = cu.myLoc.add(d);
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].containsUnit = true;
+		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].myUnit = cu.ID;
 		gc.moveRobot(cu.ID, d);
 		return cu;
 	}
