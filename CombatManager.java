@@ -93,13 +93,15 @@ public class CombatManager{
 				for(UnitType u : cs.requestedUnits) {
 					for(Unit a : infoMan.unassignedUnits) {
 						if(a.unitType() == u) {
-							MapLocation ml = cs.targetLoc;
-							if(a.location().isOnMap())
-								ml = a.location().mapLocation();
-							else
-								ml = gc.unit(a.location().structure()).location().mapLocation();
-							if(!infoMan.isReachable(cs.targetLoc, ml))
-								continue;
+							if(cs.targetLoc != null){
+								MapLocation ml = cs.targetLoc;
+								if(a.location().isOnMap())
+									ml = a.location().mapLocation();
+								else
+									ml = gc.unit(a.location().structure()).location().mapLocation();
+								if(!infoMan.isReachable(cs.targetLoc, ml))
+									continue;
+							}
 							//System.out.println("adding to cs");
 							Unit toAdd = infoMan.unassignedUnits.get(infoMan.unassignedUnits.indexOf(a));
 							cs.addUnit(toAdd);

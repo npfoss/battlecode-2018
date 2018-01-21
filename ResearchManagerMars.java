@@ -50,7 +50,7 @@ public class ResearchManagerMars extends ResearchManager{
 				if(ut == UnitType.Healer){
 					numExpectedHealer++;
 					if(numExpectedHealer>gc.researchInfo().getLevel(UnitType.Healer)){
-						gc.queueResearch(UnitType.Ranger);
+						gc.queueResearch(UnitType.Healer);
 						break;
 					}
 				}

@@ -28,12 +28,12 @@ public class TargetUnit {
 		range = r;
 		defense = d;
 		switch(ut){
-		case Rocket: priority = (ml.getPlanet() == Planet.Earth ? 7 : 1);
-		case Factory: priority = 6;
-		case Mage: priority = 5;
-		case Healer: priority = 4;
-		case Knight: priority = 3;
-		case Ranger: priority = 2;
+		case Rocket: priority = (ml.getPlanet() == Planet.Earth ? 7 : 1); break;
+		case Factory: priority = 6; break;
+		case Mage: priority = 5; break;
+		case Healer: priority = 4; break;
+		case Knight: priority = 3; break;
+		case Ranger: priority = 2; break;
 		case Worker: priority = 1;
 		}
 		infoMan = im;
