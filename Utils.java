@@ -120,6 +120,11 @@ public class Utils{
     	return new MapLocation(gc.planet(),x/units.size(), y/units.size());
     }
     
+    public static void log(String s){
+    	System.out.println(s);
+    	System.out.flush();
+    }
+    
     public static MapLocation averageMapLocation(GameController gc, Collection<CombatUnit> units) {
     	if(units.size() == 0)
     		return null;

@@ -85,6 +85,11 @@ public class CombatSquad extends Squad{
 
 	public void update(){
 		if(objective == Objective.EXPLORE){
+			requestedUnits.clear();
+			requestedUnits.add(UnitType.Ranger);
+			requestedUnits.add(UnitType.Healer);
+			requestedUnits.add(UnitType.Mage);
+			requestedUnits.add(UnitType.Knight);
 			urgency = 0;
 			return;
 		}
@@ -136,6 +141,7 @@ public class CombatSquad extends Squad{
 		//System.out.println("cs here");
 		if(objective == Objective.EXPLORE){
 			System.out.println("swarm size = " + units.size() + " obj = " + objective + " urgency = " + urgency);
+			System.out.flush();
 			explore(nav);
 			if(units.size() < 50 || gc.round() % 10 == 0)
 				objective = objective.NONE;
