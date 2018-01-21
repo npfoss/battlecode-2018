@@ -162,7 +162,7 @@ public class CombatSquad extends Squad{
 			separatedUnits.clear();
 		}
 		//TODO: think about if this is actually a good threshold
-		int swarmThreshold = combatUnits.size()*2 + 10;
+		int swarmThreshold = combatUnits.size() + 10;
 		for(int i = separatedUnits.size()-1; i>=0; i--){
 			Unit u = gc.unit(separatedUnits.get(i));
 			if(!u.location().isOnMap())
@@ -177,7 +177,7 @@ public class CombatSquad extends Squad{
 				//System.out.println("adding " + cu.ID + " 2");
 				//System.out.flush();
 				combatUnits.put(cu.ID,cu);
-				swarmThreshold+=2;
+				swarmThreshold++;
 			}
 		}
 		System.out.println("swarm size = " + combatUnits.size() + " obj = " + objective + " swarmLoc = " + swarmLoc + " targetLoc = " + targetLoc  
@@ -188,8 +188,7 @@ public class CombatSquad extends Squad{
 		//check if we're done with our objective
 		boolean done = areWeDone();
 		if(done){
-			System.out.println("setting obj to none");
-			System.out.flush();
+			Utils.log("setting obj to none");
 			objective = Objective.NONE;
 		}
 		update();
@@ -651,7 +650,7 @@ public class CombatSquad extends Squad{
     		ny = y + healdy[i];
     		if(!infoMan.isOnMap(nx, ny))
     			continue;
-    		if(infoMan.tiles[nx][ny].myUnit != -1){
+    		if(infoMan.tiles[nx][ny].myUnit != -1 && combatUnits.containsKey(infoMan.tiles[nx][ny].myUnit)){
     			ret.add(combatUnits.get(infoMan.tiles[nx][ny].myUnit));
     		}
     	}
