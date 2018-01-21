@@ -281,9 +281,9 @@ public class CombatSquad extends Squad{
 			}
 		}
 
-		knights =doKnightMicro(knights,retreat,nav);
-		mages = doMageMicro(mages,retreat,nav);
-		rangers = doRangerMicro(rangers,retreat,nav);
+		doKnightMicro(knights,retreat,nav);
+		doMageMicro(mages,retreat,nav);
+		doRangerMicro(rangers,retreat,nav);
 		doHealerMicro(healers,retreat,nav);
 		doSnipes(rangers,retreat,nav);
 		
@@ -542,18 +542,18 @@ public class CombatSquad extends Squad{
 		if(toO != -1){
 			gc.overcharge(cu.ID, toO);
 			cu.canOvercharge = false;
-			removeCombatUnit(toO);
+			//removeCombatUnit(toO);
 			TreeSet<CombatUnit> temp = new TreeSet<CombatUnit>();
 			temp.add(tO);
 			switch(tO.type){
-			case Ranger: temp = doRangerMicro(temp,retreat,nav); break;
-			case Knight: temp = doRangerMicro(temp,retreat,nav); break;
-			case Mage: temp = doRangerMicro(temp,retreat,nav); break;
+			case Ranger: doRangerMicro(temp,retreat,nav); break;
+			case Knight: doKnightMicro(temp,retreat,nav); break;
+			case Mage: doMageMicro(temp,retreat,nav); break;
 			default:
 			}
 			//System.out.println("adding " + temp.first().ID + " 3");
 			//System.out.flush();
-			combatUnits.add(temp.first());
+			//combatUnits.add(temp.first());
 		}
 		return cu;
 	}
@@ -576,7 +576,7 @@ public class CombatSquad extends Squad{
 		if(toHeal != -1){
 			gc.heal(cu.ID, toHeal);
 			cu.canAttack = false;
-			removeCombatUnit(toHeal);
+			//removeCombatUnit(toHeal);
 			switch((int)(gc.researchInfo().getLevel(UnitType.Healer))){
 			case 0: tH.health += 10;
 			case 1: tH.health += 12;
@@ -584,7 +584,7 @@ public class CombatSquad extends Squad{
 			}
 			//System.out.println("adding " + toHeal + " 4");
 			//System.out.flush();
-			combatUnits.add(tH);
+			//combatUnits.add(tH);
 		}
 		return cu;
 	}
@@ -598,7 +598,7 @@ public class CombatSquad extends Squad{
     	return ret;
     }
 
-	private TreeSet<CombatUnit> doRangerMicro(TreeSet<CombatUnit> rangers, boolean retreat, Nav nav) {
+	private void doRangerMicro(TreeSet<CombatUnit> rangers, boolean retreat, Nav nav) {
 		//first go through rangers which can attack already
 		for(CombatUnit cu: rangers.descendingSet()){
 			if(!cu.canAttack)
@@ -621,7 +621,7 @@ public class CombatSquad extends Squad{
 				if(cu.canMove)
 					cu = runAway(cu);
 			}
-			return rangers;
+			return;
 		}
 
 		//otherwise, do moves and attacks heuristically
@@ -636,8 +636,6 @@ public class CombatSquad extends Squad{
 				cu = combatMove(cu,nav);
 			}
 		}
-		
-		return rangers;
 		
 	}
 
@@ -733,14 +731,12 @@ public class CombatSquad extends Squad{
 		}
 	}
 
-	private TreeSet<CombatUnit> doMageMicro(TreeSet<CombatUnit> mages, boolean retreat, Nav nav) {
+	private void doMageMicro(TreeSet<CombatUnit> mages, boolean retreat, Nav nav) {
 		// TODO Auto-generated method stub
-		return mages;
 	}
 
-	private TreeSet<CombatUnit> doKnightMicro(TreeSet<CombatUnit> knights, boolean retreat, Nav nav) {
+	private void doKnightMicro(TreeSet<CombatUnit> knights, boolean retreat, Nav nav) {
 		// TODO Auto-generated method stub
-		return knights;
 	}
 
 	private CombatUnit moveAndUpdate(CombatUnit cu, Direction d){
