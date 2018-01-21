@@ -736,7 +736,9 @@ public class CombatSquad extends Squad{
 			Tile t = infoMan.tiles[nx][ny];
 			if(!t.isWalkable || t.containsUnit)
 				continue;
-			score = -t.possibleDamage * magicNums.DAMAGE_FACTOR_RANGER_MOVE - t.distFromNearestHostile * magicNums.HOSTILE_FACTOR_RANGER_MOVE - t.myLoc.distanceSquaredTo(swarmLoc) * magicNums.SWARM_FACTOR_RANGER_MOVE;
+			score = -t.possibleDamage * magicNums.DAMAGE_FACTOR_RANGER_MOVE - t.distFromNearestHostile * magicNums.HOSTILE_FACTOR_RANGER_MOVE 
+					- t.myLoc.distanceSquaredTo(swarmLoc) * magicNums.SWARM_FACTOR_RANGER_MOVE
+					- t.myLoc.distanceSquaredTo(targetLoc) * magicNums.TARGET_FACTOR_RANGER_MOVE;
 			if(score>bestScore){
 				bestScore = score;
 				bestIndex = i;
