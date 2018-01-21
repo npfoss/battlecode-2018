@@ -27,7 +27,7 @@ public class CombatSquad extends Squad{
 		magicNums = mn;
 		unitCounts = new int[]{0,0,0,0}; //knight,mage,ranger,healer
 		unitCompGoal = ucg;
-		System.out.println("ucg = " + ucg[0] + " " + ucg[1] + " " + ucg[2] + " " + ucg[3]);
+		//System.out.println("ucg = " + ucg[0] + " " + ucg[1] + " " + ucg[2] + " " + ucg[3]);
 		//System.out.flush();
 	}
 	
@@ -100,6 +100,8 @@ public class CombatSquad extends Squad{
 			if(unitCompGoal[i]==0)
 				continue;
 			int score = unitCounts[i]/unitCompGoal[i];
+			System.out.println("Score = " + score);
+			System.out.flush();
 			if(score<bestScore){
 				bestScore = score;
 				bestIndex = i;
