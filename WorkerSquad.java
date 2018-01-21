@@ -4,8 +4,11 @@ import java.util.ArrayList;
 public class WorkerSquad extends Squad {
 
 	UnitType toBuild;
-	public WorkerSquad(GameController g) {
+	InfoManager infoMan;
+	MapLocation targetKarboniteLoc = null;
+	public WorkerSquad(GameController g, InfoManager im) {
 		super(g);
+		infoMan = im;
 		toBuild = UnitType.Factory;
 	}
 
@@ -14,6 +17,92 @@ public class WorkerSquad extends Squad {
 			requestedUnits.add(UnitType.Worker);
 		urgency = 64-8*units.size();
 	}
+	public void moveTowardsKarbonite(int id, Nav nav) {
+		//System.out.println("trying really hard to move towards karbonite");
+		if(!gc.isMoveReady(id))
+			return;
+		MapLocation myLoc = gc.unit(id).location().mapLocation();
+		int maxDist = 2;
+		
+		if(targetKarboniteLoc != null && infoMan.tiles[targetKarboniteLoc.getX()][targetKarboniteLoc.getY()].karbonite == 0)
+			targetKarboniteLoc = null;
+		while(targetKarboniteLoc == null && maxDist < 257) {
+			VecMapLocation m = gc.allLocationsWithin(myLoc, maxDist);
+			maxDist = maxDist*2;
+			for(int i = 0; i < m.size(); i++) {
+				int x = m.get(i).getX();
+				int y= m.get(i).getY();
+				if(infoMan.tiles[x][y].karbonite > 0 && infoMan.isReachable(myLoc, m.get(i))) {
+					targetKarboniteLoc = m.get(i);
+					break;
+				}
+			}
+		}
+		if(targetKarboniteLoc != null) {
+			//System.out.println("trying sososoosososososososo hard to move towards karbonite");
+			Direction toMove = nav.dirToMoveSafely(myLoc, targetKarboniteLoc);
+			if(gc.canMove(id, toMove)) {
+				//System.out.println("IM MOVING ROAR");
+				gc.moveRobot(id, toMove);
+			}
+		}
+	}
+	public void tryToMine(int id) {
+		if(gc.canHarvest(id,Direction.Center)) {
+			gc.harvest(id, Direction.Center);
+			return;
+		}
+		if(gc.canHarvest(id,Direction.North)) {
+			gc.harvest(id, Direction.North);
+			return;
+		}
+		if(gc.canHarvest(id,Direction.South)) {
+			gc.harvest(id, Direction.South);
+			return;
+		}
+		if(gc.canHarvest(id,Direction.East)) {
+			gc.harvest(id, Direction.East);
+			return;
+		}
+		if(gc.canHarvest(id,Direction.West)) {
+			gc.harvest(id, Direction.West);
+			return;
+		}
+		if(gc.canHarvest(id,Direction.Northwest)) {
+			gc.harvest(id, Direction.Northwest);
+			return;
+		}
+		if(gc.canHarvest(id,Direction.Northeast)) {
+			gc.harvest(id, Direction.Northeast);
+			return;
+		}
+		if(gc.canHarvest(id,Direction.Southwest)) {
+			gc.harvest(id, Direction.Southwest);
+			return;
+		}
+		if(gc.canHarvest(id,Direction.Southeast)) {
+			gc.harvest(id, Direction.Southeast);
+			return;
+		}
+	}
+	public void replicateWorker(int id) {
+		if(targetLoc != null) {
+			for(Direction dirToReplicate : Utils.directionsTowardButNotIncluding(gc.unit(id).location().mapLocation().directionTo(targetLoc))) {
+				if (gc.canReplicate(id, dirToReplicate)) {
+					gc.replicate(id, dirToReplicate);
+					break;
+				}
+			}
+		}
+		else {
+			for(Direction dirToReplicate : Utils.orderedDirections) {
+				if (gc.canReplicate(id, dirToReplicate)) {
+					gc.replicate(id, dirToReplicate);
+					break;
+				}
+			}
+		}
+	}
 	public void move(Nav nav) {
 		for(int id: units) {
 			Unit worker = gc.unit(id);
@@ -21,30 +110,16 @@ public class WorkerSquad extends Squad {
 				continue;
 			//For now we shall replicate once at the start.
 			if(gc.round() == 1) {
-				if(targetLoc != null) {
-					for(Direction dirToReplicate : Utils.directionsTowardButNotIncluding(worker.location().mapLocation().directionTo(targetLoc))) {
-						if (gc.canReplicate(id, dirToReplicate)) {
-							gc.replicate(id, dirToReplicate);
-							break;
-						}
-					}
-				}
-				else {
-					for(Direction dirToReplicate : Utils.orderedDirections) {
-						if (gc.canReplicate(id, dirToReplicate)) {
-							gc.replicate(id, dirToReplicate);
-							break;
-						}
-					}
-				}
+				replicateWorker(id);
+				
 			}
 			switch (objective) {
 			case BUILD:
 				if(targetLoc != null) {
-					// System.out.println("Trying to build something useful");
+					//System.out.println("Trying to build something useful at: " + targetLoc.getX() + ", " + targetLoc.getY());
 					if(!worker.location().mapLocation().isAdjacentTo(targetLoc) && gc.isMoveReady(id)) {
 						//Move towards the target location
-						Direction movedir = nav.dirToMove(worker.location().mapLocation(),targetLoc);
+						Direction movedir = nav.dirToMoveSafely(worker.location().mapLocation(),targetLoc);
 						if (movedir != Direction.Center) {
 							gc.moveRobot(id, movedir);
 							worker = gc.unit(id);
@@ -59,6 +134,7 @@ public class WorkerSquad extends Squad {
 							}
 						}
 					}
+					//Last resort we're stuck and need to build
 					if(worker.location().mapLocation()  == targetLoc) {
 						gc.disintegrateUnit(id);
 					}
@@ -116,20 +192,12 @@ public class WorkerSquad extends Squad {
 						}
 					}
 				}
+				tryToMine(id);
 				break;
 			case MINE:
-				gc.disintegrateUnit(id);
-				/*
-			 if !(nav.isSafe???){
-			 	runAway();
-			 }
-			 else{
-			 		if we're blocking the way, move out of the way
-			 		if we are at mine loc, mine
-			 		if loc is dead, pick new loc
-			 		goto mine loc
-			 }
-				 */
+				tryToMine(id);
+				moveTowardsKarbonite(id,nav);
+				tryToMine(id);
 				break;
 			case BOARD_ROCKET:
 				break;

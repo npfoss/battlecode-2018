@@ -17,7 +17,7 @@ public class RocketManager{
         infoMan = im;
     }
 
-    public void update(){
+    public void update(Strategy strat){
         // modifies rocketSquads as necessary and launches rockets
         // remember, those are in infoMan
     	//sets the squad to be in space or not

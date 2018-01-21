@@ -44,7 +44,10 @@ public class Nav{
     takes into account movable obstructions like other robots
     */
     public Direction dirToMove(MapLocation start, MapLocation target){
-        return dirToMove(start, directionTowards(start, target));
+    	if(infoMan.isReachable(start, target))
+    		return dirToMove(start, directionTowards(start, target));
+    	else
+    		return dirToMove(start, start.directionTo(target));
     }
 
     // overloaded for convenience
@@ -84,7 +87,7 @@ public class Nav{
         // now check if legal and safe and stuff
         MapLocation loc = start.add(preferredDir);
         double danger;
-        double bestDanger = infoMan.tiles[start.getX()][start.getY()].dangerRating();
+        double bestDanger = 999999;
         Direction bestDir = Direction.Center;
 
         if (infoMan.isLocationClear(loc)){
@@ -145,6 +148,11 @@ public class Nav{
             if (bestDanger <= 0){
                 return bestDir;
             }
+        }
+
+        // last resort: stay put
+        if(infoMan.tiles[start.getX()][start.getY()].dangerRating() < bestDanger){
+            bestDir = Direction.Center;
         }
 
         return bestDir;

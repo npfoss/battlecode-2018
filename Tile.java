@@ -43,10 +43,10 @@ public class Tile{
         roundLastUpdated = 0;
         possibleDamage = 0;
         destToDir = new HashMap<String, Signpost>();
-        enemiesWhichCouldHitUs = new TreeSet<TargetUnit>(new ascendingHealthComp());
-        enemiesWithinRangerRange = new TreeSet<TargetUnit>(new ascendingHealthComp());
-        enemiesWithinKnightRange = new TreeSet<TargetUnit>(new ascendingHealthComp());
-        enemiesWithinMageRange = new TreeSet<TargetUnit>(new ascendingHealthComp());
+        enemiesWhichCouldHitUs = new TreeSet<TargetUnit>(new descendingPriorityComp());
+        enemiesWithinRangerRange = new TreeSet<TargetUnit>(new descendingPriorityComp());
+        enemiesWithinKnightRange = new TreeSet<TargetUnit>(new descendingPriorityComp());
+        enemiesWithinMageRange = new TreeSet<TargetUnit>(new descendingPriorityComp());
         //accessible = false;
         //claimed = false;
         enemiesUpdated = false;
@@ -122,7 +122,7 @@ public class Tile{
     	for(TargetUnit tu: enemies){
     		MapLocation ml = tu.myLoc;
     		long dist = myLoc.distanceSquaredTo(ml);
-    		if(Utils.isTypeHostile(tu.type) && dist<distFromNearestHostile){
+    		if(Utils.isTypeHostile(tu.type) && dist < distFromNearestHostile){
     			distFromNearestHostile = (int)dist;
     		}
     		didSomething = false;
@@ -139,9 +139,14 @@ public class Tile{
     			enemiesWithinMageRange.add(tu);
     			didSomething = true;
     		}
+    		if(didSomething){
+    			tu.tilesWhichHitMe.add(this);
+    			infoMan.targetUnits.put(tu.ID, tu);
+    		}
     		if(!Utils.isTypeHostile(tu.type))
     			continue;
     		//figure out if they can hit this tile next turn given that they can move once
+            // TODO: can't we check if they can move?
     		int xDif = Math.abs(ml.getX() - x);
     		int yDif = Math.abs(ml.getY() - y);
     		int closestTheyCanGet = (xDif-1) * (xDif-1) + (yDif-1) * (yDif-1);
@@ -150,10 +155,6 @@ public class Tile{
     		   !(tu.type == UnitType.Ranger && farthestTheyCanGet <= magicNums.RANGER_MIN_RANGE)){
     			enemiesWhichCouldHitUs.add(tu);
     			possibleDamage += tu.damageDealingPower;
-    		}
-    		if(didSomething){
-    			tu.tilesWhichHitMe.add(this);
-    			infoMan.targetUnits.put(tu.ID, tu);
     		}
     	}
     }

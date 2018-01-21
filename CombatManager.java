@@ -1,5 +1,7 @@
 import bc.*;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 /*
 manages overall decisions of combat units
@@ -10,8 +12,8 @@ public class CombatManager{
 	InfoManager infoMan;
 	GameController gc;
 	MagicNumbers magicNums;
-	
-	public CombatManager(InfoManager im, GameController g, MagicNumbers mn){
+
+	public CombatManager(InfoManager im, GameController g, MagicNumbers mn, Strategy strat){
 		infoMan = im;
 		gc = g;
 		magicNums = mn;
@@ -24,21 +26,7 @@ public class CombatManager{
 			if(u.team() == gc.team())
 				continue;
 			MapLocation loc = u.location().mapLocation();
-			boolean stop = false;
-			for(MapLocation ml: enemyStartingLocs){
-				if(ml.distanceSquaredTo(loc) < magicNums.SQUAD_SEPARATION_THRESHOLD){
-					stop = true;
-					break;
-				}
-			}
-			if(stop)
-				continue;
-			CombatSquad cs = new CombatSquad(gc,infoMan);
-			cs.objective = Objective.ATTACK_LOC;
-			cs.targetLoc = loc;
-			cs.update();
-			infoMan.combatSquads.add(cs);
-			enemyStartingLocs.add(loc);
+			addCombatSquad(loc,Objective.ATTACK_LOC,strat);
 		}
 	}
 
@@ -49,13 +37,6 @@ public class CombatManager{
 	// call update method of each squad?
 	// remember, the squads will move on their own after you update everything
 	public void update(Strategy strat){
-		if(infoMan.combatSquads.size()==0) {
-			CombatSquad cs = new CombatSquad(gc,infoMan);
-			cs.objective = Objective.EXPLORE;
-			cs.update();
-			infoMan.combatSquads.add(cs);
-		}
-
 		// set units whose objective is NONE (meaning they completed it) to unassignedUnits
 		ArrayList<CombatSquad> toRemove = new ArrayList<CombatSquad>();
 		for(CombatSquad cs: infoMan.combatSquads){
@@ -66,9 +47,42 @@ public class CombatManager{
 				toRemove.add(cs);
 			}
 		}
-		
+
 		for(CombatSquad cs: toRemove)
 			infoMan.combatSquads.remove(cs);
+		
+		//defend factories and rockets
+		for(Unit u: infoMan.factories){
+			MapLocation ml = u.location().mapLocation();
+			if(infoMan.getTargetUnits(ml, 100, true).size() > 0){
+				addCombatSquad(ml,Objective.DEFEND_LOC,strat);
+			}
+		}
+		
+		if(infoMan.myPlanet == Planet.Earth){
+			for(Unit u: infoMan.rockets){
+				MapLocation ml = u.location().mapLocation();
+				if(infoMan.getTargetUnits(ml, 100, true).size() > 0){
+					addCombatSquad(ml,Objective.DEFEND_LOC,strat);
+				}
+			}
+		}
+		
+		if(infoMan.combatSquads.size() == 0) {
+			//go after enemies
+			if(infoMan.targetUnits.size() > 0){
+				for(TargetUnit tu: infoMan.targetUnits.values()){
+					addCombatSquad(tu.myLoc,Objective.ATTACK_LOC, strat);
+				}
+			}
+			//otherwise find one
+			else{
+				CombatSquad cs = new CombatSquad(gc,infoMan,magicNums,strat.combatComposition);
+				cs.objective = Objective.EXPLORE;
+				cs.update();
+				infoMan.combatSquads.add(cs);
+			}
+		}
 
 		boolean didSomething = false;
 		while(infoMan.unassignedUnits.size() > 0) {
@@ -79,13 +93,18 @@ public class CombatManager{
 				for(UnitType u : cs.requestedUnits) {
 					for(Unit a : infoMan.unassignedUnits) {
 						if(a.unitType() == u) {
-							// System.out.println("adding to cs");
-							cs.requestedUnits.remove(u);
-							int toAdd = infoMan.unassignedUnits.get(infoMan.unassignedUnits.indexOf(a)).id();
-							cs.units.add(toAdd);
-							cs.separatedUnits.add(toAdd);
-							infoMan.unassignedUnits.remove(a);
-							cs.update();
+							if(cs.targetLoc != null){
+								MapLocation ml = cs.targetLoc;
+								if(a.location().isOnMap())
+									ml = a.location().mapLocation();
+								else
+									ml = gc.unit(a.location().structure()).location().mapLocation();
+								if(!infoMan.isReachable(cs.targetLoc, ml))
+									continue;
+							}
+							//System.out.println("adding to cs");
+							Unit toAdd = infoMan.unassignedUnits.get(infoMan.unassignedUnits.indexOf(a));
+							cs.addUnit(toAdd);
 							tryAgain = true;
 							didSomething = true;
 						}
@@ -101,7 +120,19 @@ public class CombatManager{
 			if(!didSomething)
 				break;
 		}
-
 	}	
+	
+	public void addCombatSquad(MapLocation targetLoc, Objective obj, Strategy strat){
+		for(CombatSquad cs: infoMan.combatSquads){
+			if(targetLoc.distanceSquaredTo(cs.targetLoc) < magicNums.SQUAD_SEPARATION_THRESHOLD || 
+			   targetLoc.distanceSquaredTo(cs.swarmLoc) < 75)
+				return;
+		}
+		CombatSquad cs = new CombatSquad(gc,infoMan,magicNums,strat.combatComposition);
+		cs.objective = obj;
+		cs.targetLoc = targetLoc;
+		cs.update();
+		infoMan.combatSquads.add(cs);
+	}
 
 }
