@@ -2,6 +2,8 @@ import bc.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 
 /*
 manages overall decisions of combat units
@@ -12,11 +14,13 @@ public class CombatManager{
 	InfoManager infoMan;
 	GameController gc;
 	MagicNumbers magicNums;
+	HashMap<Integer,Integer> turnUnassigned;
 
 	public CombatManager(InfoManager im, GameController g, MagicNumbers mn, Strategy strat){
 		infoMan = im;
 		gc = g;
 		magicNums = mn;
+		turnUnassigned = new HashMap<Integer,Integer>();
 		if(infoMan.myPlanet == Planet.Mars)
 			return;
 		VecUnit vu = gc.startingMap(infoMan.myPlanet).getInitial_units();
@@ -43,6 +47,7 @@ public class CombatManager{
 			if(cs.objective == Objective.NONE){
 				for(int uid: cs.units){
 					infoMan.unassignedUnits.add(gc.unit(uid));
+					turnUnassigned.put(uid, (int)(gc.round()));
 				}
 				toRemove.add(cs);
 			}
@@ -93,7 +98,8 @@ public class CombatManager{
 				for(UnitType u : cs.requestedUnits) {
 					for(Unit a : infoMan.unassignedUnits) {
 						if(a.unitType() == u) {
-							if(cs.targetLoc != null){
+							if(cs.targetLoc != null && 
+							((!turnUnassigned.containsKey(a.id()) && gc.round() == 1) || (turnUnassigned.containsKey(a.id()) && turnUnassigned.get(a.id()) == gc.round()))){
 								MapLocation ml = cs.targetLoc;
 								if(a.location().isOnMap())
 									ml = a.location().mapLocation();
