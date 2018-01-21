@@ -77,8 +77,9 @@ public class WorkerManager{
 					for(UnitType u : ws.requestedUnits) {
 						for(int i : infoMan.unassignedUnits) {
 							Unit a = gc.unit(i);
+							if(!a.location().isOnMap())
+								continue;
 							if(a.unitType() == u) {
-								//todo add this once Nate writes isReachab
 								if(ws.units.size() == 0 || infoMan.isReachable(gc.unit(ws.units.get(0)).location().mapLocation(),a.location().mapLocation()) && nav.optimalStepsTo(gc.unit(ws.units.get(0)).location().mapLocation(),a.location().mapLocation()) < 10){
 									ws.requestedUnits.remove(ws.requestedUnits.indexOf(u));
 									ws.units.add(a.id());
