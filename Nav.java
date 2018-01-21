@@ -83,7 +83,10 @@ public class Nav{
     }
 
     public Direction dirToMoveSafely(MapLocation start, MapLocation target){
-        return dirToMoveSafely(start, directionTowards(start, target));
+    	if(infoMan.isReachable(start, target))
+    		return dirToMoveSafely(start, directionTowards(start, target));
+    	else
+    		return dirToMoveSafely(start, start.directionTo(target));
     }
 
     public Direction dirToMoveSafely(MapLocation start, Direction preferredDir){
