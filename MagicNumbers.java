@@ -10,12 +10,22 @@ public class MagicNumbers{
     int KNIGHT_RANGE = 2;
     int MAGE_RANGE = 30;
     int HEALER_RANGE = 30;
+    int MAX_DIST_TO_CHECK = 100;
     int MAX_DIST_THEY_COULD_HIT_NEXT_TURN = 72;
     int MAX_DIST_THEY_COULD_HIT = 50;
-    int ABILITY_HEAT_OVERCHARGE_FACTOR = 50; //the bigger, the less we care about overcharging ability heats
-    int HOSTILE_FACTOR_RUN_AWAY = 2; //bigger, more we care
-    int SWARM_FACTOR_RUN_AWAY = 1; //^
-    int HOSTILE_FACTOR_RANGER_MOVE = 1; //^
-    int SWARM_FACTOR_RANGER_MOVE = 1; //^
+    //the bigger, the less we care:
+    double ABILITY_HEAT_OVERCHARGE_FACTOR = 50.0; 
+    double HEALER_HEALTH_FACTOR = 10.0;
+    //the bigger, the more we care:
+    double HOSTILE_FACTOR_RUN_AWAY = 2.0; 
+    double SWARM_FACTOR_RUN_AWAY = 1.0; 
+    double HOSTILE_FACTOR_RANGER_MOVE = 1.0; 
+    double SWARM_FACTOR_RANGER_MOVE = 1.0; 
+    double DAMAGE_FACTOR_RANGER_MOVE = 100.0;
+    double HOSTILE_FACTOR_HEALER_MOVE = 1.0; 
+    double SWARM_FACTOR_HEALER_MOVE = 2.0; 
+    double DAMAGE_FACTOR_HEALER_MOVE = 200.0;
+    double HOSTILE_FACTOR_RANGER_MOVE_ATTACK = 1.0; 
+    double SWARM_FACTOR_RANGER_MOVE_ATTACK = 1.0; 
     double g;
 }

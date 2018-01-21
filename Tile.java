@@ -116,8 +116,8 @@ public class Tile{
         	accessible = false;
         }
         */
-    	TreeSet<TargetUnit> enemies = infoMan.getTargetUnits(myLoc, magicNums.MAX_DIST_THEY_COULD_HIT_NEXT_TURN, false);
-    	distFromNearestHostile = 100;
+    	TreeSet<TargetUnit> enemies = infoMan.getTargetUnits(myLoc, magicNums.MAX_DIST_TO_CHECK, false);
+    	distFromNearestHostile = magicNums.MAX_DIST_TO_CHECK;
     	boolean didSomething;
     	for(TargetUnit tu: enemies){
     		MapLocation ml = tu.myLoc;
@@ -125,6 +125,8 @@ public class Tile{
     		if(Utils.isTypeHostile(tu.type) && dist < distFromNearestHostile){
     			distFromNearestHostile = (int)dist;
     		}
+    		if(dist > magicNums.MAX_DIST_THEY_COULD_HIT_NEXT_TURN)
+    			continue;
     		didSomething = false;
     		//System.out.println("here");
     		if(magicNums.RANGER_MIN_RANGE <= dist && dist <= magicNums.RANGER_RANGE){
