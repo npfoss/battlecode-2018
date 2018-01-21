@@ -51,29 +51,33 @@ public class CombatSquad extends Squad{
 		if(separatedUnits.contains(id))
 			separatedUnits.remove(separatedUnits.indexOf(id));
 		else{
-			CombatUnit toRemove  = new CombatUnit();
-			boolean remove = false;
-			for(CombatUnit cu: combatUnits){
-				if(cu.ID == id){
-					toRemove = cu;
-					remove = true;
-					break;
-				}
-			}
-			if(remove){
-				//System.out.println("removing id " + id);
-				//System.out.flush();
-				combatUnits.remove(toRemove);
-				switch(toRemove.type){
-				case Knight:unitCounts[0]--; break;
-				case Mage:unitCounts[1]--; break;
-				case Ranger:unitCounts[2]--; break;
-				case Healer:unitCounts[3]--; break;
-				default: break;
-				}
-			}
+			removeCombatUnit(id);
 		}
 		update();
+	}
+
+	private void removeCombatUnit(int id) {
+		CombatUnit toRemove  = new CombatUnit();
+		boolean remove = false;
+		for(CombatUnit cu: combatUnits){
+			if(cu.ID == id){
+				toRemove = cu;
+				remove = true;
+				break;
+			}
+		}
+		if(remove){
+			//System.out.println("removing id " + id);
+			//System.out.flush();
+			combatUnits.remove(toRemove);
+			switch(toRemove.type){
+			case Knight:unitCounts[0]--; break;
+			case Mage:unitCounts[1]--; break;
+			case Ranger:unitCounts[2]--; break;
+			case Healer:unitCounts[3]--; break;
+			default: break;
+			}
+		}
 	}
 
 	public void update(){
@@ -135,8 +139,8 @@ public class CombatSquad extends Squad{
 					continue;
 				CombatUnit cu = new CombatUnit(id,u.damage(),u.health(),u.movementHeat()<10,u.attackHeat()<10,
 						u.location().mapLocation(),u.unitType(),nav.optimalStepsTo(u.location().mapLocation(), targetLoc));
-				System.out.println("adding " + cu.ID + " 1");
-				System.out.flush();
+				//System.out.println("adding " + cu.ID + " 1");
+				//System.out.flush();
 				combatUnits.add(cu);
 			}
 			separatedUnits.clear();
@@ -153,8 +157,8 @@ public class CombatSquad extends Squad{
 				separatedUnits.remove(i);
 				CombatUnit cu = new CombatUnit(u.id(),u.damage(),u.health(),u.movementHeat()<10,u.attackHeat()<10,
 						ml,u.unitType(),nav.optimalStepsTo(ml, targetLoc));
-				System.out.println("adding " + cu.ID + " 2");
-				System.out.flush();
+				//System.out.println("adding " + cu.ID + " 2");
+				//System.out.flush();
 				combatUnits.add(cu);
 				swarmThreshold+=2;
 			}
@@ -538,7 +542,7 @@ public class CombatSquad extends Squad{
 		if(toO != -1){
 			gc.overcharge(cu.ID, toO);
 			cu.canOvercharge = false;
-			combatUnits.remove(tO);
+			removeCombatUnit(toO);
 			TreeSet<CombatUnit> temp = new TreeSet<CombatUnit>();
 			temp.add(tO);
 			switch(tO.type){
@@ -547,8 +551,8 @@ public class CombatSquad extends Squad{
 			case Mage: temp = doRangerMicro(temp,retreat,nav); break;
 			default:
 			}
-			System.out.println("adding " + temp.first().ID + " 3");
-			System.out.flush();
+			//System.out.println("adding " + temp.first().ID + " 3");
+			//System.out.flush();
 			combatUnits.add(temp.first());
 		}
 		return cu;
@@ -572,14 +576,14 @@ public class CombatSquad extends Squad{
 		if(toHeal != -1){
 			gc.heal(cu.ID, toHeal);
 			cu.canAttack = false;
-			combatUnits.remove(tH);
+			removeCombatUnit(toHeal);
 			switch((int)(gc.researchInfo().getLevel(UnitType.Healer))){
 			case 0: tH.health += 10;
 			case 1: tH.health += 12;
 			default: tH.health += 17;
 			}
-			System.out.println("adding " + cu.ID + " 4");
-			System.out.flush();
+			//System.out.println("adding " + toHeal + " 4");
+			//System.out.flush();
 			combatUnits.add(tH);
 		}
 		return cu;
