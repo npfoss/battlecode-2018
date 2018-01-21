@@ -164,7 +164,7 @@ public class CombatSquad extends Squad{
 			separatedUnits.clear();
 		}
 		//TODO: think about if this is actually a good threshold
-		int swarmThreshold = combatUnits.size() + 10;
+		int swarmThreshold = combatUnits.size()*2 + 10;
 		for(int i = separatedUnits.size()-1; i>=0; i--){
 			Unit u = gc.unit(separatedUnits.get(i));
 			if(!u.location().isOnMap())
@@ -653,7 +653,6 @@ public class CombatSquad extends Squad{
     		if(!infoMan.isOnMap(nx, ny))
     			continue;
     		if(infoMan.tiles[nx][ny].myUnit != -1 && combatUnits.containsKey(infoMan.tiles[nx][ny].myUnit)){
-    			Utils.log("found someone");
     			ret.add(combatUnits.get(infoMan.tiles[nx][ny].myUnit));
     		}
     	}
