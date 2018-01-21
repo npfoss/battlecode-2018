@@ -8,7 +8,7 @@ import java.util.HashMap;
 public class CombatSquad extends Squad{
 
 	//keep track of units into two groups: those with the main swarm and those separated from it
-	static TreeSet<CombatUnit> combatUnits;
+	static HashMap<Integer,CombatUnit> combatUnits; //ID to CombatUnit
 	ArrayList<Integer> separatedUnits;
 	InfoManager infoMan;
 	MapLocation swarmLoc;
@@ -21,7 +21,7 @@ public class CombatSquad extends Squad{
 
 	public CombatSquad(GameController g, InfoManager im, MagicNumbers mn, int[] ucg) {
 		super(g);
-		combatUnits = new TreeSet<CombatUnit>(new AscendingStepsComp());
+		combatUnits = new HashMap<Integer,CombatUnit>();
 		separatedUnits = new ArrayList<Integer>();
 		infoMan = im;
 		magicNums = mn;
@@ -58,6 +58,8 @@ public class CombatSquad extends Squad{
 
 	//done in a bad way cuz i couldn't get the normal way to work
 	private void removeCombatUnit(int id) {
+		combatUnits.remove(id);
+		/*
 		CombatUnit toRemove  = new CombatUnit();
 		boolean remove = false;
 		TreeSet<CombatUnit> newCombatUnits = new TreeSet<CombatUnit>(new AscendingStepsComp());
@@ -78,13 +80,13 @@ public class CombatSquad extends Squad{
 			case Healer:unitCounts[3]--; break;
 			default: break;
 			}
-		}
+		}*/
 	}
 
 	public void update(){
 		swarmLoc = targetLoc;
 		if(combatUnits.size() > 0)
-			swarmLoc = Utils.averageMapLocation(gc, combatUnits);
+			swarmLoc = Utils.averageMapLocation(gc, combatUnits.values());
 		numEnemyUnits = infoMan.getTargetUnits(swarmLoc, 100, false).size();
 		if(infoMan.myPlanet == Planet.Mars)
 			return;
@@ -142,7 +144,7 @@ public class CombatSquad extends Squad{
 						u.location().mapLocation(),u.unitType(),nav.optimalStepsTo(u.location().mapLocation(), targetLoc));
 				//System.out.println("adding " + cu.ID + " 1");
 				//System.out.flush();
-				combatUnits.add(cu);
+				combatUnits.put(cu.ID,cu);
 			}
 			separatedUnits.clear();
 		}
@@ -154,13 +156,13 @@ public class CombatSquad extends Squad{
 				continue;
 			MapLocation ml = u.location().mapLocation();
 			if(ml.distanceSquaredTo(swarmLoc) <= swarmThreshold ||
-				infoMan.getTargetUnits(ml, 50, false).size() > 0){
+				infoMan.getTargetUnits(ml, magicNums.MAX_DIST_THEY_COULD_HIT, false).size() > 0){
 				separatedUnits.remove(i);
 				CombatUnit cu = new CombatUnit(u.id(),u.damage(),u.health(),u.movementHeat()<10,u.attackHeat()<10,
 						ml,u.unitType(),nav.optimalStepsTo(ml, targetLoc));
 				//System.out.println("adding " + cu.ID + " 2");
 				//System.out.flush();
-				combatUnits.add(cu);
+				combatUnits.put(cu.ID,cu);
 				swarmThreshold+=2;
 			}
 		}
@@ -255,8 +257,9 @@ public class CombatSquad extends Squad{
 
 		//update combat units and tiles near them
 		int x,y,nx,ny;
-		for(CombatUnit cu: combatUnits){
+		for(CombatUnit cu: combatUnits.values()){
 			cu.update(gc,nav.optimalStepsTo(cu.myLoc, targetLoc));
+			combatUnits.put(cu.ID, cu);
 			x = cu.myLoc.getX();
 			y = cu.myLoc.getY();
 			if(cu.canMove){
@@ -286,7 +289,12 @@ public class CombatSquad extends Squad{
 		doMageMicro(mages,retreat,nav);
 		doRangerMicro(rangers,retreat,nav);
 		doHealerMicro(healers,retreat,nav);
-		doSnipes(rangers,retreat,nav);
+		//update each unit from heal, overcharge
+		TreeSet<CombatUnit> updatedRangers = new TreeSet<CombatUnit>(new AscendingStepsComp());
+		for(CombatUnit cu: rangers){
+			updatedRangers.add(combatUnits.get(cu.ID));
+		}
+		doSnipes(updatedRangers,retreat,nav);
 		
 		/* Below lies too complicated micro
 		 * 
@@ -496,6 +504,7 @@ public class CombatSquad extends Squad{
 		for(CombatUnit cu: healers.descendingSet()){
 			if(cu.canAttack){
 				cu = healSomeone(cu);
+				combatUnits.put(cu.ID, cu);
 			}
 		}
 		
@@ -504,9 +513,11 @@ public class CombatSquad extends Squad{
 			for(CombatUnit cu: healers.descendingSet()){
 				if(cu.canOvercharge){
 					cu = performOvercharge(cu,retreat,nav);
+					combatUnits.put(cu.ID, cu);
 				}
 				if(cu.canMove){
 					cu = runAway(cu);
+					combatUnits.put(cu.ID, cu);
 				}
 			}
 		}
@@ -514,9 +525,11 @@ public class CombatSquad extends Squad{
 		for(CombatUnit cu: healers){
 			if(cu.canMove){
 				cu = combatMove(cu,nav);
+				combatUnits.put(cu.ID, cu);
 			}
 			if(cu.canOvercharge){
 				cu = performOvercharge(cu,retreat,nav);
+				combatUnits.put(cu.ID, cu);
 			}
 		}
 	}
@@ -530,9 +543,9 @@ public class CombatSquad extends Squad{
 		for(CombatUnit o: overchargees){
 			switch(o.type){
 			case Healer: continue;
-			case Ranger: score = (int) (gc.unit(o.ID).abilityHeat()/50 - o.stepsFromTarget); break;
-			case Knight: score = (int) (gc.unit(o.ID).abilityHeat()/50 - o.stepsFromTarget); break;
-			case Mage: score = (int) (gc.unit(o.ID).abilityHeat()/50 - o.stepsFromTarget);
+			case Ranger: score = (int) ((gc.researchInfo().getLevel(UnitType.Ranger) == 3 ? gc.unit(o.ID).abilityHeat()/magicNums.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.stepsFromTarget); break;
+			case Knight: score = (int) ((gc.researchInfo().getLevel(UnitType.Knight) == 3 ? gc.unit(o.ID).abilityHeat()/magicNums.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.stepsFromTarget); break;
+			case Mage: score = (int) ((gc.researchInfo().getLevel(UnitType.Mage) == 4 ? gc.unit(o.ID).abilityHeat()/magicNums.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.stepsFromTarget);
 			}
 			if(score > bestScore){
 				tO = o;
@@ -543,6 +556,7 @@ public class CombatSquad extends Squad{
 		if(toO != -1){
 			gc.overcharge(cu.ID, toO);
 			cu.canOvercharge = false;
+			tO.update(gc, nav.optimalStepsTo(tO.myLoc, targetLoc));
 			//removeCombatUnit(toO);
 			TreeSet<CombatUnit> temp = new TreeSet<CombatUnit>();
 			temp.add(tO);
@@ -552,6 +566,8 @@ public class CombatSquad extends Squad{
 			case Mage: doMageMicro(temp,retreat,nav); break;
 			default:
 			}
+			tO.update(gc, nav.optimalStepsTo(tO.myLoc, targetLoc));
+			combatUnits.put(tO.ID, tO);
 			//System.out.println("adding " + temp.first().ID + " 3");
 			//System.out.flush();
 			//combatUnits.add(temp.first());
@@ -583,6 +599,7 @@ public class CombatSquad extends Squad{
 			case 1: tH.health += 12;
 			default: tH.health += 17;
 			}
+			combatUnits.put(tH.ID, tH);
 			//System.out.println("adding " + toHeal + " 4");
 			//System.out.flush();
 			//combatUnits.add(tH);
@@ -592,7 +609,7 @@ public class CombatSquad extends Squad{
 	
 	private static TreeSet<CombatUnit> getCombatUnits(MapLocation ml, int radius){
     	TreeSet<CombatUnit> ret = new TreeSet<CombatUnit>(new AscendingStepsComp());
-    	for(CombatUnit cu: combatUnits){
+    	for(CombatUnit cu: combatUnits.values()){
     		if(cu.myLoc.distanceSquaredTo(ml) <= radius)
     			ret.add(cu);
     	}
@@ -613,14 +630,17 @@ public class CombatSquad extends Squad{
 				gc.attack(cu.ID, myTile.enemiesWithinRangerRange.first().ID);
 				updateDamage(cu,myTile.enemiesWithinRangerRange.first());
 				cu.canAttack = false;
+				combatUnits.put(cu.ID, cu);
 			}
 		}
 
 		//now if retreating, run away
 		if(retreat){
 			for(CombatUnit cu: rangers.descendingSet()){
-				if(cu.canMove)
+				if(cu.canMove){
 					cu = runAway(cu);
+					combatUnits.put(cu.ID, cu);
+				}
 			}
 			return;
 		}
@@ -632,9 +652,11 @@ public class CombatSquad extends Squad{
 			}
 			if(cu.canAttack){
 				cu = rangerMoveAndAttack(cu,nav);
+				combatUnits.put(cu.ID, cu);
 			}
 			else{
 				cu = combatMove(cu,nav);
+				combatUnits.put(cu.ID, cu);
 			}
 		}
 		
@@ -667,7 +689,7 @@ public class CombatSquad extends Squad{
 			Tile t = infoMan.tiles[nx][ny];
 			if(!t.isWalkable || t.containsUnit || t.enemiesWithinRangerRange.size()==0)
 				continue;
-			score = (int) (t.distFromNearestHostile - t.myLoc.distanceSquaredTo(swarmLoc));
+			score = (int) (t.distFromNearestHostile * magicNums.HOSTILE_FACTOR_RANGER_MOVE - t.myLoc.distanceSquaredTo(swarmLoc) * magicNums.SWARM_FACTOR_RANGER_MOVE);
 			if(score>bestScore){
 				bestScore = score;
 				bestIndex = i;
@@ -706,7 +728,7 @@ public class CombatSquad extends Squad{
 			Tile t = infoMan.tiles[nx][ny];
 			if(!t.isWalkable || t.containsUnit)
 				continue;
-			score = (int) (t.distFromNearestHostile*2 - t.myLoc.distanceSquaredTo(swarmLoc));
+			score = (int) (t.distFromNearestHostile*magicNums.HOSTILE_FACTOR_RUN_AWAY - t.myLoc.distanceSquaredTo(swarmLoc)*magicNums.SWARM_FACTOR_RUN_AWAY);
 			if(score>bestScore){
 				bestScore = score;
 				bestIndex = i;

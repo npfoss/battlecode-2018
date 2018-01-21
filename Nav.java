@@ -22,6 +22,10 @@ public class Nav{
     assuming no movable units obstruct you
     */
     public int optimalStepsTo(MapLocation start, MapLocation target){
+    	if(!infoMan.isReachable(start, target)){
+        	return 1000;
+        	//arbitrarily large number
+        }
         if (!infoMan.tiles[start.getX()][start.getY()].destToDir.containsKey(target.toString())){
             generateBFSMap(target);
         }

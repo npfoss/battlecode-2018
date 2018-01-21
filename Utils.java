@@ -120,6 +120,18 @@ public class Utils{
     	return new MapLocation(gc.planet(),x/units.size(), y/units.size());
     }
     
+    public static MapLocation averageMapLocation(GameController gc, Collection<CombatUnit> units) {
+    	if(units.size() == 0)
+    		return null;
+    	int x = 0;
+    	int y = 0;
+    	for(CombatUnit cu : units) {
+    		x += cu.myLoc.getX();
+    		y += cu.myLoc.getY();
+    	}
+    	return new MapLocation(gc.planet(),x/units.size(), y/units.size());
+    }
+    
     public static boolean isTypeHostile(UnitType ut){
     	return ut == UnitType.Knight || ut == UnitType.Ranger || ut == UnitType.Mage;
     }
