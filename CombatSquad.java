@@ -304,17 +304,22 @@ public class CombatSquad extends Squad{
 			default: mages.add(cu); 
 			}
 		}
+		
+		infoMan.logTimeCheckpoint("units and tiles updated");
 
 		doKnightMicro(knights,retreat,nav);
 		doMageMicro(mages,retreat,nav);
 		doRangerMicro(rangers,retreat,nav);
+		infoMan.logTimeCheckpoint("rangers microed");
 		doHealerMicro(healers,retreat,nav);
+		infoMan.logTimeCheckpoint("healers microed");
 		//update each unit from heal, overcharge
 		TreeSet<CombatUnit> updatedRangers = new TreeSet<CombatUnit>(new AscendingStepsComp());
 		for(CombatUnit cu: rangers){
 			updatedRangers.add(combatUnits.get(cu.ID));
 		}
 		doSnipes(updatedRangers,retreat,nav);
+		infoMan.logTimeCheckpoint("sniped done");
 		
 		/* Below lies too complicated micro
 		 * 

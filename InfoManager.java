@@ -16,7 +16,7 @@ public class InfoManager {
 	Planet myPlanet;
 	MagicNumbers magicNums;
 	int height, width;
-	long turnStartTime;
+	long lastCheckpoint;
 	//int totalUnitCount;
 
 	ArrayList<Unit> rockets;
@@ -83,7 +83,7 @@ public class InfoManager {
 	}
 
 	public void update() {
-		turnStartTime = System.nanoTime();
+		lastCheckpoint = System.nanoTime();
 		
 		// called at the beginning of each turn
 		comms.update();
@@ -336,8 +336,9 @@ public class InfoManager {
     }
     
     public void logTimeCheckpoint(String identifier){
-    	long duration = System.nanoTime() - turnStartTime;
-    	Utils.log(identifier + ": " + duration + " ns since start of turn.");
+    	long duration = System.nanoTime() - lastCheckpoint;
+    	lastCheckpoint = System.nanoTime();
+    	Utils.log(identifier + ": " + duration + " ns since last checkpoint.");
     }
     
 }
