@@ -44,6 +44,8 @@ public class CombatUnit {
 	}
 	
 	public void update(GameController gc, int sft){
+		System.out.println("updating " + ID);
+		System.out.flush();
 		Unit u = gc.unit(ID);
 		stepsFromTarget = sft;
 		health = u.health();
