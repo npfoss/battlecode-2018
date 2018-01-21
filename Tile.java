@@ -116,7 +116,7 @@ public class Tile{
         	accessible = false;
         }
         */
-    	TreeSet<TargetUnit> enemies = Utils.getTargetUnits(myLoc, 72, false, infoMan);
+    	TreeSet<TargetUnit> enemies = infoMan.getTargetUnits(myLoc, 72, false);
     	distFromNearestHostile = 100;
     	boolean didSomething;
     	for(TargetUnit tu: enemies){
@@ -166,4 +166,11 @@ public class Tile{
 		default: return new TreeSet<TargetUnit>();
 		}
 	}
+
+    public double dangerRating(){
+        if (!enemiesUpdated){
+            updateEnemies(infoMan.gc);
+        }
+        return 1.0 * possibleDamage;
+    }
 }

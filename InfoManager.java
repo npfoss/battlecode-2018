@@ -2,6 +2,7 @@ import bc.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.TreeSet;
 
 /* please edit this it's just late at night
  updates enemy locations and buildings (where it last saw them etc)
@@ -279,6 +280,14 @@ public class InfoManager {
 		return false;
 	}
 
+    public TreeSet<TargetUnit> getTargetUnits(MapLocation ml, int radius, boolean hostileOnly){
+        TreeSet<TargetUnit> ret = new TreeSet<TargetUnit>(new ascendingHealthComp());
+        for(TargetUnit tu: targetUnits.values()){
+            if((!hostileOnly || Utils.isTypeHostile(tu.type)) && tu.myLoc.distanceSquaredTo(ml) <= radius)
+                ret.add(tu);
+        }
+        return ret;
+    }
 
 /******** Map related functions below this line *******/
     
