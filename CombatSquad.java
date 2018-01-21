@@ -87,7 +87,7 @@ public class CombatSquad extends Squad{
 	}
 
 	public void update(){
-		Utils.log("hi " + objective);
+		//Utils.log("hi " + objective);
 		if(objective == Objective.EXPLORE){
 			requestedUnits.clear();
 			requestedUnits.add(UnitType.Ranger);
@@ -97,6 +97,8 @@ public class CombatSquad extends Squad{
 			urgency = 0;
 			return;
 		}
+		if(targetLoc == null)
+			return;
 		swarmLoc = targetLoc;
 		if(combatUnits.size() > 0)
 			swarmLoc = Utils.averageMapLocation(gc, combatUnits.values());
