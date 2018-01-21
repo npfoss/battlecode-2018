@@ -40,7 +40,7 @@ public class WorkerSquad extends Squad {
 		}
 		if(targetKarboniteLoc != null) {
 			//System.out.println("trying sososoosososososososo hard to move towards karbonite");
-			Direction toMove = nav.dirToMove(myLoc, targetKarboniteLoc);
+			Direction toMove = nav.dirToMoveSafely(myLoc, targetKarboniteLoc);
 			if(gc.canMove(id, toMove)) {
 				//System.out.println("IM MOVING ROAR");
 				gc.moveRobot(id, toMove);
@@ -119,7 +119,7 @@ public class WorkerSquad extends Squad {
 					//System.out.println("Trying to build something useful at: " + targetLoc.getX() + ", " + targetLoc.getY());
 					if(!worker.location().mapLocation().isAdjacentTo(targetLoc) && gc.isMoveReady(id)) {
 						//Move towards the target location
-						Direction movedir = nav.dirToMove(worker.location().mapLocation(),targetLoc);
+						Direction movedir = nav.dirToMoveSafely(worker.location().mapLocation(),targetLoc);
 						if (movedir != Direction.Center) {
 							gc.moveRobot(id, movedir);
 							worker = gc.unit(id);
