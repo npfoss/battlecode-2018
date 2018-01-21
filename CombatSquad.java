@@ -56,19 +56,21 @@ public class CombatSquad extends Squad{
 		update();
 	}
 
+	//done in a bad way cuz i couldn't get the normal way to work
 	private void removeCombatUnit(int id) {
 		CombatUnit toRemove  = new CombatUnit();
 		boolean remove = false;
+		TreeSet<CombatUnit> newCombatUnits = new TreeSet<CombatUnit>(new AscendingStepsComp());
 		for(CombatUnit cu: combatUnits){
 			if(cu.ID == id){
 				toRemove = cu;
 				remove = true;
-				break;
+				continue;
 			}
+			newCombatUnits.add(cu);
 		}
 		if(remove){
-			System.out.println("removing id " + id + " " + combatUnits.remove(toRemove));
-			System.out.flush();
+			combatUnits = newCombatUnits;
 			switch(toRemove.type){
 			case Knight:unitCounts[0]--; break;
 			case Mage:unitCounts[1]--; break;
