@@ -67,8 +67,8 @@ public class CombatSquad extends Squad{
 			}
 		}
 		if(remove){
-			//System.out.println("removing id " + id);
-			//System.out.flush();
+			System.out.println("removing id " + id);
+			System.out.flush();
 			combatUnits.remove(toRemove);
 			switch(toRemove.type){
 			case Knight:unitCounts[0]--; break;
