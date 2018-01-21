@@ -31,7 +31,7 @@ public class Strategy{
 	private void determineInitalStrat() {
 		//TODO: make this depend on stuff
 		researchOrder = new UnitType[]{UnitType.Ranger,UnitType.Worker,UnitType.Healer,UnitType.Healer,UnitType.Healer,UnitType.Ranger,UnitType.Ranger};
-		combatComposition = new int[]{0,0,2,1}; //knight,mage,ranger,healer
+		combatComposition = new int[]{0,0,3,2}; //knight,mage,ranger,healer
 	}
 
 	public void update(){

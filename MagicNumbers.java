@@ -21,7 +21,7 @@ public class MagicNumbers{
     double HOSTILE_FACTOR_RUN_AWAY = 2.0; 
     double SWARM_FACTOR_RUN_AWAY = 1.0; 
     double TARGET_FACTOR_RANGER_MOVE = 1.5;
-    double HOSTILE_FACTOR_RANGER_MOVE = 0.5; 
+    //double HOSTILE_FACTOR_RANGER_MOVE = 0.5; not currently in use
     double SWARM_FACTOR_RANGER_MOVE = 1.0; 
     double DAMAGE_FACTOR_RANGER_MOVE = 100.0;
     double HOSTILE_FACTOR_HEALER_MOVE = 1.0; 
