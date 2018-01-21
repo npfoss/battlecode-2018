@@ -18,6 +18,8 @@ public class Player {
                 System.out.println("***ERROR AHHHHHHHHHHHHHHHHHHHHHHHHH***");
                 e.printStackTrace(System.out);
                 gc.nextTurn();
+                if(gc.round() % 50 == 0)
+                	System.gc();
             }
             // try{Thread.sleep(25);}catch(Exception e){}
         }

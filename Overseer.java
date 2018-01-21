@@ -17,8 +17,6 @@ public class Overseer{
     public Overseer(GameController g){
         gc = g;
 
-        strat = Strategy.UNSURE;
-
         if(gc.planet() == Planet.Earth){
         	 magicNums = new MagicNumbersEarth();
         }
@@ -26,8 +24,9 @@ public class Overseer{
         	magicNums = new MagicNumbersMars();
         
         infoMan = new InfoManager(gc,magicNums);
+        strat = new Strategy(infoMan,gc);
         workerMan = new WorkerManager(infoMan,gc);
-        combatMan = new CombatManager(infoMan,gc,magicNums);
+        combatMan = new CombatManager(infoMan,gc,magicNums,strat);
         nav = new Nav(infoMan);
         
         if(gc.planet() == Planet.Earth){
@@ -39,7 +38,7 @@ public class Overseer{
             researchMan = new ResearchManagerMars(gc, infoMan);
             rocketMan = new RocketDoNothing(gc, infoMan);
         }
-
+        
     }
 
     public void takeTurn(){
@@ -47,9 +46,9 @@ public class Overseer{
         int start = gc.getTimeLeftMs();
         
         infoMan.update();
-        strat = strat.update(infoMan);
+        strat.update();
         researchMan.update(strat);
-        rocketMan.update();
+        rocketMan.update(strat);
         workerMan.update(strat,nav);
         combatMan.update(strat);
         prodMan.update(strat);

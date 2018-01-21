@@ -46,7 +46,7 @@ if(!gc.startingMap(Planet.Earth).onMap(loc))
 		boolean bww = !gc.startingMap(Planet.Earth).onMap(ww) ? false : gc.startingMap(Planet.Earth).isPassableTerrainAt(ww) > 0 && !(gc.hasUnitAtLocation(ww)&& (gc.senseUnitAtLocation(ww).unitType() == UnitType.Factory|| gc.senseUnitAtLocation(ww).unitType() == UnitType.Rocket));
 		if(bnn && bn || bss && bs || bee && be || bww && bw)
 			return false;
-		*/
+		 */
 		boolean bnn = !gc.startingMap(Planet.Earth).onMap(n) ? false : gc.startingMap(Planet.Earth).isPassableTerrainAt(n) > 0;
 		boolean bss = !gc.startingMap(Planet.Earth).onMap(s) ? false : gc.startingMap(Planet.Earth).isPassableTerrainAt(s) > 0;
 		boolean bee = !gc.startingMap(Planet.Earth).onMap(e) ? false : gc.startingMap(Planet.Earth).isPassableTerrainAt(e) > 0;
@@ -57,8 +57,6 @@ if(!gc.startingMap(Planet.Earth).onMap(loc))
 	}
 
 	public void update(Strategy strat,Nav nav){
-		switch(strat) {
-		case RUSH:
 			//Earth and Mars should probably do different things
 			if(gc.planet() == Planet.Earth) {
 				// create new squads if necessary
@@ -89,8 +87,6 @@ if(!gc.startingMap(Planet.Earth).onMap(loc))
 										didSomething = true;
 									}
 								}
-								if(tryAgain)
-									break;
 							}
 							if(tryAgain)
 								break;
@@ -112,9 +108,6 @@ if(!gc.startingMap(Planet.Earth).onMap(loc))
 							}
 						}
 					}
-
-					if(!didSomething)
-						break;
 				}
 				if(gc.round() == 1) {
 					//Pick a place to build the first factory
@@ -130,10 +123,22 @@ if(!gc.startingMap(Planet.Earth).onMap(loc))
 									break;
 								}
 							}
-
+				if(!didSomething)
+					break;
+			}
+			if(gc.round() == 1) {
+				//Pick a place to build the first factory
+				if(true) {
+					int maxDist = 2;
+					while(startingFactory1 == null && maxDist < 25) {
+						VecMapLocation v =  gc.allLocationsWithin(gc.unit(infoMan.workerSquads.get(0).units.get(0)).location().mapLocation(), maxDist++);
+						for(int i= 0; i < v.size(); i++) {
+							if(okayToBuild(v.get(i))) {
+								startingFactory1 = v.get(i);
+								infoMan.workerSquads.get(0).targetLoc = startingFactory1;
+								break;
+							}
 						}
-					}
-
 					if(infoMan.workerSquads.size() > 1) {
 						//Pick a place to build a second factory
 						int maxDist = 2;
@@ -147,8 +152,19 @@ if(!gc.startingMap(Planet.Earth).onMap(loc))
 									System.out.println("Trying to build a second factory");
 									break;
 								}
-
+				if(infoMan.workerSquads.size() > 1) {
+					//Pick a place to build a second factory
+					int maxDist = 2;
+					while(startingFactory2 == null && maxDist < 25) {
+						VecMapLocation v =  gc.allLocationsWithin(gc.unit(infoMan.workerSquads.get(1).units.get(0)).location().mapLocation(), maxDist++);
+						for(int i= 0; i < v.size(); i++) {
+							if(okayToBuild(v.get(i))) {
+								startingFactory2 = v.get(i);
+								infoMan.workerSquads.get(1).targetLoc = startingFactory2;
+								System.out.println("Trying to build a second factory");
+								break;
 							}
+
 						}
 					}
 					if(infoMan.workerSquads.size() > 2) {
@@ -165,12 +181,11 @@ if(!gc.startingMap(Planet.Earth).onMap(loc))
 								}
 							}
 						}
-
-
 					}
+
+
 				}
-
-
+			}
 				//TODO intelligently pick locations for the next factories
 				//System.out.println("My objective is: " + ((infoMan.workerSquads.get(0).objective == Objective.BUILD) ? "Building" : "NONE"));
 				//System.out.println(infoMan.factories.size());
@@ -195,19 +210,16 @@ if(!gc.startingMap(Planet.Earth).onMap(loc))
 						}
 					}
 				}
-				for(WorkerSquad ws : infoMan.workerSquads) {
-					if(ws.objective == Objective.NONE) {
-						ws.objective = Objective.MINE;
-						break;
-					}
-
-
-				}
-				System.out.flush();
 			}
-			break;
-		default:
-			break;
+			for(WorkerSquad ws : infoMan.workerSquads) {
+				if(ws.objective == Objective.NONE) {
+					ws.objective = Objective.MINE;
+					break;
+				}
+
+
+			}
+			System.out.flush();
 		}
 		//TODO:assign workers who are just mining karbonite if there's something better to do, add to rocket squads if necessary
 	}

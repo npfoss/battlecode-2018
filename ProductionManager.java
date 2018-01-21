@@ -39,8 +39,18 @@ public class ProductionManager{
     			if(!didSomething)
     				break;
     		}
-    		if(gc.canProduceRobot(id,UnitType.Ranger)) {
-    			gc.produceRobot(id, UnitType.Ranger);
+    		infoMan.combatSquads.sort(Squad.byUrgency());
+    		infoMan.rocketSquads.sort(Squad.byUrgency());
+    		Squad toFill = null;
+    		if(infoMan.combatSquads.size()>0)
+    			toFill = infoMan.combatSquads.get(0);
+    		if(infoMan.rocketSquads.size()>0 && (toFill == null || infoMan.rocketSquads.get(0).urgency > toFill.urgency))
+    			toFill = infoMan.rocketSquads.get(0);
+    		UnitType toMake = UnitType.Worker;
+    		if(toFill != null)
+    			toMake = toFill.requestedUnits.get(0);
+    		if(gc.canProduceRobot(id,toMake)) {
+    			gc.produceRobot(id, toMake);
     		}
     	}
     	// go through the factories (in infoMan) and make them produce stuff

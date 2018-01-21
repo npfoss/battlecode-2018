@@ -43,10 +43,10 @@ public class Tile{
         roundLastUpdated = 0;
         possibleDamage = 0;
         destToDir = new HashMap<String, Signpost>();
-        enemiesWhichCouldHitUs = new TreeSet<TargetUnit>(new ascendingHealthComp());
-        enemiesWithinRangerRange = new TreeSet<TargetUnit>(new ascendingHealthComp());
-        enemiesWithinKnightRange = new TreeSet<TargetUnit>(new ascendingHealthComp());
-        enemiesWithinMageRange = new TreeSet<TargetUnit>(new ascendingHealthComp());
+        enemiesWhichCouldHitUs = new TreeSet<TargetUnit>(new descendingPriorityComp());
+        enemiesWithinRangerRange = new TreeSet<TargetUnit>(new descendingPriorityComp());
+        enemiesWithinKnightRange = new TreeSet<TargetUnit>(new descendingPriorityComp());
+        enemiesWithinMageRange = new TreeSet<TargetUnit>(new descendingPriorityComp());
         //accessible = false;
         //claimed = false;
         enemiesUpdated = false;
