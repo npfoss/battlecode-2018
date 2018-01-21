@@ -22,7 +22,7 @@ public class InfoManager {
 	ArrayList<Unit> factories;
 	ArrayList<Unit> fighters;
 
-	ArrayList<Unit> unassignedUnits;
+	HashSet<Integer> unassignedUnits;
 
 	// tracking enemies
 	HashSet<Integer> enemyRockets;
@@ -89,7 +89,7 @@ public class InfoManager {
 		factories = new ArrayList<Unit>();
 		fighters = new ArrayList<Unit>();
 
-		unassignedUnits = new ArrayList<Unit>();
+		unassignedUnits = new HashSet<Integer>();
 		
 		targetUnits.clear();
 
@@ -104,7 +104,7 @@ public class InfoManager {
 				case Worker:
 					workers.add(unit);
 					if (!isInSquads1(unit, workerSquads) && !isInSquads2(unit, rocketSquads))
-						unassignedUnits.add(unit);
+						unassignedUnits.add(unit.id());
 					break;
 				case Factory:
 					factories.add(unit);
@@ -112,12 +112,12 @@ public class InfoManager {
 				case Rocket:
 					rockets.add(unit);
 					if (!isInSquads2(unit, rocketSquads))
-						unassignedUnits.add(unit);
+						unassignedUnits.add(unit.id());
 					break;
 				default:
 					fighters.add(unit);
 					if (!isInSquads3(unit, combatSquads) && !isInSquads2(unit,rocketSquads))
-						unassignedUnits.add(unit);
+						unassignedUnits.add(unit.id());
 					break;
 				}
 			}

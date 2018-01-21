@@ -35,7 +35,7 @@ public class CombatSquad extends Squad{
 		requestedUnits.remove(u.unitType());
 		units.add(u.id());
 		separatedUnits.add(u.id());
-		infoMan.unassignedUnits.remove(u);
+		infoMan.unassignedUnits.remove(u.id());
 		switch(u.unitType()){
 		case Knight:unitCounts[0]++; break;
 		case Mage:unitCounts[1]++; break;

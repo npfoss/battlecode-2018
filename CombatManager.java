@@ -46,7 +46,7 @@ public class CombatManager{
 		for(CombatSquad cs: infoMan.combatSquads){
 			if(cs.objective == Objective.NONE){
 				for(int uid: cs.units){
-					infoMan.unassignedUnits.add(gc.unit(uid));
+					infoMan.unassignedUnits.add(uid);
 					turnUnassigned.put(uid, (int)(gc.round()));
 				}
 				toRemove.add(cs);
@@ -96,7 +96,8 @@ public class CombatManager{
 			boolean tryAgain = false;
 			for(CombatSquad cs : infoMan.combatSquads) {
 				for(UnitType u : cs.requestedUnits) {
-					for(Unit a : infoMan.unassignedUnits) {
+					for(int i : infoMan.unassignedUnits) {
+						Unit a = gc.unit(i);
 						if(a.unitType() == u) {
 							if(cs.targetLoc != null && 
 							((!turnUnassigned.containsKey(a.id()) && gc.round() == 1) || (turnUnassigned.containsKey(a.id()) && turnUnassigned.get(a.id()) == gc.round()))){
@@ -109,8 +110,7 @@ public class CombatManager{
 									continue;
 							}
 							//System.out.println("adding to cs");
-							Unit toAdd = infoMan.unassignedUnits.get(infoMan.unassignedUnits.indexOf(a));
-							cs.addUnit(toAdd);
+							cs.addUnit(a);
 							tryAgain = true;
 							didSomething = true;
 						}

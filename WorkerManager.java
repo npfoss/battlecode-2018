@@ -75,13 +75,14 @@ public class WorkerManager{
 				boolean tryAgain = false;
 				for(WorkerSquad ws : infoMan.workerSquads) {
 					for(UnitType u : ws.requestedUnits) {
-						for(Unit a : infoMan.unassignedUnits) {
+						for(int i : infoMan.unassignedUnits) {
+							Unit a = gc.unit(i);
 							if(a.unitType() == u) {
 								//todo add this once Nate writes isReachab
 								if(ws.units.size() == 0 || infoMan.isReachable(gc.unit(ws.units.get(0)).location().mapLocation(),a.location().mapLocation()) && nav.optimalStepsTo(gc.unit(ws.units.get(0)).location().mapLocation(),a.location().mapLocation()) < 10){
 									ws.requestedUnits.remove(ws.requestedUnits.indexOf(u));
-									ws.units.add(infoMan.unassignedUnits.get(infoMan.unassignedUnits.indexOf(a)).id());
-									infoMan.unassignedUnits.remove(infoMan.unassignedUnits.indexOf(a));
+									ws.units.add(a.id());
+									infoMan.unassignedUnits.remove(i);
 									ws.update();
 									tryAgain = true;
 									didSomething = true;
@@ -97,12 +98,13 @@ public class WorkerManager{
 						break;
 				}
 				if(!tryAgain) {
-					for(Unit a : infoMan.unassignedUnits) {
+					for(int i : infoMan.unassignedUnits) {
+						Unit a = gc.unit(i);
 						if(a.unitType() == UnitType.Worker) {
 							WorkerSquad wsn = new WorkerSquad(gc,infoMan);
 							wsn.objective = Objective.BUILD;
-							wsn.units.add(infoMan.unassignedUnits.get(infoMan.unassignedUnits.indexOf(a)).id());
-							infoMan.unassignedUnits.remove(infoMan.unassignedUnits.indexOf(a));
+							wsn.units.add(i);
+							infoMan.unassignedUnits.remove(i);
 							wsn.update();
 							infoMan.workerSquads.add(wsn);
 							didSomething = true;
