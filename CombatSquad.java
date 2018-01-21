@@ -84,6 +84,8 @@ public class CombatSquad extends Squad{
 	}
 
 	public void update(){
+		if(objective == Objective.EXPLORE)
+			return;
 		swarmLoc = targetLoc;
 		if(combatUnits.size() > 0)
 			swarmLoc = Utils.averageMapLocation(gc, combatUnits.values());
