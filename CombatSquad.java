@@ -61,8 +61,8 @@ public class CombatSquad extends Squad{
 				}
 			}
 			if(remove){
-				System.out.println("removing id " + id);
-				System.out.flush();
+				//System.out.println("removing id " + id);
+				//System.out.flush();
 				combatUnits.remove(toRemove);
 				switch(toRemove.type){
 				case Knight:unitCounts[0]--; break;
@@ -135,6 +135,8 @@ public class CombatSquad extends Squad{
 					continue;
 				CombatUnit cu = new CombatUnit(id,u.damage(),u.health(),u.movementHeat()<10,u.attackHeat()<10,
 						u.location().mapLocation(),u.unitType(),nav.optimalStepsTo(u.location().mapLocation(), targetLoc));
+				System.out.println("adding " + cu.ID + " 1");
+				System.out.flush();
 				combatUnits.add(cu);
 			}
 			separatedUnits.clear();
@@ -151,8 +153,10 @@ public class CombatSquad extends Squad{
 				separatedUnits.remove(i);
 				CombatUnit cu = new CombatUnit(u.id(),u.damage(),u.health(),u.movementHeat()<10,u.attackHeat()<10,
 						ml,u.unitType(),nav.optimalStepsTo(ml, targetLoc));
+				System.out.println("adding " + cu.ID + " 2");
+				System.out.flush();
 				combatUnits.add(cu);
-				swarmThreshold++;
+				swarmThreshold+=2;
 			}
 		}
 		System.out.println("swarm size = " + combatUnits.size() + " obj = " + objective + " swarmLoc = " + swarmLoc + " targetLoc = " + targetLoc  
@@ -472,8 +476,8 @@ public class CombatSquad extends Squad{
 		}
 		for(TargetUnit tu: snipees){
 			if(tu.snipeDamageToDo <= snipers.size()*30){
-				System.out.println("sniping " + tu.myLoc);
-				System.out.flush();
+				//System.out.println("sniping " + tu.myLoc);
+				//System.out.flush();
 				for(int i = 0; i <= tu.snipeDamageToDo/30.0; i++){
 					gc.beginSnipe(snipers.get(snipers.size()-1).ID, tu.myLoc);
 					snipers.remove(snipers.size()-1);
@@ -543,6 +547,8 @@ public class CombatSquad extends Squad{
 			case Mage: temp = doRangerMicro(temp,retreat,nav); break;
 			default:
 			}
+			System.out.println("adding " + temp.first().ID + " 3");
+			System.out.flush();
 			combatUnits.add(temp.first());
 		}
 		return cu;
@@ -572,6 +578,8 @@ public class CombatSquad extends Squad{
 			case 1: tH.health += 12;
 			default: tH.health += 17;
 			}
+			System.out.println("adding " + cu.ID + " 4");
+			System.out.flush();
 			combatUnits.add(tH);
 		}
 		return cu;
@@ -667,8 +675,8 @@ public class CombatSquad extends Squad{
 			//we found someone to attack
 			Direction toMove = indexToDirection(bestIndex);
 			cu = moveAndUpdate(cu,toMove);
-			System.out.println("moving in direction " + bestIndex + " to loc " + cu.myLoc + " and attacking loc " + infoMan.targetUnits.get(toAttack).myLoc);
-			System.out.flush();
+			//System.out.println("moving in direction " + bestIndex + " to loc " + cu.myLoc + " and attacking loc " + infoMan.targetUnits.get(toAttack).myLoc);
+			//System.out.flush();
 			gc.attack(cu.ID, toAttack);
 			updateDamage(cu,infoMan.targetUnits.get(toAttack));
 			cu.canAttack = false;
