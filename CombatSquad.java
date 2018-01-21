@@ -27,8 +27,8 @@ public class CombatSquad extends Squad{
 		magicNums = mn;
 		unitCounts = new int[]{0,0,0,0}; //knight,mage,ranger,healer
 		unitCompGoal = ucg;
-		System.out.println("ucg = " + ucg.toString());
-		System.out.flush();
+		System.out.println("ucg = " + ucg[0] + " " + ucg[1] + " " + ucg[2] + " " + ucg[3]);
+		//System.out.flush();
 	}
 	
 	public void addUnit(Unit u){

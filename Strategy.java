@@ -25,8 +25,7 @@ public class Strategy{
     public Strategy(InfoManager im, GameController g){
     	infoMan = im;
     	gc = g;
-    	if(infoMan.myPlanet == Planet.Earth)
-    		determineInitalStrat();
+    	determineInitalStrat();
     }
 	
 	private void determineInitalStrat() {
