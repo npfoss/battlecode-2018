@@ -121,7 +121,7 @@ public class Utils{
     }
     
     public static TreeSet<TargetUnit> getTargetUnits(MapLocation ml, int radius, boolean hostileOnly, InfoManager infoMan){
-    	TreeSet<TargetUnit> ret = new TreeSet<TargetUnit>(new ascendingHealthComp());
+    	TreeSet<TargetUnit> ret = new TreeSet<TargetUnit>(new descendingPriorityComp());
     	for(TargetUnit tu: infoMan.targetUnits.values()){
     		if((!hostileOnly || isTypeHostile(tu.type)) && tu.myLoc.distanceSquaredTo(ml) <= radius)
     			ret.add(tu);

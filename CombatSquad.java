@@ -12,19 +12,104 @@ public class CombatSquad extends Squad{
 	ArrayList<Integer> separatedUnits;
 	InfoManager infoMan;
 	MapLocation swarmLoc;
+	int numEnemyUnits;
+	MagicNumbers magicNums;
+	int[] unitCounts;
+	int[] unitCompGoal;
 	final int[] dx = {-1,-1,-1,0,0,0,1,1,1};
 	final int[] dy = {-1,0,1,-1,0,1,-1,0,1};
 
-	public CombatSquad(GameController g, InfoManager im) {
+	public CombatSquad(GameController g, InfoManager im, MagicNumbers mn, int[] ucg) {
 		super(g);
 		combatUnits = new TreeSet<CombatUnit>(new AscendingStepsComp());
 		separatedUnits = new ArrayList<Integer>();
 		infoMan = im;
+		magicNums = mn;
+		unitCounts = new int[]{0,0,0,0}; //knight,mage,ranger,healer
+		unitCompGoal = ucg;
+	}
+	
+	public void addUnit(Unit u){
+		requestedUnits.remove(u);
+		units.add(u.id());
+		separatedUnits.add(u.id());
+		infoMan.unassignedUnits.remove(u);
+		switch(u.unitType()){
+		case Knight:unitCounts[0]++; break;
+		case Mage:unitCounts[1]++; break;
+		case Ranger:unitCounts[2]++; break;
+		case Healer:unitCounts[3]++; break;
+		default: break;
+		}
+		update();
+	}
+	
+	public void removeUnit(int index, int id){
+		units.remove(index);
+		if(separatedUnits.contains(id))
+			separatedUnits.remove(separatedUnits.indexOf(id));
+		else{
+			CombatUnit toRemove  = new CombatUnit();
+			boolean remove = false;
+			for(CombatUnit cu: combatUnits){
+				if(cu.ID == id){
+					toRemove = cu;
+					remove = true;
+					break;
+				}
+			}
+			if(remove){
+				combatUnits.remove(toRemove);
+				switch(toRemove.type){
+				case Knight:unitCounts[0]--; break;
+				case Mage:unitCounts[1]--; break;
+				case Ranger:unitCounts[2]--; break;
+				case Healer:unitCounts[3]--; break;
+				default: break;
+				}
+			}
+		}
+		update();
 	}
 
 	public void update(){
+		swarmLoc = targetLoc;
+		if(combatUnits.size() > 0)
+			swarmLoc = Utils.averageMapLocation(gc, combatUnits);
+		numEnemyUnits = Utils.getTargetUnits(swarmLoc, 100, false, infoMan).size();
+		if(infoMan.myPlanet == Planet.Mars)
+			return;
 		if(requestedUnits.isEmpty())
-			requestedUnits.add(UnitType.Ranger);
+			requestedUnits.add(getRequestedUnit());
+		if(units.size() == 0)
+			urgency = 100;
+		else
+			urgency = (numEnemyUnits * 2 - units.size() + 5) * 10;
+		if(urgency < 0)
+			urgency = 0;
+		if(urgency>100)
+			urgency = 100;
+	}
+
+	private UnitType getRequestedUnit() {
+		int bestIndex = 0;
+		int bestScore = 10000;
+		for(int i = 0; i < 4; i++){
+			if(unitCompGoal[i]==0)
+				continue;
+			int score = unitCounts[i]/unitCompGoal[i];
+			if(score<bestScore){
+				bestScore = score;
+				bestIndex = i;
+			}
+		}
+		switch(bestIndex){
+		case 0: return UnitType.Knight;
+		case 1: return UnitType.Mage;
+		case 2: return UnitType.Ranger;
+		case 3: return UnitType.Healer;
+		default: return UnitType.Knight;
+		}
 	}
 
 	public void move(Nav nav){
@@ -40,36 +125,43 @@ public class CombatSquad extends Squad{
 		if(combatUnits.size()==0){
 			for(int id: separatedUnits){
 				Unit u = gc.unit(id);
+				if(!u.location().isOnMap())
+					continue;
 				CombatUnit cu = new CombatUnit(id,u.damage(),u.health(),u.movementHeat()<10,u.attackHeat()<10,
 						u.location().mapLocation(),u.unitType(),nav.optimalStepsTo(u.location().mapLocation(), targetLoc));
 				combatUnits.add(cu);
 			}
 			separatedUnits.clear();
 		}
-		swarmLoc = Utils.averageMapLocation(gc, combatUnits);
 		//TODO: think about if this is actually a good threshold
 		int swarmThreshold = combatUnits.size()*2 + 10;
 		for(int i = separatedUnits.size()-1; i>=0; i--){
 			Unit u = gc.unit(separatedUnits.get(i));
 			if(!u.location().isOnMap())
 				continue;
-			if(u.location().mapLocation().distanceSquaredTo(swarmLoc) <= swarmThreshold){
+			MapLocation ml = u.location().mapLocation();
+			if(ml.distanceSquaredTo(swarmLoc) <= swarmThreshold ||
+				Utils.getTargetUnits(ml, 50, false, infoMan).size() > 0){
 				separatedUnits.remove(i);
 				CombatUnit cu = new CombatUnit(u.id(),u.damage(),u.health(),u.movementHeat()<10,u.attackHeat()<10,
-						u.location().mapLocation(),u.unitType(),nav.optimalStepsTo(u.location().mapLocation(), targetLoc));
+						ml,u.unitType(),nav.optimalStepsTo(ml, targetLoc));
 				combatUnits.add(cu);
 				swarmThreshold++;
 			}
 		}
-		// System.out.println("swarm size = " + combatUnits.size() + " swarmLoc = " + swarmLoc + " targetLoc = " + targetLoc);
+		System.out.println("swarm size = " + combatUnits.size() + " obj = " + objective + " swarmLoc = " + swarmLoc + " targetLoc = " + targetLoc  
+				+ " urgency = " + urgency);
 		moveToSwarm(nav);
 		boolean retreat = shouldWeRetreat();
 		doSquadMicro(retreat,nav);
 		//check if we're done with our objective
 		boolean done = areWeDone();
 		if(done){
+			System.out.println("setting obj to none");
+			System.out.flush();
 			objective = Objective.NONE;
 		}
+		update();
 		/*
 		for(int id : units) {
 			Unit fighter = gc.unit(id);
@@ -104,7 +196,8 @@ public class CombatSquad extends Squad{
 
 	private boolean areWeDone(){
 		switch(objective){
-		case ATTACK_LOC: return gc.senseNearbyUnitsByTeam(targetLoc, 5, gc.team()).size() > 0 && gc.senseNearbyUnitsByTeam(targetLoc, 25, Utils.enemyTeam(gc)).size() == 0;
+		case ATTACK_LOC: return gc.senseNearbyUnitsByTeam(targetLoc, 5, gc.team()).size() > 0 && Utils.getTargetUnits(targetLoc, magicNums.SQUAD_SEPARATION_THRESHOLD,false,infoMan).size() == 0;
+		case DEFEND_LOC: return Utils.getTargetUnits(targetLoc, 100,false,infoMan).size() == 0;
 		default: return false;
 		}
 	}
@@ -152,7 +245,7 @@ public class CombatSquad extends Squad{
 			x = cu.myLoc.getX();
 			y = cu.myLoc.getY();
 			if(cu.canMove){
-				// System.out.println("microing unit " + cu.ID + " x = " + x + " y = " + y);
+				//System.out.println("microing unit " + cu.ID + " x = " + x + " y = " + y);
 				for(int i = 0; i < 9; i++){
 					nx = x + dx[i];
 					ny = y + dy[i];
@@ -167,10 +260,10 @@ public class CombatSquad extends Squad{
 				infoMan.tiles[x][y].updateEnemies(gc);
 			}
 			switch(cu.type){
-			case Ranger: rangers.add(cu);
-			case Knight: knights.add(cu);
-			case Healer: healers.add(cu);
-			default: mages.add(cu);
+			case Ranger: rangers.add(cu); break;
+			case Knight: knights.add(cu); break;
+			case Healer: healers.add(cu); break;
+			default: mages.add(cu); 
 			}
 		}
 
@@ -363,8 +456,8 @@ public class CombatSquad extends Squad{
 			if(!cu.canAttack)
 				continue;
 			Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
-			// System.out.println("trying to atack somoeone.");
-			System.out.flush();
+			//System.out.println("trying to atack somoeone.");
+			//System.out.flush();
 			if(myTile.enemiesWithinRangerRange.size() > 0){
 				gc.attack(cu.ID, myTile.enemiesWithinRangerRange.first().ID);
 				updateDamage(cu,myTile.enemiesWithinRangerRange.first());
@@ -382,7 +475,11 @@ public class CombatSquad extends Squad{
 		}
 
 		//otherwise, do moves and attacks heuristically
+		boolean doSnipeCalcs = false;
 		for(CombatUnit cu: rangers){
+			if(cu.canSnipe){
+				doSnipeCalcs = true;
+			}
 			if(!cu.canMove){
 				continue;
 			}
@@ -393,9 +490,42 @@ public class CombatSquad extends Squad{
 				cu = rangerMove(cu,nav);
 			}
 		}
+		
+		if(!doSnipeCalcs)
+			return;
+		
+		//System.out.println("doing snipe calcs");
+		//System.out.flush();
+		
+		ArrayList<CombatUnit> snipers = new ArrayList<CombatUnit>();
+		for(CombatUnit cu: rangers){
+			if(!cu.canSnipe)
+				continue;
+			boolean wantToSnipe = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].possibleDamage == 0;
+			if(wantToSnipe)
+				snipers.add(cu);
+		}
+		
+		if(snipers.size()==0)
+			return;
+		
+		TreeSet<TargetUnit> snipees = new TreeSet<TargetUnit>(new DescendingSnipePriorityComp());
+		for(TargetUnit tu: infoMan.targetUnits.values()){
+			tu.updateSnipePriority(swarmLoc);
+			snipees.add(tu);
+		}
+		for(TargetUnit tu: snipees){
+			if(tu.snipeDamageToDo <= snipers.size()*30){
+				System.out.println("sniping " + tu.myLoc);
+				System.out.flush();
+				for(int i = 0; i <= tu.snipeDamageToDo/30.0; i++){
+					gc.beginSnipe(snipers.get(snipers.size()-1).ID, tu.myLoc);
+					snipers.remove(snipers.size()-1);
+				}
+			}
+		}
+		
 	}
-
-
 
 	private CombatUnit rangerMove(CombatUnit cu, Nav nav) {
 		Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
@@ -435,6 +565,8 @@ public class CombatSquad extends Squad{
 			//we found someone to attack
 			Direction toMove = indexToDirection(bestIndex);
 			cu = moveAndUpdate(cu,toMove);
+			System.out.println("moving in direction " + bestIndex + " to loc " + cu.myLoc + " and attacking loc " + infoMan.targetUnits.get(toAttack).myLoc);
+			System.out.flush();
 			gc.attack(cu.ID, toAttack);
 			updateDamage(cu,infoMan.targetUnits.get(toAttack));
 			cu.canAttack = false;
@@ -499,8 +631,8 @@ public class CombatSquad extends Squad{
 		if(d==Direction.Center)
 			return cu;
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].containsUnit = false;
-		// System.out.println("moving to " + cu.myLoc.getX() + " " + cu.myLoc.getY());
-		System.out.flush();
+		//System.out.println("moving to " + cu.myLoc.getX() + " " + cu.myLoc.getY());
+		//System.out.flush();
 		cu.canMove = false;
 		cu.myLoc = cu.myLoc.add(d);
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].containsUnit = true;
@@ -512,23 +644,24 @@ public class CombatSquad extends Squad{
 		int damageDone = (int) (cu.damage - tu.defense);
 		if(damageDone >= tu.health){
 			infoMan.targetUnits.remove(tu.ID);
+			infoMan.removeEnemyUnit(tu.ID, tu.type);
 			for(Tile t: tu.tilesWhichHitMe){
 				t.removeEnemy(tu);
+				infoMan.tiles[t.x][t.y] = t;
 			}
 			return;
 		}
 		tu.health -= damageDone;
 		for(Tile t: tu.tilesWhichHitMe){
 			t.updateTarget(tu);
+			infoMan.tiles[t.x][t.y] = t;
 		}
 		infoMan.targetUnits.put(tu.ID, tu);
 	}
 
 	private boolean shouldWeRetreat(){
 		//TODO: make this better
-		int ourUnitCount = combatUnits.size();
-		int theirUnitCount = (int) gc.senseNearbyUnitsByTeam(swarmLoc, 100, Utils.enemyTeam(gc)).size();
-		return theirUnitCount > ourUnitCount * 1.1;
+		return numEnemyUnits > combatUnits.size() * 1.1;
 	}
 
 }
