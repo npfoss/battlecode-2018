@@ -123,8 +123,9 @@ public class CombatManager{
 	
 	public void addCombatSquad(MapLocation targetLoc, Objective obj, Strategy strat){
 		for(CombatSquad cs: infoMan.combatSquads){
-			if(targetLoc.distanceSquaredTo(cs.targetLoc) < magicNums.SQUAD_SEPARATION_THRESHOLD || 
-			   targetLoc.distanceSquaredTo(cs.swarmLoc) < 75)
+			if(cs.objective != Objective.EXPLORE && 
+			   (targetLoc.distanceSquaredTo(cs.targetLoc) < magicNums.SQUAD_SEPARATION_THRESHOLD || 
+			   targetLoc.distanceSquaredTo(cs.swarmLoc) < 75))
 				return;
 		}
 		CombatSquad cs = new CombatSquad(gc,infoMan,magicNums,strat.combatComposition);
