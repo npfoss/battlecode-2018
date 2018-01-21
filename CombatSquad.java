@@ -459,8 +459,8 @@ public class CombatSquad extends Squad{
 			//System.out.println("trying to attack somoeone.");
 			//System.out.flush();
 			if(myTile.enemiesWithinRangerRange.size() > 0){
-				System.out.println("type = " + myTile.enemiesWithinRangerRange.first().type + " priority = " + myTile.enemiesWithinRangerRange.first().priority);
-				System.out.flush();
+				//System.out.println("type = " + myTile.enemiesWithinRangerRange.first().type + " priority = " + myTile.enemiesWithinRangerRange.first().priority);
+				//System.out.flush();
 				gc.attack(cu.ID, myTile.enemiesWithinRangerRange.first().ID);
 				updateDamage(cu,myTile.enemiesWithinRangerRange.first());
 				cu.canAttack = false;
