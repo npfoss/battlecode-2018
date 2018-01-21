@@ -32,7 +32,7 @@ public class CombatSquad extends Squad{
 	}
 	
 	public void addUnit(Unit u){
-		requestedUnits.remove(u);
+		requestedUnits.remove(u.unitType());
 		units.add(u.id());
 		separatedUnits.add(u.id());
 		infoMan.unassignedUnits.remove(u);
@@ -81,8 +81,8 @@ public class CombatSquad extends Squad{
 		numEnemyUnits = Utils.getTargetUnits(swarmLoc, 100, false, infoMan).size();
 		if(infoMan.myPlanet == Planet.Mars)
 			return;
-		System.out.println("ru.size = " + requestedUnits.size());
-		System.out.flush();
+		//System.out.println("ru.size = " + requestedUnits.size());
+		//System.out.flush();
 		if(requestedUnits.isEmpty())
 			requestedUnits.add(getRequestedUnit());
 		if(units.size() == 0)
