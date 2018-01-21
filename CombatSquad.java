@@ -150,6 +150,7 @@ public class CombatSquad extends Squad{
 			explore(nav);
 			if(infoMan.combatSquads.size() > 1)
 				objective = objective.NONE;
+			infoMan.logTimeCheckpoint("done with CombatSquad move");
 			return;
 		}
 		if(combatUnits.size()==0){
@@ -197,6 +198,7 @@ public class CombatSquad extends Squad{
 			objective = Objective.NONE;
 		}
 		update();
+		infoMan.logTimeCheckpoint("done with CombatSquad move");
 		/*
 		for(int id : units) {
 			Unit fighter = gc.unit(id);

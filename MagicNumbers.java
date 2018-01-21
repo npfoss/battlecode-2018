@@ -14,7 +14,7 @@ public class MagicNumbers{
     int MAX_DIST_THEY_COULD_HIT_NEXT_TURN = 72;
     int MAX_DIST_THEY_COULD_HIT = 50;
     int ENEMY_UNIT_DIST_THRESHOLD = 150;
-    int MAX_FIGHTER_COUNT = 100;
+    int MAX_FIGHTER_COUNT = 200;
     //the bigger, the less we care:
     double ABILITY_HEAT_OVERCHARGE_FACTOR = 50.0; 
     double HEALER_HEALTH_FACTOR = 10.0;

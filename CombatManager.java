@@ -119,6 +119,8 @@ public class CombatManager{
 			if(!didSomething)
 				break;
 		}
+		
+		infoMan.logTimeCheckpoint("done updating CombatManager");
 	}	
 	
 	public void addCombatSquad(MapLocation targetLoc, Objective obj, Strategy strat){

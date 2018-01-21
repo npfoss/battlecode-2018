@@ -16,6 +16,7 @@ public class InfoManager {
 	Planet myPlanet;
 	MagicNumbers magicNums;
 	int height, width;
+	long turnStartTime;
 	//int totalUnitCount;
 
 	ArrayList<Unit> rockets;
@@ -82,6 +83,8 @@ public class InfoManager {
 	}
 
 	public void update() {
+		turnStartTime = System.nanoTime();
+		
 		// called at the beginning of each turn
 		comms.update();
 
@@ -187,6 +190,8 @@ public class InfoManager {
                 }
 			}
 		}
+		
+		logTimeCheckpoint("infoMan update done");
 	}
 
 	private void addEnemyUnit(int ID, UnitType ut){
@@ -329,4 +334,10 @@ public class InfoManager {
         //      check illegal locs sometimes
         return /*isOnMap(loc1) && isOnMap(loc2) &&*/ tiles[loc1.getX()][loc1.getY()].region == tiles[loc2.getX()][loc2.getY()].region;
     }
+    
+    public void logTimeCheckpoint(String identifier){
+    	long duration = System.nanoTime() - turnStartTime;
+    	Utils.log(identifier + ": " + duration + " ns since start of turn.");
+    }
+    
 }
