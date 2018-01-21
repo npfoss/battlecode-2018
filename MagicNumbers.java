@@ -10,5 +10,6 @@ public class MagicNumbers{
     int KNIGHT_RANGE = 2;
     int MAGE_RANGE = 30;
     int HEALER_RANGE = 30;
+    int MAX_DIST_THEY_COULD_HIT_NEXT_TURN = 72;
     double g;
 }

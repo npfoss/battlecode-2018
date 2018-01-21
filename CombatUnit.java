@@ -56,6 +56,9 @@ public class CombatUnit {
 	}
 	
 	public boolean equals(Object o){
+		System.out.println("sup");
+		System.out.flush();
+		
 		if(!(o instanceof CombatUnit))
 			return false;
 		

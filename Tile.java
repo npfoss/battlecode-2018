@@ -116,7 +116,7 @@ public class Tile{
         	accessible = false;
         }
         */
-    	TreeSet<TargetUnit> enemies = Utils.getTargetUnits(myLoc, 72, false, infoMan);
+    	TreeSet<TargetUnit> enemies = Utils.getTargetUnits(myLoc, magicNums.MAX_DIST_THEY_COULD_HIT_NEXT_TURN, false, infoMan);
     	distFromNearestHostile = 100;
     	boolean didSomething;
     	for(TargetUnit tu: enemies){
