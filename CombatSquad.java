@@ -135,8 +135,10 @@ public class CombatSquad extends Squad{
 			return;
 		//System.out.println("cs here");
 		if(objective == Objective.EXPLORE){
+			System.out.println("swarm size = " + units.size() + " obj = " + objective + " urgency = " + urgency);
 			explore(nav);
-			objective = objective.NONE;
+			if(units.size() < 50 || gc.round() % 10 == 0)
+				objective = objective.NONE;
 			return;
 		}
 		if(combatUnits.size()==0){

@@ -16,6 +16,7 @@ public class InfoManager {
 	Planet myPlanet;
 	MagicNumbers magicNums;
 	int height, width;
+	//int totalUnitCount;
 
 	ArrayList<Unit> rockets;
 	ArrayList<Unit> workers;
