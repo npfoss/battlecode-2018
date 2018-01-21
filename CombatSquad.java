@@ -87,7 +87,7 @@ public class CombatSquad extends Squad{
 		swarmLoc = targetLoc;
 		if(combatUnits.size() > 0)
 			swarmLoc = Utils.averageMapLocation(gc, combatUnits.values());
-		numEnemyUnits = infoMan.getTargetUnits(swarmLoc, 150, false).size();
+		numEnemyUnits = infoMan.getTargetUnits(swarmLoc, magicNums.ENEMY_UNIT_DIST_THRESHOLD, false).size();
 		if(infoMan.myPlanet == Planet.Mars)
 			return;
 		//System.out.println("ru.size = " + requestedUnits.size());
@@ -687,7 +687,7 @@ public class CombatSquad extends Squad{
 	private CombatUnit healerMove(CombatUnit cu, Nav nav) {
 		Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
 		//if we're not near any enemies nav, otherwise run away
-		if(myTile.distFromNearestHostile == magicNums.MAX_DIST_TO_CHECK){
+		if(numEnemyUnits == 0){
 			Direction d = nav.dirToMoveSafely(cu.myLoc, targetLoc);
 			cu = moveAndUpdate(cu,d);
 			return cu;
