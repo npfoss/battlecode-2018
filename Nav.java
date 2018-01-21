@@ -85,9 +85,77 @@ public class Nav{
     public Direction dirToMoveSafely(MapLocation start, Direction preferredDir){
         // Direction dirTowards = directionTowards(start, target);
         // now check if legal and safe and stuff
+        MapLocation loc = start.add(preferredDir);
+        double danger;
+        double bestDanger = 999999;
+        Direction bestDir = Direction.Center;
 
-        // for now (TODO)
-        return dirToMove(start, preferredDir);
+        if (infoMan.isLocationClear(loc)){
+            danger = infoMan.tiles[loc.getX()][loc.getY()].dangerRating();
+            if (danger < bestDanger){
+                bestDanger = danger;
+                bestDir = preferredDir;
+            }
+            if (bestDanger <= 0){
+                return bestDir;
+            }
+        }
+        
+        // if not, try slight deviations
+        Direction left = preferredDir;
+        Direction right = preferredDir;
+        for (int i = 0; i < 3; i++){
+            // try everything short of going backwards
+            left = Utils.rotateLeft(left);
+            right = Utils.rotateRight(right);
+
+            loc = start.add(left);
+
+            if (infoMan.isLocationClear(loc)){
+                danger = infoMan.tiles[loc.getX()][loc.getY()].dangerRating();
+                if (danger < bestDanger){
+                    bestDanger = danger;
+                    bestDir = left;
+                }
+                if (bestDanger <= 0){
+                    return bestDir;
+                }
+            }
+
+            loc = start.add(right);
+
+            if (infoMan.isLocationClear(loc)){
+                danger = infoMan.tiles[loc.getX()][loc.getY()].dangerRating();
+                if (danger < bestDanger){
+                    bestDanger = danger;
+                    bestDir = right;
+                }
+                if (bestDanger <= 0){
+                    return bestDir;
+                }
+            }
+        }
+
+        // maybe going backwards is safer?
+        right = Utils.rotateRight(right);
+        loc = start.add(right);
+        if (infoMan.isLocationClear(loc)){
+            danger = infoMan.tiles[loc.getX()][loc.getY()].dangerRating();
+            if (danger < bestDanger){
+                bestDanger = danger;
+                bestDir = right;
+            }
+            if (bestDanger <= 0){
+                return bestDir;
+            }
+        }
+
+        // last resort: stay put
+        if(infoMan.tiles[start.getX()][start.getY()].dangerRating() < bestDanger){
+            bestDir = Direction.Center;
+        }
+
+        return bestDir;
     }
 
     public Direction dirToExplore(MapLocation loc){

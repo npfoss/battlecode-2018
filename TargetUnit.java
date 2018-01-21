@@ -51,7 +51,7 @@ public class TargetUnit {
 	public void updateSnipePriority(MapLocation swarmLoc){
 		snipePriority = priority + 1 + swarmLoc.distanceSquaredTo(myLoc) / 25.0;
 		snipeDamageToDo = health;
-		for(TargetUnit tu: Utils.getTargetUnits(myLoc, 2, false, infoMan)){
+		for(TargetUnit tu: infoMan.getTargetUnits(myLoc, 2, false)){
 			if(tu.ID != ID){
 				snipePriority += tu.priority;
 				if(tu.health > snipeDamageToDo)

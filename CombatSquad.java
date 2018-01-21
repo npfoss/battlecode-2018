@@ -76,7 +76,7 @@ public class CombatSquad extends Squad{
 		swarmLoc = targetLoc;
 		if(combatUnits.size() > 0)
 			swarmLoc = Utils.averageMapLocation(gc, combatUnits);
-		numEnemyUnits = Utils.getTargetUnits(swarmLoc, 100, false, infoMan).size();
+		numEnemyUnits = infoMan.getTargetUnits(swarmLoc, 100, false).size();
 		if(infoMan.myPlanet == Planet.Mars)
 			return;
 		if(requestedUnits.isEmpty())
@@ -141,7 +141,7 @@ public class CombatSquad extends Squad{
 				continue;
 			MapLocation ml = u.location().mapLocation();
 			if(ml.distanceSquaredTo(swarmLoc) <= swarmThreshold ||
-				Utils.getTargetUnits(ml, 50, false, infoMan).size() > 0){
+				infoMan.getTargetUnits(ml, 50, false).size() > 0){
 				separatedUnits.remove(i);
 				CombatUnit cu = new CombatUnit(u.id(),u.damage(),u.health(),u.movementHeat()<10,u.attackHeat()<10,
 						ml,u.unitType(),nav.optimalStepsTo(ml, targetLoc));
@@ -196,8 +196,8 @@ public class CombatSquad extends Squad{
 
 	private boolean areWeDone(){
 		switch(objective){
-		case ATTACK_LOC: return gc.senseNearbyUnitsByTeam(targetLoc, 5, gc.team()).size() > 0 && Utils.getTargetUnits(targetLoc, magicNums.SQUAD_SEPARATION_THRESHOLD,false,infoMan).size() == 0;
-		case DEFEND_LOC: return Utils.getTargetUnits(targetLoc, 100,false,infoMan).size() == 0;
+		case ATTACK_LOC: return gc.senseNearbyUnitsByTeam(targetLoc, 5, gc.team()).size() > 0 && infoMan.getTargetUnits(targetLoc, magicNums.SQUAD_SEPARATION_THRESHOLD,false).size() == 0;
+		case DEFEND_LOC: return infoMan.getTargetUnits(targetLoc, 100, false).size() == 0;
 		default: return false;
 		}
 	}

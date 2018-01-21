@@ -116,13 +116,13 @@ public class Tile{
         	accessible = false;
         }
         */
-    	TreeSet<TargetUnit> enemies = Utils.getTargetUnits(myLoc, 72, false, infoMan);
+    	TreeSet<TargetUnit> enemies = infoMan.getTargetUnits(myLoc, 72, false);
     	distFromNearestHostile = 100;
     	boolean didSomething;
     	for(TargetUnit tu: enemies){
     		MapLocation ml = tu.myLoc;
     		long dist = myLoc.distanceSquaredTo(ml);
-    		if(Utils.isTypeHostile(tu.type) && dist<distFromNearestHostile){
+    		if(Utils.isTypeHostile(tu.type) && dist < distFromNearestHostile){
     			distFromNearestHostile = (int)dist;
     		}
     		didSomething = false;
@@ -146,6 +146,7 @@ public class Tile{
     		if(!Utils.isTypeHostile(tu.type))
     			continue;
     		//figure out if they can hit this tile next turn given that they can move once
+            // TODO: can't we check if they can move?
     		int xDif = Math.abs(ml.getX() - x);
     		int yDif = Math.abs(ml.getY() - y);
     		int closestTheyCanGet = (xDif-1) * (xDif-1) + (yDif-1) * (yDif-1);
@@ -166,4 +167,11 @@ public class Tile{
 		default: return new TreeSet<TargetUnit>();
 		}
 	}
+
+    public double dangerRating(){
+        if (!enemiesUpdated){
+            updateEnemies(infoMan.gc);
+        }
+        return 1.0 * possibleDamage;
+    }
 }

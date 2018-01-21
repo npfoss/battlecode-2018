@@ -54,7 +54,7 @@ public class CombatManager{
 		//defend factories and rockets
 		for(Unit u: infoMan.factories){
 			MapLocation ml = u.location().mapLocation();
-			if(Utils.getTargetUnits(ml, 100, true, infoMan).size()>0){
+			if(infoMan.getTargetUnits(ml, 100, true).size() > 0){
 				addCombatSquad(ml,Objective.DEFEND_LOC,strat);
 			}
 		}
@@ -62,17 +62,17 @@ public class CombatManager{
 		if(infoMan.myPlanet == Planet.Earth){
 			for(Unit u: infoMan.rockets){
 				MapLocation ml = u.location().mapLocation();
-				if(Utils.getTargetUnits(ml, 100, true, infoMan).size()>0){
+				if(infoMan.getTargetUnits(ml, 100, true).size() > 0){
 					addCombatSquad(ml,Objective.DEFEND_LOC,strat);
 				}
 			}
 		}
 		
-		if(infoMan.combatSquads.size()==0) {
+		if(infoMan.combatSquads.size() == 0) {
 			//go after enemies
-			if(infoMan.targetUnits.size()>0){
+			if(infoMan.targetUnits.size() > 0){
 				for(TargetUnit tu: infoMan.targetUnits.values()){
-					addCombatSquad(tu.myLoc,Objective.ATTACK_LOC,strat);
+					addCombatSquad(tu.myLoc,Objective.ATTACK_LOC, strat);
 				}
 			}
 			//otherwise find one

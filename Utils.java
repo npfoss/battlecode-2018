@@ -120,15 +120,6 @@ public class Utils{
     	return new MapLocation(gc.planet(),x/units.size(), y/units.size());
     }
     
-    public static TreeSet<TargetUnit> getTargetUnits(MapLocation ml, int radius, boolean hostileOnly, InfoManager infoMan){
-    	TreeSet<TargetUnit> ret = new TreeSet<TargetUnit>(new descendingPriorityComp());
-    	for(TargetUnit tu: infoMan.targetUnits.values()){
-    		if((!hostileOnly || isTypeHostile(tu.type)) && tu.myLoc.distanceSquaredTo(ml) <= radius)
-    			ret.add(tu);
-    	}
-    	return ret;
-    }
-    
     public static boolean isTypeHostile(UnitType ut){
     	return ut == UnitType.Knight || ut == UnitType.Ranger || ut == UnitType.Mage;
     }
