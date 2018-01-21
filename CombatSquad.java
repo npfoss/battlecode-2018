@@ -56,8 +56,9 @@ public class CombatSquad extends Squad{
 		update();
 	}
 
-	//done in a bad way cuz i couldn't get the normal way to work
 	private void removeCombatUnit(int id) {
+		CombatUnit cu = combatUnits.get(id);
+		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].myUnit = -1;
 		combatUnits.remove(id);
 		/*
 		CombatUnit toRemove  = new CombatUnit();
