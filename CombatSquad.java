@@ -81,6 +81,8 @@ public class CombatSquad extends Squad{
 		numEnemyUnits = Utils.getTargetUnits(swarmLoc, 100, false, infoMan).size();
 		if(infoMan.myPlanet == Planet.Mars)
 			return;
+		System.out.println("ru.size = " + requestedUnits.size());
+		System.out.flush();
 		if(requestedUnits.isEmpty())
 			requestedUnits.add(getRequestedUnit());
 		if(units.size() == 0)
@@ -100,8 +102,6 @@ public class CombatSquad extends Squad{
 			if(unitCompGoal[i]==0)
 				continue;
 			int score = unitCounts[i]/unitCompGoal[i];
-			System.out.println("Score = " + score);
-			System.out.flush();
 			if(score<bestScore){
 				bestScore = score;
 				bestIndex = i;
