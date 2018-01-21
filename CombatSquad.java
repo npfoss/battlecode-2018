@@ -710,7 +710,9 @@ public class CombatSquad extends Squad{
 			Tile t = infoMan.tiles[nx][ny];
 			if(!t.isWalkable || t.containsUnit)
 				continue;
-			score = t.distFromNearestHostile * magicNums.HOSTILE_FACTOR_HEALER_MOVE - t.possibleDamage * magicNums.DAMAGE_FACTOR_HEALER_MOVE - t.myLoc.distanceSquaredTo(swarmLoc) * magicNums.SWARM_FACTOR_HEALER_MOVE;
+			score = t.distFromNearestHostile * magicNums.HOSTILE_FACTOR_HEALER_MOVE 
+					- t.possibleDamage * magicNums.DAMAGE_FACTOR_HEALER_MOVE 
+					- t.myLoc.distanceSquaredTo(swarmLoc) * magicNums.SWARM_FACTOR_HEALER_MOVE;
 			if(score>bestScore){
 				bestScore = score;
 				bestIndex = i;
@@ -736,7 +738,8 @@ public class CombatSquad extends Squad{
 			Tile t = infoMan.tiles[nx][ny];
 			if(!t.isWalkable || t.containsUnit)
 				continue;
-			score = -t.possibleDamage * magicNums.DAMAGE_FACTOR_RANGER_MOVE
+			score = t.distFromNearestHostile * magicNums.HOSTILE_FACTOR_HEALER_MOVE
+					- t.possibleDamage * magicNums.DAMAGE_FACTOR_RANGER_MOVE
 					- t.myLoc.distanceSquaredTo(swarmLoc) * magicNums.SWARM_FACTOR_RANGER_MOVE
 					- t.myLoc.distanceSquaredTo(targetLoc) * magicNums.TARGET_FACTOR_RANGER_MOVE;
 			if(score>bestScore){
@@ -765,7 +768,8 @@ public class CombatSquad extends Squad{
 			Tile t = infoMan.tiles[nx][ny];
 			if(!t.isWalkable || t.containsUnit || t.enemiesWithinRangerRange.size()==0)
 				continue;
-			score = t.distFromNearestHostile * magicNums.HOSTILE_FACTOR_RANGER_MOVE_ATTACK - t.myLoc.distanceSquaredTo(swarmLoc) * magicNums.SWARM_FACTOR_RANGER_MOVE_ATTACK;
+			score = t.distFromNearestHostile * magicNums.HOSTILE_FACTOR_RANGER_MOVE_ATTACK 
+					- t.myLoc.distanceSquaredTo(swarmLoc) * magicNums.SWARM_FACTOR_RANGER_MOVE_ATTACK;
 			if(score>bestScore){
 				bestScore = score;
 				bestIndex = i;
@@ -804,7 +808,8 @@ public class CombatSquad extends Squad{
 			Tile t = infoMan.tiles[nx][ny];
 			if(!t.isWalkable || t.containsUnit)
 				continue;
-			score = t.distFromNearestHostile*magicNums.HOSTILE_FACTOR_RUN_AWAY - t.myLoc.distanceSquaredTo(swarmLoc)*magicNums.SWARM_FACTOR_RUN_AWAY;
+			score = t.distFromNearestHostile*magicNums.HOSTILE_FACTOR_RUN_AWAY 
+					- t.myLoc.distanceSquaredTo(swarmLoc)*magicNums.SWARM_FACTOR_RUN_AWAY;
 			if(score>bestScore){
 				bestScore = score;
 				bestIndex = i;
