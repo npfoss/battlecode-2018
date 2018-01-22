@@ -145,7 +145,7 @@ public class WorkerManager{
 							if(okayToBuild(v.get(i))) {
 								startingFactory2 = v.get(i);
 								infoMan.workerSquads.get(1).targetLoc = startingFactory2;
-								System.out.println("Trying to build a second factory");
+								// System.out.println("Trying to build a second factory");
 								break;
 							}
 
@@ -179,7 +179,7 @@ public class WorkerManager{
 			if(infoMan.factories.size() < 4 && gc.karbonite() > 100) {
 				for(WorkerSquad ws : infoMan.workerSquads) {
 					if((ws.objective == Objective.NONE  || ws.objective == Objective.MINE) && ws.units.size() > 0) {
-						System.out.println("Trying to build a third factory");
+						// System.out.println("Trying to build a third factory");
 						int maxDist = 2;
 						while(maxDist < 65) {
 							VecMapLocation v =  gc.allLocationsWithin(gc.unit(ws.units.get(0)).location().mapLocation(), maxDist);
@@ -188,7 +188,7 @@ public class WorkerManager{
 								if(okayToBuild(v.get(i))) {
 									ws.targetLoc = v.get(i);
 									ws.objective = Objective.BUILD;
-									System.out.println("Set a new location");
+									// System.out.println("Set a new location");
 									break;
 								}
 							}
