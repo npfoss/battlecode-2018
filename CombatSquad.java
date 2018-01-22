@@ -730,14 +730,14 @@ public class CombatSquad extends Squad{
 				combatUnits.put(cu.ID, cu);
 			}
 			else{
-				cu = combatMove(cu,nav);
+				cu = rangerMove(cu,nav);
 				combatUnits.put(cu.ID, cu);
 			}
 		}
 		
 	}
 
-	private CombatUnit combatMove(CombatUnit cu, Nav nav) {
+	private CombatUnit rangerMove(CombatUnit cu, Nav nav) {
 		Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
 		//if we're not near any enemies nav, otherwise run away
 		if(myTile.distFromNearestHostile == magicNums.MAX_DIST_TO_CHECK){
@@ -745,7 +745,7 @@ public class CombatSquad extends Squad{
 			cu = moveAndUpdate(cu,d);
 			return cu;
 		}
-		return rangerMove(cu);
+		return (cu.health <= magicNums.RANGER_RUN_AWAY_HEALTH_THRESH ? runAway(cu) : rangerMove(cu));
 	}
 	
 	private CombatUnit healerMove(CombatUnit cu, Nav nav) {
@@ -802,7 +802,7 @@ public class CombatSquad extends Squad{
 			Tile t = infoMan.tiles[nx][ny];
 			if(!t.isWalkable || t.containsUnit)
 				continue;
-			score = - t.distFromNearestHostile * magicNums.HOSTILE_FACTOR_HEALER_MOVE
+			score = t.distFromNearestHostile * magicNums.HOSTILE_FACTOR_HEALER_MOVE
 					- t.possibleDamage * magicNums.DAMAGE_FACTOR_RANGER_MOVE
 					- t.myLoc.distanceSquaredTo(swarmLoc) * magicNums.SWARM_FACTOR_RANGER_MOVE
 					- t.myLoc.distanceSquaredTo(targetLoc) * magicNums.TARGET_FACTOR_RANGER_MOVE;
@@ -817,6 +817,8 @@ public class CombatSquad extends Squad{
 	}
 	
 	private CombatUnit rangerMoveAndAttack(CombatUnit cu, Nav nav) {
+		if(cu.health < magicNums.RANGER_RUN_AWAY_HEALTH_THRESH)
+			return runAway(cu);
 		int x,y,nx,ny;
 		x = cu.myLoc.getX();
 		y = cu.myLoc.getY();
@@ -944,7 +946,7 @@ public class CombatSquad extends Squad{
 
 	private boolean shouldWeRetreat(){
 		//TODO: make this better
-		return numEnemyUnits > combatUnits.size() * 1.1;
+		return numEnemyUnits > combatUnits.size() * magicNums.AGGRESION_FACTOR;
 	}
 
 }
