@@ -282,10 +282,10 @@ public class CombatSquad extends Squad{
 		long otherAccum = 0;
 		int x,y,nx,ny;
 		for(CombatUnit cu: combatUnits.values()){
-			long start = System.nanoTime();
-			int ost = nav.optimalStepsTo(cu.myLoc, targetLoc);
-	        Utils.log("oST takes " + (System.nanoTime() - start) + " ns.");
-			cu.update(gc,ost);
+			//long start = System.nanoTime();
+			//int ost = nav.optimalStepsTo(cu.myLoc, targetLoc);
+	        //Utils.log("oST takes " + (System.nanoTime() - start) + " ns.");
+			cu.update(gc,(int) cu.myLoc.distanceSquaredTo(targetLoc));
 			updateAccum += System.nanoTime() - last;
 			last = System.nanoTime();
 			combatUnits.put(cu.ID, cu);
