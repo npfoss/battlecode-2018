@@ -176,7 +176,7 @@ public class WorkerManager{
 			//System.out.println("My objective is: " + ((infoMan.workerSquads.get(0).objective == Objective.BUILD) ? "Building" : "NONE"));
 			//System.out.println(infoMan.factories.size());
 
-			if(infoMan.factories.size() < 3 && gc.karbonite() > 100) {
+			if(infoMan.factories.size() < 4 && gc.karbonite() > 100) {
 				for(WorkerSquad ws : infoMan.workerSquads) {
 					if((ws.objective == Objective.NONE  || ws.objective == Objective.MINE) && ws.units.size() > 0) {
 						System.out.println("Trying to build a third factory");

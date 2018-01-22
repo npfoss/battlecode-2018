@@ -64,7 +64,8 @@ public class Overseer{
         for(CombatSquad cs : infoMan.combatSquads){
             cs.move(nav);
         }
-        gc.nextTurn();
+
         Utils.log("turn took " + (start + 50 - gc.getTimeLeftMs()) + ". " + gc.getTimeLeftMs() + " ms left");
+        gc.nextTurn();
     }
 }
