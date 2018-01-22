@@ -487,7 +487,7 @@ public class CombatSquad extends Squad{
 			}
 		}
 		if(overchargeSomeone){
-			Utils.log("overcharging unit " + tO.ID + " at " + tO.myLoc.getX() + " " + tO.myLoc.getY());
+			//Utils.log("overcharging unit " + tO.ID + " at " + tO.myLoc.getX() + " " + tO.myLoc.getY());
 			gc.overcharge(cu.ID, tO.ID);
 			cu.canOvercharge = false;
 			tO.update(gc, nav.optimalStepsTo(tO.myLoc, targetLoc));
@@ -495,7 +495,7 @@ public class CombatSquad extends Squad{
 			TreeSet<CombatUnit> temp = new TreeSet<CombatUnit>(new AscendingStepsComp());
 			temp.add(tO);
 			int x = tO.myLoc.getX();
-			int y = tO.myLoc.getX();
+			int y = tO.myLoc.getY();
 			int nx,ny;
 			for(int i = 0; i < 9; i++){
 				nx = x + dx[i];
@@ -786,7 +786,7 @@ public class CombatSquad extends Squad{
 		System.out.flush();
 		cu.canMove = false;
 		cu.myLoc = cu.myLoc.add(d);
-		Utils.log(cu.ID + " moving to " + cu.myLoc.getX() + " " + cu.myLoc.getY());
+		//Utils.log(cu.ID + " moving to " + cu.myLoc.getX() + " " + cu.myLoc.getY());
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].containsUnit = true;
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].myUnit = cu.ID;
 		cu.distFromNearestHostile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].distFromNearestHostile;

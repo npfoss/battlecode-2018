@@ -98,7 +98,7 @@ public class Tile{
     	if(enemiesUpdated)
     		return;
     	//infoMan.logTimeCheckpoint("before update");
-    	Utils.log("updating tile " + x + " " + y);
+    	//Utils.log("updating tile " + x + " " + y);
     	enemiesUpdated = true;
     	enemiesWithinRangerRange.clear();
     	enemiesWithinMageRange.clear();
