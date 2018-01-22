@@ -97,6 +97,7 @@ public class Tile{
     public void updateEnemies(GameController gc){
     	if(enemiesUpdated)
     		return;
+    	infoMan.logTimeCheckpoint("before update");
     	enemiesUpdated = true;
     	enemiesWithinRangerRange.clear();
     	enemiesWithinMageRange.clear();
@@ -150,7 +151,6 @@ public class Tile{
     		if(!Utils.isTypeHostile(tu.type))
     			continue;
     		//figure out if they can hit this tile next turn given that they can move once
-            // TODO: can't we check if they can move?
     		int xDif = Math.abs(ml.getX() - x);
     		int yDif = Math.abs(ml.getY() - y);
     		int closestTheyCanGet = (xDif-1) * (xDif-1) + (yDif-1) * (yDif-1);
@@ -161,6 +161,7 @@ public class Tile{
     			possibleDamage += tu.damageDealingPower;
     		}
     	}
+    	infoMan.logTimeCheckpoint("after update");
     }
 
 	public TreeSet<TargetUnit> getEnemiesWithinRange(UnitType type) {
