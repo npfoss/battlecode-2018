@@ -833,6 +833,7 @@ public class CombatSquad extends Squad{
 			if(!t.isWalkable || t.containsUnit || t.enemiesWithinRangerRange.size()==0)
 				continue;
 			score = t.distFromNearestHostile * magicNums.HOSTILE_FACTOR_RANGER_MOVE_ATTACK 
+					- t.possibleDamage * magicNums.DAMAGE_FACTOR_RANGER_MOVE_ATTACK
 					- t.myLoc.distanceSquaredTo(swarmLoc) * magicNums.SWARM_FACTOR_RANGER_MOVE_ATTACK;
 			if(score>bestScore){
 				bestScore = score;

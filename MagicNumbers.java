@@ -21,14 +21,15 @@ public class MagicNumbers{
     //the bigger, the more we care:
     double HOSTILE_FACTOR_RUN_AWAY = 2.0; 
     double SWARM_FACTOR_RUN_AWAY = 1.0; 
-    double TARGET_FACTOR_RANGER_MOVE = 1.0;
-    double HOSTILE_FACTOR_RANGER_MOVE = 2.0; //this makes us move closer to hostiles
+    double TARGET_FACTOR_RANGER_MOVE = 0;
+    double HOSTILE_FACTOR_RANGER_MOVE = 1.0; //this makes us move closer to hostiles
     double SWARM_FACTOR_RANGER_MOVE = 0; 
     double DAMAGE_FACTOR_RANGER_MOVE = 100.0;
     double HOSTILE_FACTOR_HEALER_MOVE = 1.0; 
     double SWARM_FACTOR_HEALER_MOVE = 1.0; 
     double DAMAGE_FACTOR_HEALER_MOVE = 200.0;
     double HOSTILE_FACTOR_RANGER_MOVE_ATTACK = 1.0; 
-    double SWARM_FACTOR_RANGER_MOVE_ATTACK = 1.0; 
+    double DAMAGE_FACTOR_RANGER_MOVE_ATTACK = 100.0;
+    double SWARM_FACTOR_RANGER_MOVE_ATTACK = 0; 
     double g;
 }
