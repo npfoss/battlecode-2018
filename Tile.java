@@ -97,7 +97,7 @@ public class Tile{
     public void updateEnemies(GameController gc){
     	if(enemiesUpdated)
     		return;
-    	infoMan.logTimeCheckpoint("before update");
+    	//infoMan.logTimeCheckpoint("before update");
     	enemiesUpdated = true;
     	enemiesWithinRangerRange.clear();
     	enemiesWithinMageRange.clear();
@@ -161,7 +161,7 @@ public class Tile{
     			possibleDamage += tu.damageDealingPower;
     		}
     	}
-    	infoMan.logTimeCheckpoint("after update");
+    	//infoMan.logTimeCheckpoint("after update");
     }
 
 	public TreeSet<TargetUnit> getEnemiesWithinRange(UnitType type) {

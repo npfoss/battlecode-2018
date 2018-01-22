@@ -276,9 +276,15 @@ public class CombatSquad extends Squad{
 		TreeSet<CombatUnit> mages = new TreeSet<CombatUnit>(new AscendingStepsComp());
 
 		//update combat units and tiles near them
+		long last = System.nanoTime();
+		long enemiesAccum = 0;
+		long updateAccum = 0;
+		long otherAccum = 0;
 		int x,y,nx,ny;
 		for(CombatUnit cu: combatUnits.values()){
 			cu.update(gc,nav.optimalStepsTo(cu.myLoc, targetLoc));
+			updateAccum += System.nanoTime() - last;
+			last = System.nanoTime();
 			combatUnits.put(cu.ID, cu);
 			x = cu.myLoc.getX();
 			y = cu.myLoc.getY();
@@ -290,12 +296,20 @@ public class CombatSquad extends Squad{
 					if(nx >= infoMan.width || nx<0 || ny >= infoMan.height || ny<0 || !infoMan.tiles[nx][ny].isWalkable)
 						continue;
 					infoMan.tiles[nx][ny].updateContains(gc);
+					otherAccum += System.nanoTime() - last;
+					last = System.nanoTime();
 					infoMan.tiles[nx][ny].updateEnemies(gc);
+					enemiesAccum += System.nanoTime() - last;
+					last = System.nanoTime();
 				}
 			}
 			else if(cu.canAttack){
 				infoMan.tiles[x][y].updateContains(gc);
+				otherAccum += System.nanoTime() - last;
+				last = System.nanoTime();
 				infoMan.tiles[x][y].updateEnemies(gc);
+				enemiesAccum += System.nanoTime() - last;
+				last = System.nanoTime();
 			}
 			switch(cu.type){
 			case Ranger: rangers.add(cu); break;
@@ -306,6 +320,9 @@ public class CombatSquad extends Squad{
 		}
 		
 		infoMan.logTimeCheckpoint("units and tiles updated");
+		Utils.log("updateAccum = " + updateAccum);
+		Utils.log("otherAccum = " + updateAccum);
+		Utils.log("enemiesAccum = " + updateAccum);
 
 		doKnightMicro(knights,retreat,nav);
 		doMageMicro(mages,retreat,nav);
