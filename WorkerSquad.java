@@ -21,6 +21,7 @@ public class WorkerSquad extends Squad {
 		//System.out.println("trying really hard to move towards karbonite");
 		if(!gc.isMoveReady(id))
 			return;
+		long start = System.nanoTime();
 		MapLocation myLoc = gc.unit(id).location().mapLocation();
 		int maxDist = 2;
 		
@@ -46,6 +47,8 @@ public class WorkerSquad extends Squad {
 				gc.moveRobot(id, toMove);
 			}
 		}
+		long end = System.nanoTime();
+		Utils.log("aaron just wasted " + (end-start) + " ns.");
 	}
 	public void tryToMine(int id) {
 		if(gc.canHarvest(id,Direction.Center)) {
