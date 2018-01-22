@@ -282,7 +282,10 @@ public class CombatSquad extends Squad{
 		long otherAccum = 0;
 		int x,y,nx,ny;
 		for(CombatUnit cu: combatUnits.values()){
-			cu.update(gc,nav.optimalStepsTo(cu.myLoc, targetLoc));
+			long start = System.nanoTime();
+			int ost = nav.optimalStepsTo(cu.myLoc, targetLoc);
+	        Utils.log("oST takes " + (System.nanoTime() - start) + " ns.");
+			cu.update(gc,ost);
 			updateAccum += System.nanoTime() - last;
 			last = System.nanoTime();
 			combatUnits.put(cu.ID, cu);
@@ -648,8 +651,8 @@ public class CombatSquad extends Squad{
 			cu.canAttack = false;
 			//removeCombatUnit(toHeal);
 			switch((int)(gc.researchInfo().getLevel(UnitType.Healer))){
-			case 0: tH.health += 10;
-			case 1: tH.health += 12;
+			case 0: tH.health += 10; break;
+			case 1: tH.health += 12; break;
 			default: tH.health += 17;
 			}
 			combatUnits.put(tH.ID, tH);
