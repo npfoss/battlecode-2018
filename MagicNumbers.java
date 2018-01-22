@@ -15,7 +15,7 @@ public class MagicNumbers{
     int MAX_DIST_THEY_COULD_HIT = 50;
     int ENEMY_UNIT_DIST_THRESHOLD = 200;
     int MAX_FIGHTER_COUNT = 200;
-    int RANGER_RUN_AWAY_HEALTH_THRESH = 61;
+    int RANGER_RUN_AWAY_HEALTH_THRESH = 0;
     double AGGRESION_FACTOR = 1.0; //bigger = more aggressive
     //the bigger, the less we care:
     double ABILITY_HEAT_OVERCHARGE_FACTOR = 50.0; 
@@ -26,7 +26,7 @@ public class MagicNumbers{
     double DAMAGE_FACTOR_RUN_AWAY = 100.0;
     double TARGET_FACTOR_RANGER_MOVE = 1.0;
     double HOSTILE_FACTOR_RANGER_MOVE = 2.0;
-    double SWARM_FACTOR_RANGER_MOVE = 0.5; 
+    double SWARM_FACTOR_RANGER_MOVE = 1.5; 
     double DAMAGE_FACTOR_RANGER_MOVE = 100.0;
     double DISTANCE_FACTOR_RANGER_MOVE = 10.0; 
     double HOSTILE_FACTOR_HEALER_MOVE = 1.0; 
@@ -36,6 +36,6 @@ public class MagicNumbers{
     double HOSTILE_FACTOR_RANGER_MOVE_ATTACK = 1.0; 
     double DAMAGE_FACTOR_RANGER_MOVE_ATTACK = 100.0;
     double DISTANCE_FACTOR_RANGER_MOVE_ATTACK = 10.0;
-    double SWARM_FACTOR_RANGER_MOVE_ATTACK = 1.0; 
+    double SWARM_FACTOR_RANGER_MOVE_ATTACK = 1.5; 
 	double g;
 }
