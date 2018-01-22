@@ -749,13 +749,24 @@ public class CombatSquad extends Squad{
 		
 	}
 
+	private CombatUnit rangerMoveAndAttack(CombatUnit cu, Nav nav) {
+		Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
+		//if we're not near any enemies nav, otherwise move and attack
+		if(myTile.distFromNearestHostile == magicNums.MAX_DIST_TO_CHECK){
+			//Utils.log("navving " + cu.myLoc.getX() + " " + cu.myLoc.getY());
+			Direction d = nav.dirToMove(cu.myLoc, targetLoc);
+			return moveAndUpdate(cu,d);
+		}
+		return (cu.health <= magicNums.RANGER_RUN_AWAY_HEALTH_THRESH ? runAway(cu) : rangerMoveAndAttack(cu));
+	}
+	
 	private CombatUnit rangerMove(CombatUnit cu, Nav nav) {
 		Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
-		//if we're not near any enemies nav, otherwise run away
+		//if we're not near any enemies nav, otherwise move
 		if(myTile.distFromNearestHostile == magicNums.MAX_DIST_TO_CHECK){
+			//Utils.log("navving " + cu.myLoc.getX() + " " + cu.myLoc.getY());
 			Direction d = nav.dirToMove(cu.myLoc, targetLoc);
-			cu = moveAndUpdate(cu,d);
-			return cu;
+			return moveAndUpdate(cu,d);
 		}
 		return (cu.health <= magicNums.RANGER_RUN_AWAY_HEALTH_THRESH ? runAway(cu) : rangerMove(cu));
 	}
@@ -806,7 +817,7 @@ public class CombatSquad extends Squad{
 		x = cu.myLoc.getX();
 		y = cu.myLoc.getY();
 		int bestIndex = -1;
-		double bestScore = -10000;
+		double bestScore = -1000000;
 		double score;
 		for(int i = 0; i < 9; i++){
 			nx = x + dx[i];
@@ -831,7 +842,7 @@ public class CombatSquad extends Squad{
 		return cu;
 	}
 	
-	private CombatUnit rangerMoveAndAttack(CombatUnit cu, Nav nav) {
+	private CombatUnit rangerMoveAndAttack(CombatUnit cu) {
 		if(cu.health < magicNums.RANGER_RUN_AWAY_HEALTH_THRESH)
 			return runAway(cu);
 		int x,y,nx,ny;
@@ -839,8 +850,8 @@ public class CombatSquad extends Squad{
 		y = cu.myLoc.getY();
 		int toAttack = -1;
 		int bestIndex = -1;
-		double bestScore = -10000;
-		double bestNormalScore = -10000;
+		double bestScore = -1000000;
+		double bestNormalScore = -1000000;
 		int bestNormalIndex = -1;
 		double score;
 		for(int i = 0; i < 9; i++){
@@ -896,7 +907,7 @@ public class CombatSquad extends Squad{
 		x = cu.myLoc.getX();
 		y = cu.myLoc.getY();
 		int bestIndex = -1;
-		double bestScore = -10000;
+		double bestScore = -1000000;
 		double score;
 		for(int i = 0; i < 9; i++){
 			nx = x + dx[i];
