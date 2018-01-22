@@ -154,7 +154,7 @@ public class CombatSquad extends Squad{
 		//System.out.println("cs here");
 		if(objective == Objective.EXPLORE){
 			infoMan.logTimeCheckpoint("start of explore move");
-			Utils.log("swarm size = " + units.size() + " obj = " + objective + " urgency = " + urgency);
+			// Utils.log("swarm size = " + units.size() + " obj = " + objective + " urgency = " + urgency);
 			explore(nav);
 			if(infoMan.combatSquads.size() > 1)
 				objective = objective.NONE;
@@ -194,8 +194,8 @@ public class CombatSquad extends Squad{
 				swarmThreshold+=2;
 			}
 		}
-		System.out.println("swarm size = " + combatUnits.size() + " obj = " + objective + " swarmLoc = " + swarmLoc + " targetLoc = " + targetLoc  
-				+ " urgency = " + urgency);
+		// System.out.println("swarm size = " + combatUnits.size() + " obj = " + objective + " swarmLoc = " + swarmLoc + " targetLoc = " + targetLoc  
+				// + " urgency = " + urgency);
 		moveToSwarm(nav);
 		boolean retreat = shouldWeRetreat();
 		infoMan.logTimeCheckpoint("starting micro");
@@ -203,7 +203,7 @@ public class CombatSquad extends Squad{
 		//check if we're done with our objective
 		boolean done = areWeDone();
 		if(done){
-			Utils.log("setting obj to none");
+			// Utils.log("setting obj to none");
 			objective = Objective.NONE;
 		}
 		update();
