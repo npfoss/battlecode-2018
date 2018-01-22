@@ -14,9 +14,11 @@ public class CombatUnit {
 	boolean canAttack;
 	boolean canMove;
 	boolean canSnipe;
+	boolean canOvercharge;
 	int stepsFromTarget;
 	MapLocation myLoc;
 	UnitType type;
+	long maxHealth;
 	
 	public CombatUnit(){
 		
@@ -33,14 +35,24 @@ public class CombatUnit {
 		myLoc = ml;
 		type = ut;
 		stepsFromTarget = sft;
+		switch(type){
+		case Ranger: maxHealth = 200; break;
+		case Knight: maxHealth = 250; break;
+		case Mage: maxHealth = 80; break;
+		case Healer: maxHealth = 100;
+		}
 	}
 	
-	public void update(GameController gc){
+	public void update(GameController gc, int sft){
+		//System.out.println("updating " + ID);
+		//System.out.flush();
 		Unit u = gc.unit(ID);
+		stepsFromTarget = sft;
 		health = u.health();
 		canAttack = u.attackHeat() < 10 && !(type == UnitType.Ranger && u.rangerIsSniping() != 0);
 		canMove = u.movementHeat() < 10 && !(type == UnitType.Ranger && u.rangerIsSniping() != 0);
 		canSnipe = (gc.researchInfo().getLevel(UnitType.Ranger) == 3 && type == UnitType.Ranger && u.abilityHeat() < 10 && u.rangerIsSniping() == 0);
+		canSnipe = (gc.researchInfo().getLevel(UnitType.Healer) == 3 && type == UnitType.Healer && u.abilityHeat() < 10);
 	}
 	
 	public boolean equals(Object o){
@@ -51,6 +63,7 @@ public class CombatUnit {
 		
 		return ID == cu.ID;
 	}
+	
 	/*
 	public void addOption(int opt, Tile tile) {
 		if(attackOptions.containsKey(opt)){

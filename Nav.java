@@ -22,6 +22,10 @@ public class Nav{
     assuming no movable units obstruct you
     */
     public int optimalStepsTo(MapLocation start, MapLocation target){
+    	if(!infoMan.isReachable(start, target)){
+        	//can't get there but just return distance
+    		return (int)(start.distanceSquaredTo(target));
+        }
         if (!infoMan.tiles[start.getX()][start.getY()].destToDir.containsKey(target.toString())){
             generateBFSMap(target);
         }
@@ -79,7 +83,10 @@ public class Nav{
     }
 
     public Direction dirToMoveSafely(MapLocation start, MapLocation target){
-        return dirToMoveSafely(start, directionTowards(start, target));
+    	if(infoMan.isReachable(start, target))
+    		return dirToMoveSafely(start, directionTowards(start, target));
+    	else
+    		return dirToMoveSafely(start, start.directionTo(target));
     }
 
     public Direction dirToMoveSafely(MapLocation start, Direction preferredDir){
