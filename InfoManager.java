@@ -2,6 +2,7 @@ import bc.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.TreeSet;
 
 /* please edit this it's just late at night
  updates enemy locations and buildings (where it last saw them etc)
@@ -15,22 +16,24 @@ public class InfoManager {
 	Planet myPlanet;
 	MagicNumbers magicNums;
 	int height, width;
+	long lastCheckpoint;
+	//int totalUnitCount;
 
 	ArrayList<Unit> rockets;
 	ArrayList<Unit> workers;
 	ArrayList<Unit> factories;
 	ArrayList<Unit> fighters;
 
-	ArrayList<Unit> unassignedUnits;
+	HashSet<Integer> unassignedUnits;
 
 	// tracking enemies
-	ArrayList<Unit> enemyRockets;
-	ArrayList<Unit> enemyWorkers;
-	ArrayList<Unit> enemyFactories;
-	ArrayList<Unit> enemyRangers;
-	ArrayList<Unit> enemyMages;
-	ArrayList<Unit> enemyHealers;
-	ArrayList<Unit> enemyKnights;
+	HashSet<Integer> enemyRockets;
+	HashSet<Integer> enemyWorkers;
+	HashSet<Integer> enemyFactories;
+	HashSet<Integer> enemyRangers;
+	HashSet<Integer> enemyMages;
+	HashSet<Integer> enemyHealers;
+	HashSet<Integer> enemyKnights;
 
 	//for knowing when you last saw a given enemy unit (unit id -> turn last seen)
 	HashMap<Integer,Integer> enemyLastSeen;
@@ -59,13 +62,13 @@ public class InfoManager {
 
 		myPlanet = gc.planet();
 
-		enemyRockets = new ArrayList<Unit>();
-		enemyWorkers = new ArrayList<Unit>();
-		enemyFactories = new ArrayList<Unit>();
-		enemyRangers = new ArrayList<Unit>();
-		enemyMages = new ArrayList<Unit>();
-		enemyKnights = new ArrayList<Unit>();
-		enemyHealers = new ArrayList<Unit>();
+		enemyRockets = new HashSet<Integer>();
+		enemyWorkers = new HashSet<Integer>();
+		enemyFactories = new HashSet<Integer>();
+		enemyRangers = new HashSet<Integer>();
+		enemyMages = new HashSet<Integer>();
+		enemyKnights = new HashSet<Integer>();
+		enemyHealers = new HashSet<Integer>();
 		
 		enemyLastSeen = new HashMap<Integer,Integer>();
 
@@ -80,6 +83,8 @@ public class InfoManager {
 	}
 
 	public void update() {
+		lastCheckpoint = System.nanoTime();
+		
 		// called at the beginning of each turn
 		comms.update();
 
@@ -88,7 +93,7 @@ public class InfoManager {
 		factories = new ArrayList<Unit>();
 		fighters = new ArrayList<Unit>();
 
-		unassignedUnits = new ArrayList<Unit>();
+		unassignedUnits = new HashSet<Integer>();
 		
 		targetUnits.clear();
 
@@ -103,7 +108,7 @@ public class InfoManager {
 				case Worker:
 					workers.add(unit);
 					if (!isInSquads1(unit, workerSquads) && !isInSquads2(unit, rocketSquads))
-						unassignedUnits.add(unit);
+						unassignedUnits.add(unit.id());
 					break;
 				case Factory:
 					factories.add(unit);
@@ -111,17 +116,17 @@ public class InfoManager {
 				case Rocket:
 					rockets.add(unit);
 					if (!isInSquads2(unit, rocketSquads))
-						unassignedUnits.add(unit);
+						unassignedUnits.add(unit.id());
 					break;
 				default:
 					fighters.add(unit);
 					if (!isInSquads3(unit, combatSquads) && !isInSquads2(unit,rocketSquads))
-						unassignedUnits.add(unit);
+						unassignedUnits.add(unit.id());
 					break;
 				}
 			}
 			else{
-				addEnemyUnit(unit);
+				addEnemyUnit(unit.id(),unit.unitType());
 				enemyLastSeen.put(unit.id(),(int) gc.round());
 				if(!unit.location().isOnMap())
 					continue;
@@ -135,7 +140,7 @@ public class InfoManager {
 					range = unit.attackRange();
 				}
 				TargetUnit tu = new TargetUnit(unit.id(),unit.health(),damage,
-						unit.location().mapLocation(),unit.unitType(),range,defense);
+						unit.location().mapLocation(),unit.unitType(),range,defense, this);
 				targetUnits.put(unit.id(), tu);
 			}
 		}
@@ -165,22 +170,7 @@ public class InfoManager {
 			for(int i = s.units.size()-1; i >= 0; i--){
 				int id = s.units.get(i);
 				if(!ids.contains(id)){
-					s.units.remove(i);
-					if(s.separatedUnits.contains(id))
-						s.separatedUnits.remove(s.separatedUnits.indexOf(id));
-					else{
-						CombatUnit toRemove  = new CombatUnit();
-						boolean remove = false;
-						for(CombatUnit cu: s.combatUnits){
-							if(cu.ID == id){
-								toRemove = cu;
-								remove = true;
-								break;
-							}
-						}
-						if(remove)
-							s.combatUnits.remove(toRemove);
-					}
+					s.removeUnit(i,id);
 				}
 			}
 			s.update();
@@ -200,52 +190,34 @@ public class InfoManager {
                 }
 			}
 		}
+		
+		logTimeCheckpoint("infoMan update done");
 	}
 
-	private void addEnemyUnit(Unit unit){
-		switch (unit.unitType()){
-		case Rocket: enemyRockets = updateUnit(enemyRockets,unit);
-		case Factory: enemyFactories = updateUnit(enemyFactories,unit);
-		case Worker: enemyWorkers = updateUnit(enemyWorkers,unit);
-		case Ranger: enemyRangers = updateUnit(enemyRangers,unit);
-		case Mage: enemyMages = updateUnit(enemyMages,unit);
-		case Knight: enemyKnights = updateUnit(enemyKnights,unit);
-		case Healer: enemyHealers = updateUnit(enemyHealers,unit);
+	private void addEnemyUnit(int ID, UnitType ut){
+		switch (ut){
+		case Rocket: enemyRockets.add(ID);
+		case Factory: enemyFactories.add(ID);
+		case Worker: enemyWorkers.add(ID);
+		case Ranger: enemyRangers.add(ID);
+		case Mage: enemyMages.add(ID);
+		case Knight: enemyKnights.add(ID);
+		case Healer: enemyHealers.add(ID);
 		}	
 	}
 
 	//if you're about to deal the finishing blow to a unit, remove it from our tracking
 	//necessary to do by ID because Unit object changes every turn
-	public void removeEnemyUnit(Unit unit){
-		switch (unit.unitType()){
-		case Rocket: enemyRockets = removeByID(enemyRockets,unit.id());
-		case Factory: enemyFactories = removeByID(enemyFactories,unit.id());
-		case Worker: enemyWorkers = removeByID(enemyWorkers,unit.id());
-		case Ranger: enemyRangers = removeByID(enemyRangers,unit.id());
-		case Mage: enemyMages = removeByID(enemyMages,unit.id());
-		case Knight: enemyKnights = removeByID(enemyKnights,unit.id());
-		case Healer: enemyHealers = removeByID(enemyHealers,unit.id());
+	public void removeEnemyUnit(int ID, UnitType ut){
+		switch (ut){
+		case Rocket: enemyRockets.remove(ID);
+		case Factory: enemyFactories.remove(ID);
+		case Worker: enemyWorkers.remove(ID);
+		case Ranger: enemyRangers.remove(ID);
+		case Mage: enemyMages.remove(ID);
+		case Knight: enemyKnights.remove(ID);
+		case Healer: enemyHealers.remove(ID);
 		}	
-	}
-
-	private ArrayList<Unit> removeByID(ArrayList<Unit> al, int id){
-		al.remove(gc.unit(id));
-		return al;
-	}
-
-	private ArrayList<Unit> updateUnit(ArrayList<Unit> al, Unit unit){
-		Unit toRemove = unit;
-		boolean remove = false;
-		for(Unit u: al){
-			if(u.id()==unit.id()){
-				remove = true;
-				toRemove = u;
-				break;
-			}
-		}
-		if(remove) al.remove(toRemove);
-		al.add(unit);
-		return al;
 	}
 
 	public boolean isInSquads1(Unit unit, ArrayList<WorkerSquad> squad) {
@@ -279,6 +251,14 @@ public class InfoManager {
 		return false;
 	}
 
+    public TreeSet<TargetUnit> getTargetUnits(MapLocation ml, int radius, boolean hostileOnly){
+        TreeSet<TargetUnit> ret = new TreeSet<TargetUnit>(new descendingPriorityComp());
+        for(TargetUnit tu: targetUnits.values()){
+            if((!hostileOnly || Utils.isTypeHostile(tu.type)) && tu.myLoc.distanceSquaredTo(ml) <= radius)
+                ret.add(tu);
+        }
+        return ret;
+    }
 
 /******** Map related functions below this line *******/
     
@@ -354,4 +334,11 @@ public class InfoManager {
         //      check illegal locs sometimes
         return /*isOnMap(loc1) && isOnMap(loc2) &&*/ tiles[loc1.getX()][loc1.getY()].region == tiles[loc2.getX()][loc2.getY()].region;
     }
+    
+    public void logTimeCheckpoint(String identifier){
+    	long duration = System.nanoTime() - lastCheckpoint;
+    	lastCheckpoint = System.nanoTime();
+    	// Utils.log(identifier + ": " + duration + " ns since last checkpoint.");
+    }
+    
 }

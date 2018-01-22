@@ -17,8 +17,6 @@ public class Overseer{
     public Overseer(GameController g){
         gc = g;
 
-        strat = Strategy.UNSURE;
-
         if(gc.planet() == Planet.Earth){
         	 magicNums = new MagicNumbersEarth();
         }
@@ -26,12 +24,13 @@ public class Overseer{
         	magicNums = new MagicNumbersMars();
         
         infoMan = new InfoManager(gc,magicNums);
+        strat = new Strategy(infoMan,gc);
         workerMan = new WorkerManager(infoMan,gc);
-        combatMan = new CombatManager(infoMan,gc,magicNums);
+        combatMan = new CombatManager(infoMan,gc,magicNums,strat);
         nav = new Nav(infoMan);
         
         if(gc.planet() == Planet.Earth){
-            prodMan = new ProductionManager(infoMan, gc);
+            prodMan = new ProductionManager(infoMan, gc, magicNums);
             researchMan = new ResearchManagerEarth(gc, infoMan);
             rocketMan = new RocketManager(gc, infoMan);
         } else {
@@ -39,18 +38,18 @@ public class Overseer{
             researchMan = new ResearchManagerMars(gc, infoMan);
             rocketMan = new RocketDoNothing(gc, infoMan);
         }
-
+        
     }
 
     public void takeTurn(){
-        System.out.println("Current round: " + gc.round());
+        Utils.log("Current round: " + gc.round());
         int start = gc.getTimeLeftMs();
         
         infoMan.update();
-        strat = strat.update(infoMan);
+        strat.update();
         researchMan.update(strat);
-        rocketMan.update();
-        workerMan.update(strat);
+        rocketMan.update(strat);
+        workerMan.update(strat,nav);
         combatMan.update(strat);
         prodMan.update(strat);
 
@@ -65,7 +64,8 @@ public class Overseer{
         for(CombatSquad cs : infoMan.combatSquads){
             cs.move(nav);
         }
+
+        Utils.log("turn took " + (start + 50 - gc.getTimeLeftMs()) + ". " + gc.getTimeLeftMs() + " ms left");
         gc.nextTurn();
-        System.out.println("turn took " + (start + 50 - gc.getTimeLeftMs()) + ". " + gc.getTimeLeftMs() + " ms left");
     }
 }
