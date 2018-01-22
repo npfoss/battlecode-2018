@@ -787,7 +787,7 @@ public class CombatSquad extends Squad{
 			if(!t.isWalkable || t.containsUnit)
 				continue;
 			score = t.distFromNearestHostile * magicNums.HOSTILE_FACTOR_HEALER_MOVE
-					+ (t.distFromNearestHostile - (goalRangerDistance+magicNums.HEALER_RANGE) > 0 ? t.distFromNearestHostile - (goalRangerDistance+magicNums.HEALER_RANGE) : 0) 
+					- (t.distFromNearestHostile - (goalRangerDistance+magicNums.HEALER_RANGE) > 0 ? t.distFromNearestHostile - (goalRangerDistance+magicNums.HEALER_RANGE) : 0) 
 					* magicNums.DISTANCE_FACTOR_RANGER_MOVE
 					- t.possibleDamage * magicNums.DAMAGE_FACTOR_HEALER_MOVE 
 					- t.myLoc.distanceSquaredTo(swarmLoc) * magicNums.SWARM_FACTOR_HEALER_MOVE;
@@ -817,7 +817,7 @@ public class CombatSquad extends Squad{
 			if(!t.isWalkable || t.containsUnit)
 				continue;
 			score = t.distFromNearestHostile * magicNums.HOSTILE_FACTOR_RANGER_MOVE
-					+ (t.distFromNearestHostile - goalRangerDistance > 0 ? t.distFromNearestHostile - goalRangerDistance : 0) * magicNums.DISTANCE_FACTOR_RANGER_MOVE
+					- (t.distFromNearestHostile - goalRangerDistance > 0 ? t.distFromNearestHostile - goalRangerDistance : 0) * magicNums.DISTANCE_FACTOR_RANGER_MOVE
 					- t.possibleDamage * magicNums.DAMAGE_FACTOR_RANGER_MOVE
 					- t.myLoc.distanceSquaredTo(swarmLoc) * magicNums.SWARM_FACTOR_RANGER_MOVE
 					- t.myLoc.distanceSquaredTo(targetLoc) * magicNums.TARGET_FACTOR_RANGER_MOVE;
@@ -852,7 +852,7 @@ public class CombatSquad extends Squad{
 			if(!t.isWalkable || t.containsUnit)
 				continue;
 			score = t.distFromNearestHostile * magicNums.HOSTILE_FACTOR_HEALER_MOVE
-					+ (t.distFromNearestHostile - goalRangerDistance > 0 ? t.distFromNearestHostile - goalRangerDistance : 0) * magicNums.DISTANCE_FACTOR_RANGER_MOVE
+					- (t.distFromNearestHostile - goalRangerDistance > 0 ? t.distFromNearestHostile - goalRangerDistance : 0) * magicNums.DISTANCE_FACTOR_RANGER_MOVE
 					- t.possibleDamage * magicNums.DAMAGE_FACTOR_RANGER_MOVE
 					- t.myLoc.distanceSquaredTo(swarmLoc) * magicNums.SWARM_FACTOR_RANGER_MOVE
 					- t.myLoc.distanceSquaredTo(targetLoc) * magicNums.TARGET_FACTOR_RANGER_MOVE;
@@ -863,7 +863,7 @@ public class CombatSquad extends Squad{
 			if(t.enemiesWithinRangerRange.size()==0)
 				continue;
 			score = t.distFromNearestHostile * magicNums.HOSTILE_FACTOR_RANGER_MOVE_ATTACK 
-					+ (t.distFromNearestHostile - goalRangerDistance > 0 ? t.distFromNearestHostile - goalRangerDistance : 0) * magicNums.DISTANCE_FACTOR_RANGER_MOVE_ATTACK
+					- (t.distFromNearestHostile - goalRangerDistance > 0 ? t.distFromNearestHostile - goalRangerDistance : 0) * magicNums.DISTANCE_FACTOR_RANGER_MOVE_ATTACK
 					- t.possibleDamage * magicNums.DAMAGE_FACTOR_RANGER_MOVE_ATTACK
 					- t.myLoc.distanceSquaredTo(swarmLoc) * magicNums.SWARM_FACTOR_RANGER_MOVE_ATTACK;
 			if(score>bestScore){
