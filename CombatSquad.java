@@ -146,7 +146,7 @@ public class CombatSquad extends Squad{
 			return;
 		//System.out.println("cs here");
 		if(objective == Objective.EXPLORE){
-			infoMan.logTimeCheckpoint("no way");
+			infoMan.logTimeCheckpoint("start of explore move");
 			Utils.log("swarm size = " + units.size() + " obj = " + objective + " urgency = " + urgency);
 			explore(nav);
 			if(infoMan.combatSquads.size() > 1)
@@ -256,8 +256,8 @@ public class CombatSquad extends Squad{
 	}
 
 	private void explore(Nav nav){
+		Direction dirToMove = Utils.orderedDirections[(int) (8*Math.random())];
 		for(int uid: units){
-			Direction dirToMove = Utils.orderedDirections[(int) (8*Math.random())];
 			if(gc.canMove(uid, dirToMove) && gc.unit(uid).movementHeat() < 10)
 				gc.moveRobot(uid, dirToMove);
 		}
@@ -741,7 +741,7 @@ public class CombatSquad extends Squad{
 		Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
 		//if we're not near any enemies nav, otherwise run away
 		if(myTile.distFromNearestHostile == magicNums.MAX_DIST_TO_CHECK){
-			Direction d = nav.dirToMoveSafely(cu.myLoc, targetLoc);
+			Direction d = nav.dirToMove(cu.myLoc, targetLoc);
 			cu = moveAndUpdate(cu,d);
 			return cu;
 		}
@@ -802,7 +802,7 @@ public class CombatSquad extends Squad{
 			Tile t = infoMan.tiles[nx][ny];
 			if(!t.isWalkable || t.containsUnit)
 				continue;
-			score = t.distFromNearestHostile * magicNums.HOSTILE_FACTOR_HEALER_MOVE
+			score = - t.distFromNearestHostile * magicNums.HOSTILE_FACTOR_HEALER_MOVE
 					- t.possibleDamage * magicNums.DAMAGE_FACTOR_RANGER_MOVE
 					- t.myLoc.distanceSquaredTo(swarmLoc) * magicNums.SWARM_FACTOR_RANGER_MOVE
 					- t.myLoc.distanceSquaredTo(targetLoc) * magicNums.TARGET_FACTOR_RANGER_MOVE;
