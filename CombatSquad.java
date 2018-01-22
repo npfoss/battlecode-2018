@@ -62,6 +62,12 @@ public class CombatSquad extends Squad{
 		CombatUnit cu = combatUnits.get(id);
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].myUnit = -1;
 		combatUnits.remove(id);
+		switch(cu.type){
+		case Knight:unitCounts[0]--; break;
+		case Mage:unitCounts[1]--; break;
+		case Ranger:unitCounts[2]--; break;
+		case Healer:unitCounts[3]--; 
+		}
 		/*
 		CombatUnit toRemove  = new CombatUnit();
 		boolean remove = false;
