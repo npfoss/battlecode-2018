@@ -65,7 +65,8 @@ public class Overseer{
             cs.move(nav);
         }
 
-        Utils.log("turn took " + (start + 50 - gc.getTimeLeftMs()) + ". " + gc.getTimeLeftMs() + " ms left");
         gc.nextTurn();
+        Utils.log("previous turn took " + (start + 50 - gc.getTimeLeftMs()) + ". " + gc.getTimeLeftMs() + " ms left");
+
     }
 }
