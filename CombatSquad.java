@@ -476,9 +476,9 @@ public class CombatSquad extends Squad{
 		for(CombatUnit o: overchargees){
 			switch(o.type){
 			case Healer: continue;
-			case Ranger: score = (gc.researchInfo().getLevel(UnitType.Ranger) == 3 ? gc.unit(o.ID).abilityHeat()/magicNums.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.stepsFromTarget; break;
-			case Knight: score = (gc.researchInfo().getLevel(UnitType.Knight) == 3 ? gc.unit(o.ID).abilityHeat()/magicNums.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.stepsFromTarget; break;
-			case Mage: score = (gc.researchInfo().getLevel(UnitType.Mage) == 4 ? gc.unit(o.ID).abilityHeat()/magicNums.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.stepsFromTarget;
+			case Ranger: score = (gc.researchInfo().getLevel(UnitType.Ranger) == 3 ? gc.unit(o.ID).abilityHeat()/magicNums.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.distFromNearestHostile; break;
+			case Knight: score = (gc.researchInfo().getLevel(UnitType.Knight) == 3 ? gc.unit(o.ID).abilityHeat()/magicNums.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.distFromNearestHostile; break;
+			case Mage: score = (gc.researchInfo().getLevel(UnitType.Mage) == 4 ? gc.unit(o.ID).abilityHeat()/magicNums.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.distFromNearestHostile;
 			}
 			if(score > bestScore){
 				tO = o;
@@ -487,7 +487,7 @@ public class CombatSquad extends Squad{
 			}
 		}
 		if(overchargeSomeone){
-			Utils.log("overcharging unit at " + tO.myLoc.getX() + " " + tO.myLoc.getY());
+			Utils.log("overcharging unit " + tO.ID + " at " + tO.myLoc.getX() + " " + tO.myLoc.getY());
 			gc.overcharge(cu.ID, tO.ID);
 			cu.canOvercharge = false;
 			tO.update(gc, nav.optimalStepsTo(tO.myLoc, targetLoc));
@@ -511,8 +511,8 @@ public class CombatSquad extends Squad{
 			case Mage: doMageMicro(temp,retreat,nav); break;
 			default:
 			}
-			tO = combatUnits.get(tO.ID);
-			tO.update(gc, nav.optimalStepsTo(tO.myLoc, targetLoc));
+			//tO = combatUnits.get(tO.ID);
+			//tO.update(gc, nav.optimalStepsTo(tO.myLoc, targetLoc));
 			combatUnits.put(tO.ID, tO);
 			//System.out.println("adding " + temp.first().ID + " 3");
 			//System.out.flush();
@@ -783,10 +783,10 @@ public class CombatSquad extends Squad{
 			return cu;
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].containsUnit = false;
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].myUnit = -1;
-		//System.out.println("moving to " + cu.myLoc.getX() + " " + cu.myLoc.getY());
-		//System.out.flush();
+		System.out.flush();
 		cu.canMove = false;
 		cu.myLoc = cu.myLoc.add(d);
+		Utils.log(cu.ID + " moving to " + cu.myLoc.getX() + " " + cu.myLoc.getY());
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].containsUnit = true;
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].myUnit = cu.ID;
 		gc.moveRobot(cu.ID, d);
@@ -800,15 +800,13 @@ public class CombatSquad extends Squad{
 			infoMan.targetUnits.remove(tu.ID);
 			infoMan.removeEnemyUnit(tu.ID, tu.type);
 			for(Tile t: tu.tilesWhichHitMe){
-				t.removeEnemy(tu);
-				infoMan.tiles[t.x][t.y] = t;
+				infoMan.tiles[t.x][t.y].removeEnemy(tu);
 			}
 			return;
 		}
 		tu.health -= damageDone;
 		for(Tile t: tu.tilesWhichHitMe){
-			t.updateTarget(tu);
-			infoMan.tiles[t.x][t.y] = t;
+			infoMan.tiles[t.x][t.y].updateTarget(tu);
 		}
 		infoMan.targetUnits.put(tu.ID, tu);
 	}
