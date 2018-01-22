@@ -139,11 +139,11 @@ public class CombatSquad extends Squad{
 			}
 		}
 		switch(bestIndex){
-		case 0: return UnitType.Knight;
-		case 1: return UnitType.Mage;
-		case 2: return UnitType.Ranger;
-		case 3: return UnitType.Healer;
-		default: return UnitType.Knight;
+			case 0: return UnitType.Knight;
+			case 1: return UnitType.Mage;
+			case 2: return UnitType.Ranger;
+			case 3: return UnitType.Healer;
+			default: return UnitType.Knight;
 		}
 	}
 

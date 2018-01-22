@@ -1,9 +1,5 @@
 import bc.*;
 
-/* Enum - choose general strategy mode
-didn't call it StrategyManager because it's an enum so this makes more sense
-*/
-
 /*controls:
  * research order
  * combatsquad composition
@@ -31,7 +27,9 @@ public class Strategy{
 	private void determineInitalStrat() {
 		//TODO: make this depend on stuff
 		researchOrder = new UnitType[]{UnitType.Ranger,UnitType.Worker,UnitType.Healer,UnitType.Healer,UnitType.Healer,UnitType.Ranger,UnitType.Ranger};
-		combatComposition = new int[]{0,0,3,2}; //knight,mage,ranger,healer
+		combatComposition = new int[]{0, 0, 3, 2}; //knight,mage,ranger,healer
+        rocketComposition = new int[]{0, 0, 4, 2, 2};
+                            // knight, mage, ranger, healer, worker
 	}
 
 	public void update(){

@@ -5,12 +5,18 @@ public class RocketSquad extends Squad{
 
 	int rocketID;
 	boolean isInSpace = false;
+	int launchRound;
 
-	public RocketSquad(GameController g){
+	// NOTE: rocket is always unit at index 0 (maintained by manager)
+
+	public RocketSquad(GameController g, MapLocation rocketLoc, int lr){
 		super(g);
+		objective = Objective.BOARD_ROCKET;
+		targetLoc = rocketLoc;
+		launchRound = lr;
 	}
 	public void update(){
-
+		
 	}
 
 	public void move(Nav nav){

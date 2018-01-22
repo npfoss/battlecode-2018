@@ -24,7 +24,8 @@ public class InfoManager {
 	ArrayList<Unit> factories;
 	ArrayList<Unit> fighters;
 
-	HashSet<Integer> unassignedUnits;
+	HashSet<Integer> unassignedUnits; // *no rockets*
+    ArrayList<Unit> newRockets;
 
 	// tracking enemies
 	HashSet<Integer> enemyRockets;
@@ -73,6 +74,8 @@ public class InfoManager {
 		enemyLastSeen = new HashMap<Integer,Integer>();
 
 		targetUnits = new HashMap<Integer,TargetUnit>();
+
+        newRockets = new ArrayList<Unit>();
 		
         height = (int) gc.startingMap(myPlanet).getHeight();
         width = (int) gc.startingMap(myPlanet).getWidth();
@@ -94,6 +97,7 @@ public class InfoManager {
 		fighters = new ArrayList<Unit>();
 
 		unassignedUnits = new HashSet<Integer>();
+        newRockets.clear();
 		
 		targetUnits.clear();
 
@@ -116,7 +120,7 @@ public class InfoManager {
 				case Rocket:
 					rockets.add(unit);
 					if (!isInSquads2(unit, rocketSquads))
-						unassignedUnits.add(unit.id());
+						newRockets.add(unit);
 					break;
 				default:
 					fighters.add(unit);
