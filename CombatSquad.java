@@ -146,6 +146,7 @@ public class CombatSquad extends Squad{
 			return;
 		//System.out.println("cs here");
 		if(objective == Objective.EXPLORE){
+			infoMan.logTimeCheckpoint("no way");
 			Utils.log("swarm size = " + units.size() + " obj = " + objective + " urgency = " + urgency);
 			explore(nav);
 			if(infoMan.combatSquads.size() > 1)
