@@ -476,9 +476,9 @@ public class CombatSquad extends Squad{
 		for(CombatUnit o: overchargees){
 			switch(o.type){
 			case Healer: continue;
-			case Ranger: score = (gc.researchInfo().getLevel(UnitType.Ranger) == 3 ? gc.unit(o.ID).abilityHeat()/magicNums.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.distFromNearestHostile; break;
-			case Knight: score = (gc.researchInfo().getLevel(UnitType.Knight) == 3 ? gc.unit(o.ID).abilityHeat()/magicNums.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.distFromNearestHostile; break;
-			case Mage: score = (gc.researchInfo().getLevel(UnitType.Mage) == 4 ? gc.unit(o.ID).abilityHeat()/magicNums.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.distFromNearestHostile;
+			case Ranger: score = (gc.researchInfo().getLevel(UnitType.Ranger) == 3 ? gc.unit(o.ID).abilityHeat() * magicNums.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.distFromNearestHostile; break;
+			case Knight: score = (gc.researchInfo().getLevel(UnitType.Knight) == 3 ? gc.unit(o.ID).abilityHeat() * magicNums.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.distFromNearestHostile; break;
+			case Mage: score = (gc.researchInfo().getLevel(UnitType.Mage) == 4 ? gc.unit(o.ID).abilityHeat() * magicNums.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.distFromNearestHostile;
 			}
 			if(score > bestScore){
 				tO = o;
@@ -529,7 +529,7 @@ public class CombatSquad extends Squad{
 		for(CombatUnit h: healees){
 			if(h.health + 10 >= h.maxHealth)
 				continue;
-			double score = -h.stepsFromTarget - h.health/magicNums.HEALER_HEALTH_FACTOR;
+			double score = -h.distFromNearestHostile - h.health * magicNums.HEALER_HEALTH_FACTOR;
 			if(score > bestScore){
 				tH = h;
 				toHeal = h.ID;
@@ -789,6 +789,7 @@ public class CombatSquad extends Squad{
 		Utils.log(cu.ID + " moving to " + cu.myLoc.getX() + " " + cu.myLoc.getY());
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].containsUnit = true;
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].myUnit = cu.ID;
+		cu.distFromNearestHostile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].distFromNearestHostile;
 		gc.moveRobot(cu.ID, d);
 		return cu;
 	}
