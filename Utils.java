@@ -120,13 +120,21 @@ public class Utils{
     	return new MapLocation(gc.planet(),x/units.size(), y/units.size());
     }
     
-    public static TreeSet<TargetUnit> getTargetUnits(MapLocation ml, int radius, boolean hostileOnly, InfoManager infoMan){
-    	TreeSet<TargetUnit> ret = new TreeSet<TargetUnit>(new descendingPriorityComp());
-    	for(TargetUnit tu: infoMan.targetUnits.values()){
-    		if((!hostileOnly || isTypeHostile(tu.type)) && tu.myLoc.distanceSquaredTo(ml) <= radius)
-    			ret.add(tu);
+    public static void log(String s){
+    	System.out.println(s);
+    	System.out.flush();
+    }
+    
+    public static MapLocation averageMapLocation(GameController gc, Collection<CombatUnit> units) {
+    	if(units.size() == 0)
+    		return null;
+    	int x = 0;
+    	int y = 0;
+    	for(CombatUnit cu : units) {
+    		x += cu.myLoc.getX();
+    		y += cu.myLoc.getY();
     	}
-    	return ret;
+    	return new MapLocation(gc.planet(),x/units.size(), y/units.size());
     }
     
     public static boolean isTypeHostile(UnitType ut){

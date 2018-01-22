@@ -2,6 +2,7 @@ import bc.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.TreeSet;
 
 /* please edit this it's just late at night
  updates enemy locations and buildings (where it last saw them etc)
@@ -15,13 +16,15 @@ public class InfoManager {
 	Planet myPlanet;
 	MagicNumbers magicNums;
 	int height, width;
+	long lastCheckpoint;
+	//int totalUnitCount;
 
 	ArrayList<Unit> rockets;
 	ArrayList<Unit> workers;
 	ArrayList<Unit> factories;
 	ArrayList<Unit> fighters;
 
-	ArrayList<Unit> unassignedUnits;
+	HashSet<Integer> unassignedUnits;
 
 	// tracking enemies
 	HashSet<Integer> enemyRockets;
@@ -80,6 +83,8 @@ public class InfoManager {
 	}
 
 	public void update() {
+		lastCheckpoint = System.nanoTime();
+		
 		// called at the beginning of each turn
 		comms.update();
 
@@ -88,7 +93,7 @@ public class InfoManager {
 		factories = new ArrayList<Unit>();
 		fighters = new ArrayList<Unit>();
 
-		unassignedUnits = new ArrayList<Unit>();
+		unassignedUnits = new HashSet<Integer>();
 		
 		targetUnits.clear();
 
@@ -103,7 +108,7 @@ public class InfoManager {
 				case Worker:
 					workers.add(unit);
 					if (!isInSquads1(unit, workerSquads) && !isInSquads2(unit, rocketSquads))
-						unassignedUnits.add(unit);
+						unassignedUnits.add(unit.id());
 					break;
 				case Factory:
 					factories.add(unit);
@@ -111,12 +116,12 @@ public class InfoManager {
 				case Rocket:
 					rockets.add(unit);
 					if (!isInSquads2(unit, rocketSquads))
-						unassignedUnits.add(unit);
+						unassignedUnits.add(unit.id());
 					break;
 				default:
 					fighters.add(unit);
 					if (!isInSquads3(unit, combatSquads) && !isInSquads2(unit,rocketSquads))
-						unassignedUnits.add(unit);
+						unassignedUnits.add(unit.id());
 					break;
 				}
 			}
@@ -185,6 +190,8 @@ public class InfoManager {
                 }
 			}
 		}
+		
+		logTimeCheckpoint("infoMan update done");
 	}
 
 	private void addEnemyUnit(int ID, UnitType ut){
@@ -244,6 +251,14 @@ public class InfoManager {
 		return false;
 	}
 
+    public TreeSet<TargetUnit> getTargetUnits(MapLocation ml, int radius, boolean hostileOnly){
+        TreeSet<TargetUnit> ret = new TreeSet<TargetUnit>(new descendingPriorityComp());
+        for(TargetUnit tu: targetUnits.values()){
+            if((!hostileOnly || Utils.isTypeHostile(tu.type)) && tu.myLoc.distanceSquaredTo(ml) <= radius)
+                ret.add(tu);
+        }
+        return ret;
+    }
 
 /******** Map related functions below this line *******/
     
@@ -319,4 +334,11 @@ public class InfoManager {
         //      check illegal locs sometimes
         return /*isOnMap(loc1) && isOnMap(loc2) &&*/ tiles[loc1.getX()][loc1.getY()].region == tiles[loc2.getX()][loc2.getY()].region;
     }
+    
+    public void logTimeCheckpoint(String identifier){
+    	long duration = System.nanoTime() - lastCheckpoint;
+    	lastCheckpoint = System.nanoTime();
+    	// Utils.log(identifier + ": " + duration + " ns since last checkpoint.");
+    }
+    
 }

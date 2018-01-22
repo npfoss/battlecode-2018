@@ -11,16 +11,103 @@ public class WorkerSquad extends Squad {
 		infoMan = im;
 		toBuild = UnitType.Factory;
 	}
-
+	final int[] dx = {-1,-1,-1,0,0,0,1,1,1};
+	final int[] dy = {-1,0,1,-1,0,1,-1,0,1};
 	public void update() {
 		if(requestedUnits.isEmpty())
 			requestedUnits.add(UnitType.Worker);
 		urgency = 64-8*units.size();
 	}
+	public void moveTowardsBuildLoc(int id, Unit worker, Nav nav) {
+		if(!worker.location().mapLocation().isAdjacentTo(targetLoc) && gc.isMoveReady(id)) {
+			//Move towards the target location
+			Direction movedir = nav.dirToMoveSafely(worker.location().mapLocation(),targetLoc);
+			if (movedir != Direction.Center) {
+				gc.moveRobot(id, movedir);
+				worker = gc.unit(id);
+			}
+			else if(worker.location().mapLocation()  == targetLoc) {//We are on top of the targetLoc, move away
+				for(Direction dirToMove : Utils.orderedDirections) {
+					if (gc.canMove(id, dirToMove)) {
+						gc.moveRobot(id, dirToMove);
+						worker = gc.unit(id);
+					}
+					break;
+				}
+			}
+			//Last resort we're stuck and need to build
+			if(worker.location().mapLocation()  == targetLoc) {
+				gc.disintegrateUnit(id);
+			}
+		}
+		
+	}
+	public void tryToBuild (int id, Unit worker) {
+		if(gc.hasUnitAtLocation(targetLoc) && gc.senseUnitAtLocation(targetLoc).unitType() == toBuild && gc.senseUnitAtLocation(targetLoc).structureIsBuilt() != 0) {
+			objective = Objective.NONE;
+			return; 
+		}
+		//We're here! Lets make a blueprint/work on building it up.
+		if(worker.location().mapLocation().isAdjacentTo(targetLoc)) {
+			if(gc.hasUnitAtLocation(targetLoc) && gc.senseUnitAtLocation(targetLoc).unitType() == toBuild) {
+				Unit blueprint = gc.senseUnitAtLocation(targetLoc);
+				if (gc.canBuild(id, blueprint.id())) {
+					gc.build(id, blueprint.id());
+				}
+			}
+		}
+		if(gc.hasUnitAtLocation(targetLoc) && gc.senseUnitAtLocation(targetLoc).unitType() == toBuild && gc.senseUnitAtLocation(targetLoc).structureIsBuilt() != 0) {
+			objective = Objective.NONE;
+			return; 
+		}
+		if(!(gc.hasUnitAtLocation(targetLoc))) {
+			Direction dirToBuild = worker.location().mapLocation().directionTo(targetLoc);
+			if (gc.karbonite() > bc.bcUnitTypeBlueprintCost(toBuild)
+					&& gc.canBlueprint(id, toBuild, dirToBuild)) {
+				gc.blueprint(worker.id(), toBuild, dirToBuild);
+			}
+		}
+		
+		//System.out.println(gc.senseUnitAtLocation(targetLoc).unitType());
+		if(gc.hasUnitAtLocation(targetLoc) && gc.senseUnitAtLocation(targetLoc).unitType() == toBuild && gc.senseUnitAtLocation(targetLoc).structureIsBuilt() != 0) {
+			objective = Objective.NONE;
+		}
+	}
+	public int safeX(int x) {
+		if(x < 0)
+			return 0;
+		if(x > infoMan.width-1)
+			return infoMan.width-1;
+		return x;
+	}
+	public int safeY(int y) {
+		if(y < 0)
+			return 0;
+		if(y > infoMan.height-1)
+			return infoMan.height-1;
+		return y;
+	}
+	public boolean karboniteNearLoc(MapLocation loc) {
+		for(int i = 0; i < 9; i++) {
+			if(infoMan.tiles[safeX(loc.getX()+dx[i])][safeY(loc.getY()+dy[i])].karbonite > 0) {
+				return true;
+			}
+		}
+		return false;
+	}
 	public void moveTowardsKarbonite(int id, Nav nav) {
 		//System.out.println("trying really hard to move towards karbonite");
 		if(!gc.isMoveReady(id))
 			return;
+		//long start = System.nanoTime();
+		for(Direction d : Utils.orderedDirections) {
+			if(gc.canMove(id, d)) {
+				if(karboniteNearLoc(gc.unit(id).location().mapLocation().add(d))) {
+					gc.moveRobot(id, d);
+					return;
+				}
+			}
+		}
 		MapLocation myLoc = gc.unit(id).location().mapLocation();
 		int maxDist = 2;
 		
@@ -40,50 +127,56 @@ public class WorkerSquad extends Squad {
 		}
 		if(targetKarboniteLoc != null) {
 			//System.out.println("trying sososoosososososososo hard to move towards karbonite");
-			Direction toMove = nav.dirToMove(myLoc, targetKarboniteLoc);
+			Direction toMove = nav.dirToMoveSafely(myLoc, targetKarboniteLoc);
 			if(gc.canMove(id, toMove)) {
 				//System.out.println("IM MOVING ROAR");
 				gc.moveRobot(id, toMove);
 			}
+		}else {
+			//For now probably nothing better todo :(
+			gc.disintegrateUnit(id);
 		}
+		//long end = System.nanoTime();
+		//Utils.log("aaron just wasted " + (end-start) + " ns.");
 	}
-	public void tryToMine(int id) {
+	public boolean tryToMine(int id) {
 		if(gc.canHarvest(id,Direction.Center)) {
 			gc.harvest(id, Direction.Center);
-			return;
+			return true;
 		}
 		if(gc.canHarvest(id,Direction.North)) {
 			gc.harvest(id, Direction.North);
-			return;
+			return true;
 		}
 		if(gc.canHarvest(id,Direction.South)) {
 			gc.harvest(id, Direction.South);
-			return;
+			return true;
 		}
 		if(gc.canHarvest(id,Direction.East)) {
 			gc.harvest(id, Direction.East);
-			return;
+			return true;
 		}
 		if(gc.canHarvest(id,Direction.West)) {
 			gc.harvest(id, Direction.West);
-			return;
+			return true;
 		}
 		if(gc.canHarvest(id,Direction.Northwest)) {
 			gc.harvest(id, Direction.Northwest);
-			return;
+			return true;
 		}
 		if(gc.canHarvest(id,Direction.Northeast)) {
 			gc.harvest(id, Direction.Northeast);
-			return;
+			return true;
 		}
 		if(gc.canHarvest(id,Direction.Southwest)) {
 			gc.harvest(id, Direction.Southwest);
-			return;
+			return true;
 		}
 		if(gc.canHarvest(id,Direction.Southeast)) {
 			gc.harvest(id, Direction.Southeast);
-			return;
+			return true;
 		}
+		return false;
 	}
 	public void replicateWorker(int id) {
 		if(targetLoc != null) {
@@ -108,67 +201,20 @@ public class WorkerSquad extends Squad {
 			Unit worker = gc.unit(id);
 			if(worker.location().isInSpace() || worker.location().isInGarrison())
 				continue;
-			//For now we shall replicate once at the start.
-			if(gc.round() == 1) {
+			//For now we shall replicate at the start, to be optimized.
+			if(gc.round() == 1 || (infoMan.workers.size() < 6 && gc.round() < 50)) {
 				replicateWorker(id);
 				
 			}
 			switch (objective) {
 			case BUILD:
 				if(targetLoc != null) {
+					moveTowardsBuildLoc(id, worker, nav);
 					//System.out.println("Trying to build something useful at: " + targetLoc.getX() + ", " + targetLoc.getY());
-					if(!worker.location().mapLocation().isAdjacentTo(targetLoc) && gc.isMoveReady(id)) {
-						//Move towards the target location
-						Direction movedir = nav.dirToMove(worker.location().mapLocation(),targetLoc);
-						if (movedir != Direction.Center) {
-							gc.moveRobot(id, movedir);
-							worker = gc.unit(id);
-						}
-						else {//We are on top of the targetLoc, move away
-							for(Direction dirToMove : Utils.orderedDirections) {
-								if (gc.canMove(id, dirToMove)) {
-									gc.moveRobot(id, dirToMove);
-									worker = gc.unit(id);
-								}
-								break;
-							}
-						}
-					}
-					//Last resort we're stuck and need to build
-					if(worker.location().mapLocation()  == targetLoc) {
-						gc.disintegrateUnit(id);
-					}
 					
 					if(worker.location().mapLocation().isAdjacentTo(targetLoc)) {
-						if(gc.hasUnitAtLocation(targetLoc) && gc.senseUnitAtLocation(targetLoc).unitType() == toBuild && gc.senseUnitAtLocation(targetLoc).structureIsBuilt() != 0) {
-							objective = Objective.NONE;
-							break; 
-						}
-						//We're here! Lets make a blueprint/work on building it up.
-						if(worker.location().mapLocation().isAdjacentTo(targetLoc)) {
-							if(gc.hasUnitAtLocation(targetLoc) && gc.senseUnitAtLocation(targetLoc).unitType() == toBuild) {
-								Unit blueprint = gc.senseUnitAtLocation(targetLoc);
-								if (gc.canBuild(id, blueprint.id())) {
-									gc.build(id, blueprint.id());
-								}
-							}
-						}
-						if(gc.hasUnitAtLocation(targetLoc) && gc.senseUnitAtLocation(targetLoc).unitType() == toBuild && gc.senseUnitAtLocation(targetLoc).structureIsBuilt() != 0) {
-							objective = Objective.NONE;
-							break; 
-						}
-						if(!(gc.hasUnitAtLocation(targetLoc))) {
-							Direction dirToBuild = worker.location().mapLocation().directionTo(targetLoc);
-							if (gc.karbonite() > bc.bcUnitTypeBlueprintCost(toBuild)
-									&& gc.canBlueprint(id, toBuild, dirToBuild)) {
-								gc.blueprint(worker.id(), toBuild, dirToBuild);
-							}
-						}
+						tryToBuild(id, worker);
 						
-						//System.out.println(gc.senseUnitAtLocation(targetLoc).unitType());
-						if(gc.hasUnitAtLocation(targetLoc) && gc.senseUnitAtLocation(targetLoc).unitType() == toBuild && gc.senseUnitAtLocation(targetLoc).structureIsBuilt() != 0) {
-							objective = Objective.NONE;
-						}
 					}
 				}
 				else {
@@ -195,8 +241,8 @@ public class WorkerSquad extends Squad {
 				tryToMine(id);
 				break;
 			case MINE:
-				tryToMine(id);
-				moveTowardsKarbonite(id,nav);
+				if(!tryToMine(id))
+					moveTowardsKarbonite(id,nav);
 				tryToMine(id);
 				break;
 			case BOARD_ROCKET:
@@ -205,5 +251,7 @@ public class WorkerSquad extends Squad {
 				break;
 			}
 		}
+
+		infoMan.logTimeCheckpoint("workers moved");
 	}
 }

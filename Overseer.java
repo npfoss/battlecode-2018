@@ -30,7 +30,7 @@ public class Overseer{
         nav = new Nav(infoMan);
         
         if(gc.planet() == Planet.Earth){
-            prodMan = new ProductionManager(infoMan, gc);
+            prodMan = new ProductionManager(infoMan, gc, magicNums);
             researchMan = new ResearchManagerEarth(gc, infoMan);
             rocketMan = new RocketManager(gc, infoMan);
         } else {
@@ -42,7 +42,7 @@ public class Overseer{
     }
 
     public void takeTurn(){
-        System.out.println("Current round: " + gc.round());
+        Utils.log("Current round: " + gc.round());
         int start = gc.getTimeLeftMs();
         
         infoMan.update();
@@ -64,7 +64,8 @@ public class Overseer{
         for(CombatSquad cs : infoMan.combatSquads){
             cs.move(nav);
         }
+
+        Utils.log("turn took " + (start + 50 - gc.getTimeLeftMs()) + ". " + gc.getTimeLeftMs() + " ms left");
         gc.nextTurn();
-        System.out.println("turn took " + (start + 50 - gc.getTimeLeftMs()) + ". " + gc.getTimeLeftMs() + " ms left");
     }
 }

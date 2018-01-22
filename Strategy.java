@@ -25,17 +25,16 @@ public class Strategy{
     public Strategy(InfoManager im, GameController g){
     	infoMan = im;
     	gc = g;
-    	if(infoMan.myPlanet == Planet.Earth)
-    		determineInitalStrat();
+    	determineInitalStrat();
     }
 	
 	private void determineInitalStrat() {
-		//eventually make this depend on stuff
-		researchOrder = new UnitType[]{UnitType.Ranger,UnitType.Ranger,UnitType.Healer,UnitType.Healer,UnitType.Healer,UnitType.Ranger};
-		combatComposition = new int[]{0,0,1,0}; //knight,mage,ranger,healer
+		//TODO: make this depend on stuff
+		researchOrder = new UnitType[]{UnitType.Ranger,UnitType.Worker,UnitType.Healer,UnitType.Healer,UnitType.Healer,UnitType.Ranger,UnitType.Ranger};
+		combatComposition = new int[]{0,0,3,2}; //knight,mage,ranger,healer
 	}
 
 	public void update(){
-        //eventually make it do stuff
+        //TODO: make it adjust stuff if necessary
     }
 }

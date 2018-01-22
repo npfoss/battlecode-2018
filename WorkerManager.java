@@ -75,13 +75,15 @@ public class WorkerManager{
 				boolean tryAgain = false;
 				for(WorkerSquad ws : infoMan.workerSquads) {
 					for(UnitType u : ws.requestedUnits) {
-						for(Unit a : infoMan.unassignedUnits) {
+						for(int i : infoMan.unassignedUnits) {
+							Unit a = gc.unit(i);
+							if(!a.location().isOnMap())
+								continue;
 							if(a.unitType() == u) {
-								//todo add this once Nate writes isReachab
 								if(ws.units.size() == 0 || infoMan.isReachable(gc.unit(ws.units.get(0)).location().mapLocation(),a.location().mapLocation()) && nav.optimalStepsTo(gc.unit(ws.units.get(0)).location().mapLocation(),a.location().mapLocation()) < 10){
 									ws.requestedUnits.remove(ws.requestedUnits.indexOf(u));
-									ws.units.add(infoMan.unassignedUnits.get(infoMan.unassignedUnits.indexOf(a)).id());
-									infoMan.unassignedUnits.remove(infoMan.unassignedUnits.indexOf(a));
+									ws.units.add(a.id());
+									infoMan.unassignedUnits.remove(i);
 									ws.update();
 									tryAgain = true;
 									didSomething = true;
@@ -97,12 +99,13 @@ public class WorkerManager{
 						break;
 				}
 				if(!tryAgain) {
-					for(Unit a : infoMan.unassignedUnits) {
+					for(int i : infoMan.unassignedUnits) {
+						Unit a = gc.unit(i);
 						if(a.unitType() == UnitType.Worker) {
 							WorkerSquad wsn = new WorkerSquad(gc,infoMan);
 							wsn.objective = Objective.BUILD;
-							wsn.units.add(infoMan.unassignedUnits.get(infoMan.unassignedUnits.indexOf(a)).id());
-							infoMan.unassignedUnits.remove(infoMan.unassignedUnits.indexOf(a));
+							wsn.units.add(i);
+							infoMan.unassignedUnits.remove(i);
 							wsn.update();
 							infoMan.workerSquads.add(wsn);
 							didSomething = true;
@@ -142,7 +145,7 @@ public class WorkerManager{
 							if(okayToBuild(v.get(i))) {
 								startingFactory2 = v.get(i);
 								infoMan.workerSquads.get(1).targetLoc = startingFactory2;
-								System.out.println("Trying to build a second factory");
+								// System.out.println("Trying to build a second factory");
 								break;
 							}
 
@@ -173,10 +176,10 @@ public class WorkerManager{
 			//System.out.println("My objective is: " + ((infoMan.workerSquads.get(0).objective == Objective.BUILD) ? "Building" : "NONE"));
 			//System.out.println(infoMan.factories.size());
 
-			if(infoMan.factories.size() < 3 && gc.karbonite() > 100) {
+			if(infoMan.factories.size() < 4 && gc.karbonite() > 100) {
 				for(WorkerSquad ws : infoMan.workerSquads) {
 					if((ws.objective == Objective.NONE  || ws.objective == Objective.MINE) && ws.units.size() > 0) {
-						System.out.println("Trying to build a third factory");
+						// System.out.println("Trying to build a third factory");
 						int maxDist = 2;
 						while(maxDist < 65) {
 							VecMapLocation v =  gc.allLocationsWithin(gc.unit(ws.units.get(0)).location().mapLocation(), maxDist);
@@ -185,7 +188,7 @@ public class WorkerManager{
 								if(okayToBuild(v.get(i))) {
 									ws.targetLoc = v.get(i);
 									ws.objective = Objective.BUILD;
-									System.out.println("Set a new location");
+									// System.out.println("Set a new location");
 									break;
 								}
 							}
