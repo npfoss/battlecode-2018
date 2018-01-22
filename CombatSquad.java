@@ -190,6 +190,7 @@ public class CombatSquad extends Squad{
 				+ " urgency = " + urgency);
 		moveToSwarm(nav);
 		boolean retreat = shouldWeRetreat();
+		infoMan.logTimeCheckpoint("starting micro");
 		doSquadMicro(retreat,nav);
 		//check if we're done with our objective
 		boolean done = areWeDone();
