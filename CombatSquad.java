@@ -291,7 +291,7 @@ public class CombatSquad extends Squad{
 		long otherAccum = 0;*/
 		int x,y,nx,ny;
 		for(CombatUnit cu: combatUnits.values()){
-			cu.update(gc,(int) cu.myLoc.distanceSquaredTo(targetLoc));
+			cu.update(gc, nav.optimalStepsTo(cu.myLoc, targetLoc));
 			//updateAccum += System.nanoTime() - last;
 			//last = System.nanoTime();
 			combatUnits.put(cu.ID, cu);
@@ -548,7 +548,7 @@ public class CombatSquad extends Squad{
 		}
 		for(TargetUnit tu: snipees){
 			if(tu.snipeDamageToDo <= snipers.size()*30){
-				//System.out.println("sniping " + tu.myLoc);
+				Utils.log("sniping " + tu.myLoc);
 				//System.out.flush();
 				for(int i = 0; i <= tu.snipeDamageToDo/30.0; i++){
 					gc.beginSnipe(snipers.get(snipers.size()-1).ID, tu.myLoc);
@@ -613,6 +613,7 @@ public class CombatSquad extends Squad{
 			}
 		}
 		if(toO != -1){
+			Utils.log("overcharging unit at " + tO.myLoc.getX() + " " + tO.myLoc.getY());
 			gc.overcharge(cu.ID, toO);
 			cu.canOvercharge = false;
 			tO.update(gc, nav.optimalStepsTo(tO.myLoc, targetLoc));
@@ -747,7 +748,7 @@ public class CombatSquad extends Squad{
 	private CombatUnit rangerMoveAndAttack(CombatUnit cu, Nav nav) {
 		Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
 		//if we're not near any enemies nav, otherwise move and attack
-		if(myTile.distFromNearestHostile == magicNums.MAX_DIST_TO_CHECK){
+		if(myTile.distFromNearestHostile > magicNums.MAX_DIST_THEY_COULD_HIT_NEXT_TURN){
 			//Utils.log("navving " + cu.myLoc.getX() + " " + cu.myLoc.getY());
 			Direction d = nav.dirToMove(cu.myLoc, targetLoc);
 			return moveAndUpdate(cu,d);
@@ -758,7 +759,7 @@ public class CombatSquad extends Squad{
 	private CombatUnit rangerMove(CombatUnit cu, Nav nav) {
 		Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
 		//if we're not near any enemies nav, otherwise move
-		if(myTile.distFromNearestHostile == magicNums.MAX_DIST_TO_CHECK){
+		if(myTile.distFromNearestHostile > magicNums.MAX_DIST_THEY_COULD_HIT_NEXT_TURN){
 			//Utils.log("navving " + cu.myLoc.getX() + " " + cu.myLoc.getY());
 			Direction d = nav.dirToMove(cu.myLoc, targetLoc);
 			return moveAndUpdate(cu,d);
