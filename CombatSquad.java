@@ -14,7 +14,7 @@ public class CombatSquad extends Squad{
 	MapLocation swarmLoc;
 	int numEnemyUnits;
 	int goalRangerDistance;
-	MagicNumbers magicNums;
+	static MagicNumbers magicNums;
 	int[] unitCounts;
 	int[] unitCompGoal;
 	final int[] dx = {-1,-1,-1,0,0,0,1,1,1};
@@ -677,6 +677,7 @@ public class CombatSquad extends Squad{
 		return cu;
 	}
 	
+	/* not sure if it's actually faster :(
 	private static final int[] healdx = {0,0,0,0,0,1,1,1,1,1,1,2,2,2,2,2,2,3,3,3,3,3,4,4,4,4,5,5,5,
 										 0,0,0,0,0,1,1,1,1,1,2,2,2,2,2,3,3,3,3,4,4,4,5,5,
 										 -1,-1,-1,-1,-1,-1,-2,-2,-2,-2,-2,-2,-3,-3,-3,-3,-3,-4,-4,-4,-4,-5,-5,-5,
@@ -685,20 +686,14 @@ public class CombatSquad extends Squad{
 										 -1,-2,-3,-4,-5,-1,-2,-3,-4,-5,-1,-2,-3,-4,-5,-1,-2,-3,-4,-1,-2,-3,-1,-2,
 										 0,1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,0,1,2,3,0,1,2,
 										 -1,-2,-3,-4,-5,-1,-2,-3,-4,-5,-1,-2,-3,-4,-1,-2,-3,-1,-2};
+	*/
 
 	private static TreeSet<CombatUnit> getUnitsToHeal(MapLocation ml){
-		int x = ml.getX();
-		int y = ml.getY();
-		int nx,ny;
     	TreeSet<CombatUnit> ret = new TreeSet<CombatUnit>(new AscendingStepsComp());
-    	for(int i = 0; i < healdx.length; i++){
-    		nx = x + healdx[i];
-    		ny = y + healdy[i];
-    		if(!infoMan.isOnMap(nx, ny))
-    			continue;
-    		if(infoMan.tiles[nx][ny].myUnit != -1 && combatUnits.containsKey(infoMan.tiles[nx][ny].myUnit)){
-    			ret.add(combatUnits.get(infoMan.tiles[nx][ny].myUnit));
-    		}
+    	for(CombatUnit cu: combatUnits.values()){
+    		int dist = (int) ml.distanceSquaredTo(cu.myLoc);
+    		if(dist <= magicNums.HEALER_RANGE)
+    			ret.add(cu);
     	}
     	return ret;
     }
