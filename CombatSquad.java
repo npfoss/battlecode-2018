@@ -321,8 +321,8 @@ public class CombatSquad extends Squad{
 		
 		infoMan.logTimeCheckpoint("units and tiles updated");
 		Utils.log("updateAccum = " + updateAccum);
-		Utils.log("otherAccum = " + updateAccum);
-		Utils.log("enemiesAccum = " + updateAccum);
+		Utils.log("otherAccum = " + otherAccum);
+		Utils.log("enemiesAccum = " + enemiesAccum);
 
 		doKnightMicro(knights,retreat,nav);
 		doMageMicro(mages,retreat,nav);
