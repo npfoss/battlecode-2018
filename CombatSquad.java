@@ -618,7 +618,7 @@ public class CombatSquad extends Squad{
 			cu.canOvercharge = false;
 			tO.update(gc, nav.optimalStepsTo(tO.myLoc, targetLoc));
 			//removeCombatUnit(toO);
-			TreeSet<CombatUnit> temp = new TreeSet<CombatUnit>();
+			TreeSet<CombatUnit> temp = new TreeSet<CombatUnit>(new AscendingStepsComp());
 			temp.add(tO);
 			int x = tO.myLoc.getX();
 			int y = tO.myLoc.getX();
