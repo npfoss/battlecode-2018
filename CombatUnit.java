@@ -16,6 +16,7 @@ public class CombatUnit {
 	boolean canSnipe;
 	boolean canOvercharge;
 	int stepsFromTarget;
+	int distFromNearestHostile;
 	MapLocation myLoc;
 	UnitType type;
 	long maxHealth;
