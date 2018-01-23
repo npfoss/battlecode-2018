@@ -442,6 +442,8 @@ public class InfoManager {
         } catch (Exception e) {
             // cry, mars is impassible
         }
+        
+        Utils.log("marsx = " + marsx + " marsy = " + marsy);
 
         return bestloc;
     }
