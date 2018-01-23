@@ -239,20 +239,22 @@ public class WorkerManager{
 		WorkerSquad ws = null;
 		for (WorkerSquad w : infoMan.workerSquads){
 			if (w.objective == Objective.MINE || infoMan.factories.size() > 1 && w.objective == Objective.BUILD && w.toBuild == UnitType.Factory){
+				w.objective = Objective.BUILD;
+				w.toBuild = UnitType.Rocket;
+				w.targetLoc = null;
+				w.update();
 				ws = w;
 				break;
 			}
 		}
 		if (ws == null){
 			ws = new WorkerSquad(gc,infoMan);
+			ws.objective = Objective.BUILD;
+			ws.toBuild = UnitType.Rocket;
+			ws.targetLoc = null;
+			ws.update();
 			infoMan.workerSquads.add(ws);
 		}
-		ws.objective = Objective.BUILD;
-		ws.toBuild = UnitType.Rocket;
-		ws.targetLoc = null;
-		ws.requestedUnits.clear();
-		ws.requestedUnits.add(UnitType.Worker);
-		ws.update();
 	}
 }
 
