@@ -93,7 +93,7 @@ public class RocketSquad extends Squad {
 		if (shouldLaunch(numUnitsInside)){
 			Utils.log("trying to launch rocket!");
 			MapLocation dest = nav.getNextMarsDest();
-			if(gc.canLaunchRocket(rocket.id(), dest)){
+			if(dest != null && gc.canLaunchRocket(rocket.id(), dest)){
 				gc.launchRocket(rocket.id(), dest);
 				isInSpace = true;
 			}
