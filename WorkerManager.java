@@ -103,6 +103,8 @@ public class WorkerManager{
 				if(!tryAgain) {
 					for(int i : infoMan.unassignedUnits) {
 						Unit a = gc.unit(i);
+						if(!a.location().isOnMap())
+							continue;
 						if(a.unitType() == UnitType.Worker) {
 							WorkerSquad wsn = new WorkerSquad(gc,infoMan);
 							wsn.objective = Objective.BUILD;
