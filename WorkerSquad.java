@@ -215,7 +215,7 @@ public class WorkerSquad extends Squad {
 			if(worker.location().isInSpace() || worker.location().isInGarrison())
 				continue;
 			//For now we shall replicate at the start, to be optimized.
-			if(infoMan.workerCount < strat.maxWorkers) {
+			if(infoMan.workerCount < strat.maxWorkers && infoMan.myPlanet == Planet.Earth) {
 				replicateWorker(id);
 			}
 			switch (objective) {

@@ -42,6 +42,8 @@ public class CombatManager{
 	// remember, the squads will move on their own after you update everything
 	public void update(Strategy strat){
 		// set units whose objective is NONE (meaning they completed it) to unassignedUnits
+		//Utils.log("sup");
+		
 		ArrayList<CombatSquad> toRemove = new ArrayList<CombatSquad>();
 		for(CombatSquad cs: infoMan.combatSquads){
 			if(cs.objective == Objective.NONE){
@@ -74,7 +76,8 @@ public class CombatManager{
 			}
 		}
 		
-		if(infoMan.combatSquads.size()==1 && infoMan.combatSquads.get(0).objective == Objective.EXPLORE){
+		if((infoMan.combatSquads.size()==1 && infoMan.combatSquads.get(0).objective == Objective.EXPLORE) || infoMan.myPlanet == Planet.Mars){
+			Utils.log("here");
 			for(TargetUnit tu: infoMan.targetUnits.values()){
 				addCombatSquad(tu.myLoc,Objective.ATTACK_LOC, strat);
 			}
@@ -89,6 +92,7 @@ public class CombatManager{
 
 		boolean didSomething = false;
 		while(infoMan.unassignedUnits.size() > 0) {
+			Utils.log("here2");
 			didSomething = false;
 			infoMan.combatSquads.sort(Squad.byUrgency());
 			boolean tryAgain = false;
