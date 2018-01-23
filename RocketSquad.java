@@ -84,13 +84,14 @@ public class RocketSquad extends Squad {
 			}
 		}
 
-		Utils.log("rocketsquad reporting size = " + units.size() + " urgency = " + urgency + " numUnitsInside = " + numUnitsInside);
+		Utils.log("rocketsquad reporting size = " + units.size() + " urgency = " + urgency + " numUnitsInside = " + numUnitsInside + " countodwn = " + countdown);
 		
 		if (numUnitsInside >= rocket.structureMaxCapacity()){
 			beginCountdown();
 		}
 
 		if (shouldLaunch(numUnitsInside)){
+			Utils.log("trying to launch rocket!");
 			MapLocation dest = nav.getNextMarsDest();
 			if(gc.canLaunchRocket(rocket.id(), dest)){
 				gc.launchRocket(rocket.id(), dest);

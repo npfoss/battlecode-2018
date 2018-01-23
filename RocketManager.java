@@ -83,6 +83,8 @@ public class RocketManager{
         for (Unit unit : toSteal){
             if (unit != null){
                 Squad squad = infoMan.getSquad(unit);
+                if(squad == null)
+                	continue;
                 rs.units.add(unit.id());
                 squad.removeUnit(unit.id());
                 squad.update();
