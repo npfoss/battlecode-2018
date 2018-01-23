@@ -9,7 +9,7 @@ public class CombatSquad extends Squad{
 
 	//keep track of units into two groups: those with the main swarm and those separated from it
 	static HashMap<Integer,CombatUnit> combatUnits; //ID to CombatUnit
-	ArrayList<Integer> separatedUnits;
+	//ArrayList<Integer> separatedUnits;
 	MapLocation swarmLoc;
 	int numEnemyUnits;
 	int goalRangerDistance;
@@ -22,7 +22,7 @@ public class CombatSquad extends Squad{
 	public CombatSquad(GameController g, InfoManager im, MagicNumbers mn, int[] ucg) {
 		super(im);
 		combatUnits = new HashMap<Integer,CombatUnit>();
-		separatedUnits = new ArrayList<Integer>();
+		//separatedUnits = new ArrayList<Integer>();
 		magicNums = mn;
 		unitCounts = new int[]{0,0,0,0}; //knight,mage,ranger,healer
 		unitCompGoal = ucg;
@@ -33,7 +33,7 @@ public class CombatSquad extends Squad{
 	public void addUnit(Unit u){
 		requestedUnits.remove(u.unitType());
 		units.add(u.id());
-		separatedUnits.add(u.id());
+		//separatedUnits.add(u.id());
 		infoMan.unassignedUnits.remove(u.id());
 		switch(u.unitType()){
 		case Knight:unitCounts[0]++; break;
@@ -42,16 +42,19 @@ public class CombatSquad extends Squad{
 		case Healer:unitCounts[3]++; break;
 		default: break;
 		}
+		MapLocation ml = u.location().mapLocation();
+		CombatUnit cu = new CombatUnit(u.id(),u.damage(),u.health(),u.movementHeat()<10,u.attackHeat()<10,
+				ml,u.unitType(),(int) ml.distanceSquaredTo(targetLoc));
+		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].myUnit = cu.ID;
+		combatUnits.put(cu.ID, cu);
 		update();
 	}
 	
 	public void removeUnit(int id){
 		super.removeUnit(id);
-		if(separatedUnits.contains(id))
-			separatedUnits.remove(separatedUnits.indexOf(id));
-		else{
-			removeCombatUnit(id);
-		}
+		//if(separatedUnits.contains(id))
+			//separatedUnits.remove(separatedUnits.indexOf(id));
+		removeCombatUnit(id);
 		update();
 	}
 
@@ -155,10 +158,11 @@ public class CombatSquad extends Squad{
 			Utils.log("swarm size = " + units.size() + " obj = " + objective + " urgency = " + urgency);
 			explore(nav);
 			if(infoMan.combatSquads.size() > 1)
-				objective = objective.NONE;
+				objective = Objective.NONE;
 			infoMan.logTimeCheckpoint("done with CombatSquad move");
 			return;
 		}
+		/*
 		if(combatUnits.size()==0){
 			for(int id: separatedUnits){
 				Unit u = gc.unit(id);
@@ -191,10 +195,10 @@ public class CombatSquad extends Squad{
 				combatUnits.put(cu.ID,cu);
 				swarmThreshold+=2;
 			}
-		}
+		}*/
 		Utils.log("ovr size = " + units.size() + " swarm size = " + combatUnits.size() + " obj = " + objective + " swarmLoc = " + swarmLoc + " targetLoc = " + targetLoc  
 			  + " urgency = " + urgency);
-		moveToSwarm(nav);
+		//moveToSwarm(nav);
 		boolean retreat = shouldWeRetreat();
 		infoMan.logTimeCheckpoint("starting micro");
 		doSquadMicro(retreat,nav);
