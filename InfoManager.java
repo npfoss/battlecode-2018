@@ -419,6 +419,7 @@ public class InfoManager {
         MapLocation bestloc = null;
         for (int x = marsx; x < startingMap.getWidth(); x++){
             for (int y = marsy; y < startingMap.getHeight(); y++){
+                Utils.log("checking x = " + x + " y = " + y);
                 MapLocation loc = new MapLocation(Planet.Mars, x, y);
                 if (startingMap.isPassableTerrainAt(loc) > 0){
                     bestloc = loc;
