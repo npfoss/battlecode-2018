@@ -71,6 +71,8 @@ public class RocketManager{
         long maxDist = 999999;
         ArrayList<Unit> list = type == UnitType.Worker ? infoMan.workers : infoMan.fighters;
         for (Unit unit : list){
+        	if(!unit.location().isOnMap())
+        		continue;
             if ((toSteal[maxInd] == null || rs.targetLoc.distanceSquaredTo(unit.location().mapLocation()) < maxDist)
                     && canStealUnit(rs, unit)){
                 toSteal[maxInd] = unit;
@@ -81,7 +83,7 @@ public class RocketManager{
 
         // do the deed
         for (Unit unit : toSteal){
-            if (unit != null && unit.location().isOnMap()){
+            if (unit != null){
                 Squad squad = infoMan.getSquad(unit);
                 if(squad == null)
                 	continue;
