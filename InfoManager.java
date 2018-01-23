@@ -141,10 +141,12 @@ public class InfoManager {
 						newRockets.add(unit);
 					break;
 				default:
-					Utils.log("wow");
+					if(myPlanet == Planet.Mars)
+						Utils.log("wow");
 					fighters.add(unit);
 					if (!isInSquads3(unit, combatSquads) && !isInSquads2(unit,rocketSquads)){
-						Utils.log("no way");
+						if(myPlanet == Planet.Mars)
+							Utils.log("no way");
 						unassignedUnits.add(unit.id());
 					}
 					break;
