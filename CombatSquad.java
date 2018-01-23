@@ -192,8 +192,8 @@ public class CombatSquad extends Squad{
 				swarmThreshold+=2;
 			}
 		}
-		//Utils.log("swarm size = " + combatUnits.size() + " obj = " + objective + " swarmLoc = " + swarmLoc + " targetLoc = " + targetLoc  
-		//		  + " urgency = " + urgency + " unit 1 is " + units.get(0));
+		Utils.log("swarm size = " + combatUnits.size() + " obj = " + objective + " swarmLoc = " + swarmLoc + " targetLoc = " + targetLoc  
+			  + " urgency = " + urgency);
 		moveToSwarm(nav);
 		boolean retreat = shouldWeRetreat();
 		infoMan.logTimeCheckpoint("starting micro");
