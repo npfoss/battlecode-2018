@@ -138,7 +138,10 @@ public class WorkerSquad extends Squad {
 			}
 		}else {
 			//For now probably nothing better todo :(
-			gc.disintegrateUnit(id);
+			//gc.disintegrateUnit(id);
+			Direction dirToMove = Utils.orderedDirections[(int) (8*Math.random())];
+			if(gc.canMove(id, dirToMove))
+				gc.moveRobot(id, dirToMove);
 		}
 		//long end = System.nanoTime();
 		//Utils.log("aaron just wasted " + (end-start) + " ns.");

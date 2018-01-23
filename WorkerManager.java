@@ -166,6 +166,7 @@ public class WorkerManager{
 					//Pick a place to build a third factory
 					int maxDist = 2;
 					while(startingFactory3 == null && maxDist < 33) {
+						//Utils.log("basing off " + gc.unit(infoMan.workerSquads.get(2).units.get(0)).location().mapLocation());
 						VecMapLocation v =  gc.allLocationsWithin(gc.unit(infoMan.workerSquads.get(2).units.get(0)).location().mapLocation(), maxDist);
 						maxDist = maxDist*2;
 						for(int i= 0; i < v.size(); i++) {
@@ -194,19 +195,27 @@ public class WorkerManager{
 				for(WorkerSquad ws : infoMan.workerSquads) {
 					if((ws.objective == Objective.NONE  || ws.objective == Objective.MINE) && ws.units.size() > 0) {
 						// System.out.println("Trying to build a third factory");
-						int maxDist = 2;
-						while(maxDist < 65) {
-							VecMapLocation v =  gc.allLocationsWithin(gc.unit(ws.units.get(0)).location().mapLocation(), maxDist);
-							maxDist = maxDist*2;
-							for(int i= 0; i < v.size(); i++) {
-								if(okayToBuild(v.get(i))) {
+						int maxDist = 36;
+						VecMapLocation v =  gc.allLocationsWithin(gc.unit(ws.units.get(0)).location().mapLocation(), maxDist);
+						int maxHostileDist = 0;
+						boolean foundSomewhere = false;
+						for(int i= 0; i < v.size(); i++) {
+							if(okayToBuild(v.get(i))) {
+								int dist = infoMan.distToHostile(v.get(i));
+								if(dist>maxHostileDist){
+									maxHostileDist = dist;
 									ws.targetLoc = v.get(i);
-									ws.objective = Objective.BUILD;
-									// System.out.println("Set a new location");
-									break;
+									foundSomewhere = true;
 								}
+								if(maxHostileDist == 250)
+									break;
 							}
 						}
+						if(foundSomewhere){
+							ws.objective = Objective.BUILD;
+							ws.toBuild = UnitType.Factory;
+						}
+							
 					}
 				}
 			}
@@ -225,11 +234,12 @@ public class WorkerManager{
 					for(int i= 0; i < v.size(); i++) {
 						if(okayToBuild(v.get(i))) {
 							int dist = infoMan.distToHostile(v.get(i));
-							if(dist>maxDist){
-								maxDist = dist;
+							if(dist>maxHostileDist){
+								maxHostileDist = dist;
 								ws.targetLoc = v.get(i);
 							}
-							break;
+							if(maxHostileDist == 250)
+								break;
 						}
 					}
 					if (ws.targetLoc != null) break;
