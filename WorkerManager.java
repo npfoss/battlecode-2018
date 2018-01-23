@@ -30,6 +30,10 @@ public class WorkerManager{
 			return false;
 		}
 		
+		infoMan.tiles[loc.getX()][loc.getY()].updateEnemies(gc);
+		if(infoMan.tiles[loc.getX()][loc.getY()].distFromNearestHostile < infoMan.magicNums.MAX_DIST_TO_CHECK)
+			return false;
+		
 		MapLocation n = loc.add(Direction.North);
 		MapLocation s = loc.add(Direction.South);
 		MapLocation e = loc.add(Direction.East);
@@ -317,8 +321,8 @@ public class WorkerManager{
 			ws.toBuild = UnitType.Rocket;
 			ws.targetLoc = null;
 			ws.update();
-			infoMan.workerSquads.add(ws);
 		}
+		infoMan.workerSquads.add(ws);
 	}
 }
 
