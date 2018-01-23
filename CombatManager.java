@@ -106,7 +106,9 @@ public class CombatManager{
 							if(!infoMan.isReachable(cs.targetLoc, ml))
 								continue;
 						}
-						Utils.log("adding to cs uu.size() = " + infoMan.unassignedUnits.size());
+						Utils.log("adding to cs");
+						if(cs.targetLoc != null)
+							Utils.log("targetLoc = " + cs.targetLoc);
 						cs.addUnit(a);
 						tryAgain = true;
 						didSomething = true;
@@ -136,6 +138,7 @@ public class CombatManager{
 		cs.targetLoc = targetLoc;
 		cs.update();
 		Utils.log("adding cs " + cs.units.size());
+		Utils.log("targetLoc = " + targetLoc);
 		infoMan.combatSquads.add(cs);
 	}
 
