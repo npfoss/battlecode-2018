@@ -299,11 +299,11 @@ public class CombatSquad extends Squad{
 		int x,y,nx,ny;
 		for(CombatUnit cu: combatUnits.values()){
 			cu.update(gc,(int) cu.myLoc.distanceSquaredTo(targetLoc));
+			combatUnits.put(cu.ID, cu);
 			if(cu.notOnMap)
 				continue;
 			//updateAccum += System.nanoTime() - last;
 			//last = System.nanoTime();
-			combatUnits.put(cu.ID, cu);
 			x = cu.myLoc.getX();
 			y = cu.myLoc.getY();
 			if(cu.canMove){
