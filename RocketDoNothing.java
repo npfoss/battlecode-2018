@@ -11,20 +11,20 @@ public class RocketDoNothing extends RocketManager{
     }
 
     public void update(){
-    	for(RocketSquad s : infoMan.rocketSquads) {
+    	for(Unit r: infoMan.rockets) {
     		boolean didSomething;
-    		while(gc.unit(s.units.get(0)).structureGarrison().size() > 0) {
+    		while(r.structureGarrison().size() > 0) {
     			didSomething = false;
     			for(Direction dirToUnload : Utils.orderedDirections)
-    				if(gc.canUnload(s.units.get(0), dirToUnload)) {
-    					gc.unload(s.units.get(0), dirToUnload);
+    				if(gc.canUnload(r.id(), dirToUnload)) {
+    					gc.unload(r.id(), dirToUnload);
     					didSomething = true;
     				}
     			if(!didSomething)
     				break;
     		}
-    		if(gc.unit(s.units.get(0)).structureGarrison().size() == 0) {
-    			gc.disintegrateUnit(s.units.get(0));
+    		if(r.structureGarrison().size() == 0) {
+    			gc.disintegrateUnit(r.id());
     		}
     	}
     }

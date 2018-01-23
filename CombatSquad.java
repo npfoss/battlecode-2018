@@ -577,6 +577,7 @@ public class CombatSquad extends Squad{
 					combatUnits.put(cu.ID, cu);
 				}
 			}
+			return;
 		}
 		
 		for(CombatUnit cu: healers){
