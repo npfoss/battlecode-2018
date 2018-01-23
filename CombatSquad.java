@@ -48,7 +48,7 @@ public class CombatSquad extends Squad{
 		else
 			ml = gc.unit(u.location().structure()).location().mapLocation();
 		CombatUnit cu = new CombatUnit(u.id(),u.damage(),u.health(),u.movementHeat()<10,u.attackHeat()<10,
-				ml,u.unitType(),(int) ml.distanceSquaredTo(targetLoc));
+				ml,u.unitType(),1000);
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].myUnit = cu.ID;
 		combatUnits.put(cu.ID, cu);
 		update();
@@ -299,6 +299,8 @@ public class CombatSquad extends Squad{
 		int x,y,nx,ny;
 		for(CombatUnit cu: combatUnits.values()){
 			cu.update(gc,(int) cu.myLoc.distanceSquaredTo(targetLoc));
+			if(cu.notOnMap)
+				continue;
 			//updateAccum += System.nanoTime() - last;
 			//last = System.nanoTime();
 			combatUnits.put(cu.ID, cu);
