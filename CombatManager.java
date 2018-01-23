@@ -44,6 +44,9 @@ public class CombatManager{
 		// set units whose objective is NONE (meaning they completed it) to unassignedUnits
 		//Utils.log("sup");
 		
+		if(infoMan.myPlanet == Planet.Mars)
+			Utils.log("There are " + infoMan.combatSquads.size() + " cs's.");
+		
 		ArrayList<CombatSquad> toRemove = new ArrayList<CombatSquad>();
 		for(CombatSquad cs: infoMan.combatSquads){
 			if(cs.objective == Objective.NONE){

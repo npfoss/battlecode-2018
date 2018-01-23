@@ -25,7 +25,8 @@ public class RocketManager{
         ArrayList<Integer> toRemove = new ArrayList<Integer>();
         for (int i = infoMan.rocketSquads.size() - 1; i >= 0; i--){
             // make sure each squad has a rocket at index 0. if no rocket, delete it
-            if (infoMan.rocketSquads.get(i).units.size() < 1 || gc.unit(infoMan.rocketSquads.get(i).units.get(0)).unitType() != UnitType.Rocket){
+            if (infoMan.rocketSquads.get(i).units.size() < 1 || gc.unit(infoMan.rocketSquads.get(i).units.get(0)).unitType() != UnitType.Rocket
+            	|| infoMan.rocketSquads.get(i).isInSpace){
                 toRemove.add(i);
             }
         }
