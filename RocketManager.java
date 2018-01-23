@@ -56,9 +56,10 @@ public class RocketManager{
                     case Worker: requests[4]++; break;
                 }
             }
+            /*
             for (int ind = 0; ind < requests.length; ind++){
                 stealClosestApplicableUnitsOfType(rs, Utils.robotTypes[ind], requests[ind]);
-            }
+            }*/
         }
     }
 
