@@ -15,11 +15,12 @@ public class RocketDoNothing extends RocketManager{
     		boolean didSomething;
     		while(r.structureGarrison().size() > 0) {
     			didSomething = false;
-    			for(Direction dirToUnload : Utils.orderedDirections)
+    			for(Direction dirToUnload : Utils.orderedDirections){
     				if(gc.canUnload(r.id(), dirToUnload)) {
     					gc.unload(r.id(), dirToUnload);
     					didSomething = true;
     				}
+                }
     			if(!didSomething)
     				break;
     		}

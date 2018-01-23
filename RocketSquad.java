@@ -114,6 +114,8 @@ public class RocketSquad extends Squad {
 		 	* surrounding units (friends and foes)
 		*/
 
-		return countdown <= 0 || gc.round() + 1 == infoMan.magicNums.EARTH_FLOOD_ROUND;
+		return countdown <= 0
+				|| gc.round() + 1 == infoMan.magicNums.EARTH_FLOOD_ROUND
+				|| rocket.health() * 2 < rocket.maxHealth();
 	}
 }
