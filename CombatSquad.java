@@ -119,7 +119,14 @@ public class CombatSquad extends Squad{
 			return;
 		//System.out.println("ru.size = " + requestedUnits.size());
 		//System.out.flush();
-		if(requestedUnits.isEmpty())
+		if(infoMan.myPlanet == Planet.Mars){
+			requestedUnits.clear();
+			requestedUnits.add(UnitType.Ranger);
+			requestedUnits.add(UnitType.Healer);
+			requestedUnits.add(UnitType.Mage);
+			requestedUnits.add(UnitType.Knight);
+		}
+		else if(requestedUnits.isEmpty())
 			requestedUnits.add(getRequestedUnit());
 		if(units.size() == 0)
 			urgency = 100;

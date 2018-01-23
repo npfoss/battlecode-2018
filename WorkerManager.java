@@ -292,7 +292,7 @@ public class WorkerManager{
 							continue;
 						if(a.unitType() == UnitType.Worker) {
 							WorkerSquad wsn = new WorkerSquad(gc,infoMan);
-							wsn.objective = Objective.BUILD;
+							wsn.objective = Objective.MINE;
 							wsn.units.add(i);
 							infoMan.unassignedUnits.remove(i);
 							wsn.update();

@@ -77,7 +77,7 @@ public class CombatManager{
 		}
 		
 		if((infoMan.combatSquads.size()==1 && infoMan.combatSquads.get(0).objective == Objective.EXPLORE) || infoMan.myPlanet == Planet.Mars){
-			Utils.log("here");
+			//Utils.log("here");
 			for(TargetUnit tu: infoMan.targetUnits.values()){
 				addCombatSquad(tu.myLoc,Objective.ATTACK_LOC, strat);
 			}
@@ -92,7 +92,7 @@ public class CombatManager{
 
 		boolean didSomething = false;
 		while(infoMan.unassignedUnits.size() > 0) {
-			Utils.log("here2");
+			//Utils.log("here2");
 			didSomething = false;
 			infoMan.combatSquads.sort(Squad.byUrgency());
 			boolean tryAgain = false;
