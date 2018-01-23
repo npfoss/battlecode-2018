@@ -22,11 +22,12 @@ public class ProductionManager{
 
     public void update(Strategy strat){
         // find squads with highest urgency and find factories to build them. etc junk
-    	// stuff
+    	// TODO: stuff
 
     }
 
     public void move(){
+        // go through the factories (in infoMan) and make them produce stuff
     	for(Unit factory : infoMan.factories) {
     		int id = factory.id();
     		//TODO: pick an intelligent direction
@@ -56,7 +57,5 @@ public class ProductionManager{
     			gc.produceRobot(id, toMake);
     		}
     	}
-    	// go through the factories (in infoMan) and make them produce stuff
-
     }
 }

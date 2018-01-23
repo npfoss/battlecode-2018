@@ -124,6 +124,7 @@ public class InfoManager {
 					break;
 				case Rocket:
 					rockets.add(unit);
+                    Utils.log("THERE IS A ROCKET!");
 					if (!isInSquads2(unit, rocketSquads))
 						newRockets.add(unit);
 					break;

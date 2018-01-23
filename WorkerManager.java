@@ -25,9 +25,11 @@ public class WorkerManager{
 	public boolean okayToBuild(MapLocation loc) {
 		if(!gc.startingMap(Planet.Earth).onMap(loc))
 			return false;
+
 		if(!(gc.startingMap(Planet.Earth).isPassableTerrainAt(loc) > 0 && !(gc.hasUnitAtLocation(loc)))){//&& (gc.senseUnitAtLocation(loc).unitType() == UnitType.Factory|| gc.senseUnitAtLocation(loc).unitType() == UnitType.Rocket)))) {
 			return false;
 		}
+		
 		MapLocation n = loc.add(Direction.North);
 		MapLocation s = loc.add(Direction.South);
 		MapLocation e = loc.add(Direction.East);
@@ -201,12 +203,54 @@ public class WorkerManager{
 					ws.objective = Objective.MINE;
 					break;
 				}
-
-
+				// added for rocket stuff. TODO: make nicer
+				else if (ws.targetLoc == null && ws.units.size() > 0 && ws.objective == Objective.BUILD && ws.toBuild == UnitType.Rocket){
+					// choose where to put the rocket
+					// TODO: do this intelligently
+					int maxDist = 2;
+					while(maxDist < 65) {
+						VecMapLocation v =  gc.allLocationsWithin(gc.unit(ws.units.get(0)).location().mapLocation(), maxDist);
+						maxDist = maxDist*2;
+						for(int i= 0; i < v.size(); i++) {
+							if(okayToBuild(v.get(i))) {
+								ws.targetLoc = v.get(i);
+								break;
+							}
+						}
+						if (ws.targetLoc != null) break;
+					}
+				}
 			}
 			System.out.flush();
 		}
 		//TODO:assign workers who are just mining karbonite if there's something better to do, add to rocket squads if necessary
+
+		// TODO: VERY TEMPORARY
+		if ((gc.round() + 1) % 100 == 0){
+			// rocket!
+			produceRocket();
+		}
+	}
+
+	public void produceRocket(){
+		// choose a squad or create a new one
+		WorkerSquad ws = null;
+		for (WorkerSquad w : infoMan.workerSquads){
+			if (w.objective == Objective.MINE){
+				ws = w;
+				break;
+			}
+		}
+		if (ws == null){
+			ws = new WorkerSquad(gc,infoMan);
+			infoMan.workerSquads.add(ws);
+		}
+		ws.objective = Objective.BUILD;
+		ws.toBuild = UnitType.Rocket;
+		ws.targetLoc = null;
+		ws.requestedUnits.clear();
+		ws.requestedUnits.add(UnitType.Worker);
+		ws.update();
 	}
 }
 

@@ -13,6 +13,7 @@ public class WorkerSquad extends Squad {
 
 	final int[] dx = {-1,-1,-1,0,0,0,1,1,1};
 	final int[] dy = {-1,0,1,-1,0,1,-1,0,1};
+
 	public void update() {
 		if(requestedUnits.isEmpty())
 			requestedUnits.add(UnitType.Worker);
@@ -74,6 +75,7 @@ public class WorkerSquad extends Squad {
 			objective = Objective.NONE;
 		}
 	}
+
 	public int safeX(int x) {
 		if(x < 0)
 			return 0;
@@ -81,6 +83,7 @@ public class WorkerSquad extends Squad {
 			return infoMan.width-1;
 		return x;
 	}
+
 	public int safeY(int y) {
 		if(y < 0)
 			return 0;
@@ -141,6 +144,7 @@ public class WorkerSquad extends Squad {
 		//Utils.log("aaron just wasted " + (end-start) + " ns.");
 	}
 	public boolean tryToMine(int id) {
+		// TODO: prefer to mine higher karbonite spots?
 		if(gc.canHarvest(id,Direction.Center)) {
 			gc.harvest(id, Direction.Center);
 			return true;
