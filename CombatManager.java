@@ -79,6 +79,7 @@ public class CombatManager{
 		if((infoMan.combatSquads.size()==1 && infoMan.combatSquads.get(0).objective == Objective.EXPLORE) || infoMan.myPlanet == Planet.Mars){
 			//Utils.log("here");
 			for(TargetUnit tu: infoMan.targetUnits.values()){
+				Utils.log("sup");
 				addCombatSquad(tu.myLoc,Objective.ATTACK_LOC, strat);
 			}
 		}
