@@ -134,6 +134,7 @@ public class CombatManager{
 		cs.objective = obj;
 		cs.targetLoc = targetLoc;
 		cs.update();
+		Utils.log("adding cs " + cs.units.size());
 		infoMan.combatSquads.add(cs);
 	}
 
