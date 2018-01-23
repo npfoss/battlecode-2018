@@ -63,8 +63,6 @@ public class RocketSquad extends Squad {
 			return;
 		countdown--;
 		
-		Utils.log("rocketsquad reporting size = " + units.size() + " urgency = " + urgency);
-
 		int numUnitsInside = 0;
 		// start at 1 because rocket is first one
 		for(int i = 1; i < units.size(); i++) {
@@ -86,6 +84,8 @@ public class RocketSquad extends Squad {
 			}
 		}
 
+		Utils.log("rocketsquad reporting size = " + units.size() + " urgency = " + urgency + " numUnitsInside = " + numUnitsInside);
+		
 		if (numUnitsInside >= rocket.structureMaxCapacity()){
 			beginCountdown();
 		}
