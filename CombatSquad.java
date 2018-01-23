@@ -249,7 +249,8 @@ public class CombatSquad extends Squad{
 		default: return false;
 		}
 	}
-
+	
+	/*
 	private void moveToSwarm(Nav nav){
 		//TODO: micro more if you see enemies on the way
 		for(int uid: separatedUnits){
@@ -262,7 +263,7 @@ public class CombatSquad extends Squad{
 			if(gc.canMove(uid, moveDir))
 				gc.moveRobot(uid, moveDir);
 		}
-	}
+	}*/
 
 	private void explore(Nav nav){
 		Direction dirToMove = Utils.orderedDirections[(int) (8*Math.random())];
