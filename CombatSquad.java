@@ -193,7 +193,7 @@ public class CombatSquad extends Squad{
 			}
 		}
 		Utils.log("swarm size = " + combatUnits.size() + " obj = " + objective + " swarmLoc = " + swarmLoc + " targetLoc = " + targetLoc  
-				  + " urgency = " + urgency + "units 1 and 2 are " + units.get(0) + " " + units.get(1));
+				  + " urgency = " + urgency + " unit 1 is " + units.get(0));
 		moveToSwarm(nav);
 		boolean retreat = shouldWeRetreat();
 		infoMan.logTimeCheckpoint("starting micro");
@@ -201,7 +201,7 @@ public class CombatSquad extends Squad{
 		//check if we're done with our objective
 		boolean done = areWeDone();
 		if(done){
-			// Utils.log("setting obj to none");
+			Utils.log("setting obj to none");
 			objective = Objective.NONE;
 		}
 		update();
