@@ -16,6 +16,7 @@ public class CombatUnit {
 	boolean canSnipe;
 	boolean canOvercharge;
 	int stepsFromTarget;
+	int distFromNearestHostile;
 	MapLocation myLoc;
 	UnitType type;
 	long maxHealth;
@@ -52,7 +53,7 @@ public class CombatUnit {
 		canAttack = u.attackHeat() < 10 && !(type == UnitType.Ranger && u.rangerIsSniping() != 0);
 		canMove = u.movementHeat() < 10 && !(type == UnitType.Ranger && u.rangerIsSniping() != 0);
 		canSnipe = (gc.researchInfo().getLevel(UnitType.Ranger) == 3 && type == UnitType.Ranger && u.abilityHeat() < 10 && u.rangerIsSniping() == 0);
-		canSnipe = (gc.researchInfo().getLevel(UnitType.Healer) == 3 && type == UnitType.Healer && u.abilityHeat() < 10);
+		canOvercharge = (gc.researchInfo().getLevel(UnitType.Healer) == 3 && type == UnitType.Healer && u.abilityHeat() < 10);
 	}
 	
 	public boolean equals(Object o){
