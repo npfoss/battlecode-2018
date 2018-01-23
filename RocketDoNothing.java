@@ -10,8 +10,7 @@ public class RocketDoNothing extends RocketManager{
         super(g, im);
     }
 
-    public void update(){
-    	Utils.log("sup fam");
+    public void update(Strategy strat){
     	for(Unit r: infoMan.rockets) {
     		boolean didSomething;
     		while(r.structureGarrison().size() > 0) {
