@@ -115,8 +115,6 @@ public class CombatSquad extends Squad{
 		if(combatUnits.size() > 0)
 			swarmLoc = Utils.averageMapLocation(gc, combatUnits.values());
 		numEnemyUnits = infoMan.getTargetUnits(swarmLoc, magicNums.ENEMY_UNIT_DIST_THRESHOLD, false).size();
-		if(infoMan.myPlanet == Planet.Mars)
-			return;
 		//System.out.println("ru.size = " + requestedUnits.size());
 		//System.out.flush();
 		if(infoMan.myPlanet == Planet.Mars){
