@@ -117,7 +117,9 @@ public class InfoManager {
 		HashSet<Integer> ids = new HashSet<Integer>();
 		for (int i = 0; i < units.size(); i++) {
 			Unit unit = units.get(i);
-            if(unit.location().isInSpace()) continue;
+            if(unit.location().isInSpace()){
+                continue;
+            }
 			if(unit.team() == gc.team()){
 				ids.add(unit.id());
 				switch (unit.unitType()) {
@@ -209,7 +211,7 @@ public class InfoManager {
 		}
 		
 		workerCount = workers.size();
-		
+
 		logTimeCheckpoint("infoMan update done");
 	}
 
@@ -349,7 +351,7 @@ public class InfoManager {
                         regions.add(newRegion);
                     } else {
                         // impassible terrain
-                        tiles[x][y] = new Tile(x, y, false, startingMap.initialKarboniteAt(loc), null, loc, magicNums, this);
+                        tiles[x][y] = new Tile(false, startingMap.initialKarboniteAt(loc), null, loc, magicNums, this);
                     }
                 }
             }
@@ -360,7 +362,7 @@ public class InfoManager {
     //      from it to the given region
     public void floodfill(PlanetMap startingMap, Region region, MapLocation loc){
         long karbs = startingMap.initialKarboniteAt(loc);
-        tiles[loc.getX()][loc.getY()] = new Tile(loc.getX(), loc.getY(), true, karbs, region, loc, magicNums, this);
+        tiles[loc.getX()][loc.getY()] = new Tile(true, karbs, region, loc, magicNums, this);
         region.tiles.add(tiles[loc.getX()][loc.getY()]);
         region.karbonite += karbs;
 
