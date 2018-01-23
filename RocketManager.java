@@ -39,6 +39,44 @@ public class RocketManager{
         	rs.units.add(rocket.id());
             infoMan.rocketSquads.add(rs);
         }
+        
+        while(infoMan.unassignedUnits.size() > 0) {
+			boolean didSomething = false;
+			infoMan.rocketSquads.sort(Squad.byUrgency());
+			boolean tryAgain = false;
+			for(RocketSquad rs : infoMan.rocketSquads) {
+				for(int i : infoMan.unassignedUnits) {
+					Unit a = gc.unit(i);
+					if(rs.requestedUnits.contains(a.unitType())) {
+						/*
+						if(rs.targetLoc != null && 
+						((!turnUnassigned.containsKey(a.id()) && gc.round() == 1) || (turnUnassigned.containsKey(a.id()) && turnUnassigned.get(a.id()) == gc.round()))){
+							MapLocation ml = cs.targetLoc;
+							if(a.location().isOnMap())
+								ml = a.location().mapLocation();
+							else
+								ml = gc.unit(a.location().structure()).location().mapLocation();
+							if(!infoMan.isReachable(cs.targetLoc, ml))
+								continue;
+						}*/
+						Utils.log("adding to rs");
+						//if(cs.targetLoc != null)
+						//	Utils.log("targetLoc = " + cs.targetLoc);
+						rs.units.add(i);
+						rs.update();
+						infoMan.unassignedUnits.remove(i);
+						tryAgain = true;
+						didSomething = true;
+					}
+					if(tryAgain)
+						break;
+				}
+				if(tryAgain)
+					break;
+			}
+			if(!didSomething)
+				break;
+		}
 
         // udpate() each squad so we know what units to find
         // and poach nearby units if reasonable
@@ -56,9 +94,10 @@ public class RocketManager{
                     case Worker: requests[4]++; break;
                 }
             }
+            /*
             for (int ind = 0; ind < requests.length; ind++){
                 stealClosestApplicableUnitsOfType(rs, Utils.robotTypes[ind], requests[ind]);
-            }
+            }*/
         }
     }
 

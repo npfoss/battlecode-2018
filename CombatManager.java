@@ -53,8 +53,9 @@ public class CombatManager{
 			}
 		}
 
-		for(CombatSquad cs: toRemove)
+		for(CombatSquad cs: toRemove){
 			infoMan.combatSquads.remove(cs);
+		}
 		
 		//defend factories and rockets
 		for(Unit u: infoMan.factories){
@@ -106,6 +107,8 @@ public class CombatManager{
 								continue;
 						}
 						Utils.log("adding to cs");
+						if(cs.targetLoc != null)
+							Utils.log("targetLoc = " + cs.targetLoc);
 						cs.addUnit(a);
 						tryAgain = true;
 						didSomething = true;
@@ -134,6 +137,8 @@ public class CombatManager{
 		cs.objective = obj;
 		cs.targetLoc = targetLoc;
 		cs.update();
+		Utils.log("adding cs " + cs.units.size());
+		Utils.log("targetLoc = " + targetLoc);
 		infoMan.combatSquads.add(cs);
 	}
 
