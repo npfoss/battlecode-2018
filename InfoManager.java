@@ -458,6 +458,7 @@ public class InfoManager {
         		}
         	}
         }
+        Utils.log("bestloc = " + bestloc);
         placesWeveSentTo.add(bestloc);
         return bestloc;
         
