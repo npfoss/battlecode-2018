@@ -42,7 +42,11 @@ public class CombatSquad extends Squad{
 		case Healer:unitCounts[3]++; break;
 		default: break;
 		}
-		MapLocation ml = u.location().mapLocation();
+		MapLocation ml = targetLoc;
+		if(u.location().isOnMap())
+			ml = u.location().mapLocation();
+		else
+			ml = gc.unit(u.location().structure()).location().mapLocation();
 		CombatUnit cu = new CombatUnit(u.id(),u.damage(),u.health(),u.movementHeat()<10,u.attackHeat()<10,
 				ml,u.unitType(),(int) ml.distanceSquaredTo(targetLoc));
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].myUnit = cu.ID;
