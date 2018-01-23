@@ -19,6 +19,7 @@ public class CombatUnit {
 	MapLocation myLoc;
 	UnitType type;
 	long maxHealth;
+	boolean notOnMap;
 	
 	public CombatUnit(){
 		
@@ -41,12 +42,17 @@ public class CombatUnit {
 		case Mage: maxHealth = 80; break;
 		case Healer: maxHealth = 100;
 		}
+		notOnMap = true;
 	}
 	
 	public void update(GameController gc, int sft){
 		//System.out.println("updating " + ID);
 		//System.out.flush();
 		Unit u = gc.unit(ID);
+		if(notOnMap && u.location().isOnMap()){
+			myLoc = u.location().mapLocation();
+			notOnMap = false;
+		}
 		stepsFromTarget = sft;
 		health = u.health();
 		canAttack = u.attackHeat() < 10 && !(type == UnitType.Ranger && u.rangerIsSniping() != 0);
