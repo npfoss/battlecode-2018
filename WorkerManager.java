@@ -215,19 +215,83 @@ public class WorkerManager{
 				else if (ws.targetLoc == null && ws.units.size() > 0 && ws.objective == Objective.BUILD && ws.toBuild == UnitType.Rocket){
 					// choose where to put the rocket
 					// TODO: do this intelligently
-					int maxDist = 2;
-					while(maxDist < 65) {
-						VecMapLocation v =  gc.allLocationsWithin(gc.unit(ws.units.get(0)).location().mapLocation(), maxDist);
-						maxDist = maxDist*2;
-						for(int i= 0; i < v.size(); i++) {
-							if(okayToBuild(v.get(i))) {
+					int maxDist = 36;
+					VecMapLocation v =  gc.allLocationsWithin(gc.unit(ws.units.get(0)).location().mapLocation(), maxDist);
+					int maxHostileDist = 0;
+					for(int i= 0; i < v.size(); i++) {
+						if(okayToBuild(v.get(i))) {
+							int dist = infoMan.distToHostile(v.get(i));
+							if(dist>maxDist){
+								maxDist = dist;
 								ws.targetLoc = v.get(i);
-								break;
 							}
+							break;
 						}
-						if (ws.targetLoc != null) break;
+					}
+					if (ws.targetLoc != null) break;
+				}
+			}
+		}
+		else{
+			if(infoMan.workerSquads.size()==0) {
+				WorkerSquad ws = new WorkerSquad(gc,infoMan);
+				ws.objective = Objective.MINE;
+				ws.update();
+				infoMan.workerSquads.add(ws);
+				Utils.log("creating new ws 1");
+			}
+			
+			boolean didSomething = false;
+			while(infoMan.unassignedUnits.size() > 0) {
+				didSomething = false;
+				infoMan.workerSquads.sort(Squad.byUrgency());
+				boolean tryAgain = false;
+				for(WorkerSquad ws : infoMan.workerSquads) {
+					for(UnitType u : ws.requestedUnits) {
+						for(int i : infoMan.unassignedUnits) {
+							Unit a = gc.unit(i);
+							if(!a.location().isOnMap())
+								continue;
+							if(a.unitType() == u) {
+								if(ws.units.size() == 0 || infoMan.isReachable(gc.unit(ws.units.get(0)).location().mapLocation(),a.location().mapLocation()) && nav.optimalStepsTo(gc.unit(ws.units.get(0)).location().mapLocation(),a.location().mapLocation()) < 20){
+									ws.requestedUnits.remove(ws.requestedUnits.indexOf(u));
+									ws.units.add(a.id());
+									infoMan.unassignedUnits.remove(i);
+									ws.update();
+									tryAgain = true;
+									didSomething = true;
+								}
+							}
+							if(tryAgain)
+								break;
+						}
+						if(tryAgain)
+							break;
+					}
+					if(tryAgain)
+						break;
+				}
+				if(!tryAgain) {
+					for(int i : infoMan.unassignedUnits) {
+						Unit a = gc.unit(i);
+						if(!a.location().isOnMap())
+							continue;
+						if(a.unitType() == UnitType.Worker) {
+							WorkerSquad wsn = new WorkerSquad(gc,infoMan);
+							wsn.objective = Objective.BUILD;
+							wsn.units.add(i);
+							infoMan.unassignedUnits.remove(i);
+							wsn.update();
+							infoMan.workerSquads.add(wsn);
+							didSomething = true;
+							Utils.log("creating new ws 2");
+							break;
+						}
 					}
 				}
+
+				if(!didSomething)
+					break;
 			}
 		}
 

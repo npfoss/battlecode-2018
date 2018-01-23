@@ -54,6 +54,7 @@ public class InfoManager {
     ArrayList<Region> regions;
     Tile[][] tiles;
     int marsx, marsy; // TODO: don't use this system, it sucks
+    ArrayList<MapLocation> placesWeveSentTo;
 
 	public InfoManager(GameController g, MagicNumbers mn) {
 		gc = g;
@@ -91,6 +92,7 @@ public class InfoManager {
         marsx = 0;
         marsy = 0;
         builtRocket = true;
+        placesWeveSentTo = new ArrayList<MapLocation>();
 	}
 
 	public void update(Strategy strat) {
@@ -432,22 +434,36 @@ public class InfoManager {
         
         // for now :(
         // TODO: remove
+        long bestDist = -1;
         PlanetMap startingMap = gc.startingMap(Planet.Mars);
         MapLocation bestloc = null;
-        for (int x = marsx; x < startingMap.getWidth(); x++){
-            for (int y = marsy; y < startingMap.getHeight(); y++){
-               // Utils.log("checking x = " + x + " y = " + y);
-                MapLocation loc = new MapLocation(Planet.Mars, x, y);
-                if (startingMap.isPassableTerrainAt(loc) > 0){
-                    bestloc = loc;
-                    //if (x <= marsx && marsy <= y){
-                    break;
-                    //}
-                }
-            }
+        int numChecked = 0;
+        int x,y;
+        while(numChecked < 7){
+        	// Utils.log("checking x = " + x + " y = " + y);
+        	x = (int)(Math.random()*(startingMap.getWidth()));
+        	y = (int)(Math.random()*(startingMap.getHeight()));
+        	MapLocation loc = new MapLocation(Planet.Mars, x, y);
+        	if (startingMap.isPassableTerrainAt(loc) > 0){
+        		numChecked++;
+        		long minDist = 10000;
+        		for(MapLocation l: placesWeveSentTo){
+        			if(l.distanceSquaredTo(loc) < minDist){
+        				minDist = l.distanceSquaredTo(loc);
+        			}
+        		}
+        		if(minDist > bestDist){
+        			bestDist = minDist;
+        			bestloc = loc;
+        		}
+        	}
         }
-        // so we don't land in the same place twice (unless we run out)
-        try{
+        placesWeveSentTo.add(bestloc);
+        return bestloc;
+        
+// so we don't land in the same place twice (unless we run out)
+        
+        /*try{
             marsx = bestloc.getX();
             marsy = bestloc.getY() + 1;
             if (marsy == startingMap.getHeight()){
@@ -470,8 +486,7 @@ public class InfoManager {
         }
         
         Utils.log("marsx = " + marsx + " marsy = " + marsy);
-
-        return bestloc;
+         */
     }
 
 

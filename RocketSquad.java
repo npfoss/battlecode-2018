@@ -7,12 +7,14 @@ public class RocketSquad extends Squad {
 	int countdown;
 	// NOTE: rocket is always unit at index 0 (maintained by manager)
 	Unit rocket;
+	long startRound;
 
 	public RocketSquad(InfoManager infoMan, MapLocation rocketLoc){
 		super(infoMan);
 		objective = Objective.BOARD_ROCKET;
 		targetLoc = rocketLoc;
 		countdown = 99999;
+		startRound = gc.round();
 		urgency = 5; // meaningless and arbitrary
 	}
 
@@ -86,7 +88,9 @@ public class RocketSquad extends Squad {
 
 		Utils.log("rocketsquad reporting size = " + units.size() + " urgency = " + urgency + " numUnitsInside = " + numUnitsInside + " countdown = " + countdown);
 		
-		if (numUnitsInside >= rocket.structureMaxCapacity() && countdown > 5){
+		long roundsSinceStart = gc.round() - startRound;
+		
+		if ((numUnitsInside >= rocket.structureMaxCapacity() || (roundsSinceStart > 50 && numUnitsInside > 0)) && countdown > 5){
 			beginCountdown();
 		}
 

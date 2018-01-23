@@ -123,7 +123,7 @@ public class WorkerSquad extends Squad {
 			for(int i = 0; i < m.size(); i++) {
 				int x = m.get(i).getX();
 				int y= m.get(i).getY();
-				if(infoMan.tiles[x][y].karbonite > 0 && infoMan.isReachable(myLoc, m.get(i))) {
+				if(infoMan.tiles[x][y].karbonite > 0 && infoMan.isReachable(myLoc, m.get(i)) && infoMan.distToHostile(m.get(i)) > 200) {
 					targetKarboniteLoc = m.get(i);
 					break;
 				}
