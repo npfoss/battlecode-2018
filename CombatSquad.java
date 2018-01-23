@@ -8,12 +8,12 @@ import java.util.HashMap;
 public class CombatSquad extends Squad{
 
 	//keep track of units into two groups: those with the main swarm and those separated from it
-	static HashMap<Integer,CombatUnit> combatUnits; //ID to CombatUnit
+	HashMap<Integer,CombatUnit> combatUnits; //ID to CombatUnit
 	//ArrayList<Integer> separatedUnits;
 	MapLocation swarmLoc;
 	int numEnemyUnits;
 	int goalRangerDistance;
-	static MagicNumbers magicNums;
+	MagicNumbers magicNums;
 	int[] unitCounts;
 	int[] unitCompGoal;
 	final int[] dx = {-1,-1,-1,0,0,0,1,1,1};
@@ -698,7 +698,7 @@ public class CombatSquad extends Squad{
 										 -1,-2,-3,-4,-5,-1,-2,-3,-4,-5,-1,-2,-3,-4,-1,-2,-3,-1,-2};
 	*/
 
-	private static TreeSet<CombatUnit> getUnitsToHeal(MapLocation ml){
+	private TreeSet<CombatUnit> getUnitsToHeal(MapLocation ml){
     	TreeSet<CombatUnit> ret = new TreeSet<CombatUnit>(new AscendingStepsComp());
     	for(CombatUnit cu: combatUnits.values()){
     		int dist = (int) ml.distanceSquaredTo(cu.myLoc);

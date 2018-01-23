@@ -165,7 +165,7 @@ public class Tile{
     	}
     	//infoMan.logTimeCheckpoint("after update");
     }
-
+    
 	public TreeSet<TargetUnit> getEnemiesWithinRange(UnitType type) {
 		switch(type){
 		case Ranger: return enemiesWithinRangerRange;

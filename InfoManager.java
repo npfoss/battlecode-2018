@@ -333,6 +333,17 @@ public class InfoManager {
         }
         return ret;
     }
+    
+    public int distToHostile(MapLocation ml){
+    	TreeSet<TargetUnit> tus = getTargetUnits(ml,250,true);
+    	int closest = 250;
+    	for(TargetUnit tu: tus){
+    		if(ml.distanceSquaredTo(tu.myLoc) < closest){
+    			closest = (int) ml.distanceSquaredTo(tu.myLoc);
+    		}
+    	}
+    	return closest;
+    }
 
 /******** Map related functions below this line *******/
     
