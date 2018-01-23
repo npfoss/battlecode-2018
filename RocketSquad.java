@@ -13,6 +13,7 @@ public class RocketSquad extends Squad {
 		objective = Objective.BOARD_ROCKET;
 		targetLoc = rocketLoc;
 		countdown = 99999;
+		urgency = 5; // meaningless and arbitrary
 	}
 
 	public void update(){

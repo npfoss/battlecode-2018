@@ -171,7 +171,7 @@ public class InfoManager {
 					s.units.remove(i);
 				}
 			}
-			s.update();
+			// s.update(); // rocket squads get updated by rocketMan anyways
 		}
 
 		for(CombatSquad s: combatSquads){

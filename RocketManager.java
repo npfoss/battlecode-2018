@@ -17,15 +17,10 @@ public class RocketManager{
         infoMan = im;
     }
 
+    /* modifies rocketSquads as necessary and launches rockets
+            (remember, those are in infoMan) */
     public void update(Strategy strat){
-        // modifies rocketSquads as necessary and launches rockets
-        // remember, those are in infoMan
-        
-    	// sets the squad to be in space or not
-    	
-        // also update() on each squad after
 
-        
         // adjust for rocket deaths
         ArrayList<Integer> toRemove = new ArrayList<Integer>();
         for (int i = infoMan.rocketSquads.size() - 1; i >= 0; i--){
@@ -39,9 +34,16 @@ public class RocketManager{
         }
 
         // find new (unassigned) rockets and make squads
+        for (Unit rocket : infoMan.newRockets){
+            infoMan.rocketSquads.add(new RocketSquad(infoMan, rocket.location().mapLocation()));
+        }
 
+        // udpate() each squad so we know what units to find
+        for (RocketSquad rs : infoMan.rocketSquads){
+            rs.update(strat.rocketComposition);
+        }
 
-        // udpate each squad so we know what units to find
-
+        // poach nearby units if reasonable
+        
     }
 }
