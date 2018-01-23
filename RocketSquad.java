@@ -90,7 +90,7 @@ public class RocketSquad extends Squad {
 		
 		long roundsSinceStart = gc.round() - startRound;
 		
-		if ((numUnitsInside >= rocket.structureMaxCapacity() || (roundsSinceStart > 50 && numUnitsInside > 0)) && countdown > 5){
+		if (((numUnitsInside >= rocket.structureMaxCapacity() || (roundsSinceStart > 50 && numUnitsInside > 0))) && countdown > 5){
 			beginCountdown();
 		}
 
