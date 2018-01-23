@@ -236,7 +236,7 @@ public class WorkerManager{
 		// choose a squad or create a new one
 		WorkerSquad ws = null;
 		for (WorkerSquad w : infoMan.workerSquads){
-			if (w.objective == Objective.MINE){
+			if (w.objective == Objective.MINE || infoMan.factories.size() > 1 && w.objective == Objective.BUILD && w.toBuild == UnitType.Factory){
 				ws = w;
 				break;
 			}
