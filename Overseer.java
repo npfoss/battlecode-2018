@@ -59,7 +59,7 @@ public class Overseer{
         	rs.move(nav);
         }
         for(WorkerSquad ws : infoMan.workerSquads){
-            ws.move(nav);
+            ws.move(nav,strat);
         }
         for(CombatSquad cs : infoMan.combatSquads){
             cs.move(nav);
