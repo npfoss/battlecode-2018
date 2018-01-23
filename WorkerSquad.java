@@ -188,6 +188,7 @@ public class WorkerSquad extends Squad {
 			for(Direction dirToReplicate : Utils.directionsTowardButNotIncluding(gc.unit(id).location().mapLocation().directionTo(targetLoc))) {
 				if (gc.canReplicate(id, dirToReplicate)) {
 					gc.replicate(id, dirToReplicate);
+					infoMan.workerCount++;
 					break;
 				}
 			}
@@ -196,19 +197,20 @@ public class WorkerSquad extends Squad {
 			for(Direction dirToReplicate : Utils.orderedDirections) {
 				if (gc.canReplicate(id, dirToReplicate)) {
 					gc.replicate(id, dirToReplicate);
+					infoMan.workerCount++;
 					break;
 				}
 			}
 		}
 	}
-	public void move(Nav nav) {
+	public void move(Nav nav, Strategy strat) {
 		Utils.log("ws reporting: size = " + units.size() + " toBuild = " + toBuild + " objective = " + objective + " urgency = " + urgency);
 		for(int id: units) {
 			Unit worker = gc.unit(id);
 			if(worker.location().isInSpace() || worker.location().isInGarrison())
 				continue;
 			//For now we shall replicate at the start, to be optimized.
-			if(gc.round() == 1 || infoMan.workers.size() < 6) {
+			if(gc.round() == 1 || infoMan.workerCount < strat.maxWorkers) {
 				replicateWorker(id);
 			}
 			switch (objective) {

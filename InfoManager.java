@@ -24,6 +24,8 @@ public class InfoManager {
 	ArrayList<Unit> workers;
 	ArrayList<Unit> factories;
 	ArrayList<Unit> fighters;
+	
+	int workerCount;
 
 	HashSet<Integer> unassignedUnits; // *no rockets*
     ArrayList<Unit> newRockets;
@@ -205,6 +207,8 @@ public class InfoManager {
                 }
 			}
 		}
+		
+		workerCount = workers.size();
 		
 		logTimeCheckpoint("infoMan update done");
 	}
@@ -440,8 +444,7 @@ public class InfoManager {
             if (marsx == startingMap.getWidth()){
                 marsx = 0;
             }
-            marsx = bestloc.getX();
-            marsy = bestloc.getY() + 1;
+            marsy++;
             if (marsy == startingMap.getHeight()){
                 marsy = 0;
                 marsx++;

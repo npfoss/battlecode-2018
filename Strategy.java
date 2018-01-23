@@ -32,11 +32,14 @@ public class Strategy{
 		combatComposition = new int[]{0, 0, 3, 2}; //knight,mage,ranger,healer
         rocketComposition = defaultRocketComposition;
         nextRocketBuild = 101;
+        maxWorkers = 6;
 	}
 
 	public void update(){
         //TODO: make it adjust stuff if necessary
-		if(gc.round() > nextRocketBuild)
+		if(gc.round() > nextRocketBuild){
 			nextRocketBuild+=50;
+			maxWorkers += 2;
+		}
     }
 }

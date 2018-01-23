@@ -11,6 +11,7 @@ public class RocketDoNothing extends RocketManager{
     }
 
     public void update(){
+    	Utils.log("sup fam");
     	for(Unit r: infoMan.rockets) {
     		boolean didSomething;
     		while(r.structureGarrison().size() > 0) {

@@ -105,7 +105,7 @@ public class CombatManager{
 							if(!infoMan.isReachable(cs.targetLoc, ml))
 								continue;
 						}
-						//System.out.println("adding to cs");
+						Utils.log("adding to cs");
 						cs.addUnit(a);
 						tryAgain = true;
 						didSomething = true;
