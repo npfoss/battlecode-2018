@@ -140,6 +140,9 @@ public class CombatManager{
 		Utils.log("adding cs " + cs.units.size());
 		Utils.log("targetLoc = " + targetLoc);
 		infoMan.combatSquads.add(cs);
+		for(CombatSquad cs2: infoMan.combatSquads){
+			Utils.log("size = " + cs2.units.size());
+		}
 	}
 
 }

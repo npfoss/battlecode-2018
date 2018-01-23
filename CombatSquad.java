@@ -192,7 +192,7 @@ public class CombatSquad extends Squad{
 				swarmThreshold+=2;
 			}
 		}
-		Utils.log("swarm size = " + combatUnits.size() + " obj = " + objective + " swarmLoc = " + swarmLoc + " targetLoc = " + targetLoc  
+		Utils.log("ovr size = " + units.size() + " swarm size = " + combatUnits.size() + " obj = " + objective + " swarmLoc = " + swarmLoc + " targetLoc = " + targetLoc  
 			  + " urgency = " + urgency);
 		moveToSwarm(nav);
 		boolean retreat = shouldWeRetreat();
