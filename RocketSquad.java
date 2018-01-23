@@ -84,9 +84,9 @@ public class RocketSquad extends Squad {
 			}
 		}
 
-		Utils.log("rocketsquad reporting size = " + units.size() + " urgency = " + urgency + " numUnitsInside = " + numUnitsInside + " countodwn = " + countdown);
+		Utils.log("rocketsquad reporting size = " + units.size() + " urgency = " + urgency + " numUnitsInside = " + numUnitsInside + " countdown = " + countdown);
 		
-		if (numUnitsInside >= rocket.structureMaxCapacity()){
+		if (numUnitsInside >= rocket.structureMaxCapacity() && countdown > 5){
 			beginCountdown();
 		}
 
