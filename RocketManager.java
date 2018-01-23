@@ -64,6 +64,7 @@ public class RocketManager{
 						//	Utils.log("targetLoc = " + cs.targetLoc);
 						rs.units.add(i);
 						rs.update();
+						infoMan.unassignedUnits.remove(i);
 						tryAgain = true;
 						didSomething = true;
 					}
