@@ -42,7 +42,7 @@ public class CombatSquad extends Squad{
 		case Healer:unitCounts[3]++; break;
 		default: break;
 		}
-		MapLocation ml = targetLoc;
+		MapLocation ml = new MapLocation(gc.planet(),0,0);
 		if(u.location().isOnMap())
 			ml = u.location().mapLocation();
 		else
