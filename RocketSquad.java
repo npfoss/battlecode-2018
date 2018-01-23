@@ -41,7 +41,7 @@ public class RocketSquad extends Squad {
 			}
 		}
 		requestedUnits.clear();
-		long capacity = gc.unit(rocket).structureMaxCapacity();
+		long capacity = rocket.structureMaxCapacity();
 		// *arbitrary order of importance*
 		int[] order = {2, 3, 1, 0, 4};
 		for (int ind : order){
@@ -67,8 +67,8 @@ public class RocketSquad extends Squad {
 			Unit astronaut = gc.unit(id);
 			if(astronaut.location().isInGarrison()){
 				numUnitsInside++;
-			} else if(gc.canLoad(rocket, id)){
-				gc.load(rocket, id);
+			} else if(gc.canLoad(rocket.id(), id)){
+				gc.load(rocket.id(), id);
 				numUnitsInside++;
 			} else if(!astronaut.location().mapLocation().isAdjacentTo(targetLoc) && gc.isMoveReady(id)) {
 				//Move towards the target location
@@ -81,14 +81,14 @@ public class RocketSquad extends Squad {
 			}
 		}
 
-		if (numUnitsInside >= gc.unit(rocket).structureMaxCapacity()){
+		if (numUnitsInside >= rocket.structureMaxCapacity()){
 			beginCountdown();
 		}
 
 		if (shouldLaunch(numUnitsInside)){
 			MapLocation dest = nav.getNextMarsDest();
-			if(gc.canLaunchRocket(rocket, dest)){
-				gc.launchRocket(rocket, dest);
+			if(gc.canLaunchRocket(rocket.id(), dest)){
+				gc.launchRocket(rocket.id(), dest);
 				isInSpace = true;
 			}
 		}
