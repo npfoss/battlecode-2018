@@ -117,7 +117,7 @@ public class CombatSquad extends Squad{
 		if(units.size() == 0)
 			urgency = 100;
 		else
-			urgency = (numEnemyUnits * 2 - units.size() + 5) * 10;
+			urgency = (numEnemyUnits * 2 - units.size() + 15) * 10;
 		if(urgency < 0)
 			urgency = 0;
 		if(urgency>100)

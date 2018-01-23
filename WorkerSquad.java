@@ -17,7 +17,7 @@ public class WorkerSquad extends Squad {
 	public void update() {
 		if(requestedUnits.isEmpty())
 			requestedUnits.add(UnitType.Worker);
-		urgency = 64-8*units.size();
+		urgency = 8-units.size();
 	}
 	
 	public void moveTowardsBuildLoc(int id, Unit worker, Nav nav) {

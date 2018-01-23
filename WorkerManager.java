@@ -67,7 +67,7 @@ public class WorkerManager{
 				ws.objective = Objective.BUILD;
 				ws.update();
 				infoMan.workerSquads.add(ws);
-				Utils.log("creating new ws");
+				Utils.log("creating new ws 1");
 			}
 
 			// assign unassigned workers to build.
@@ -83,7 +83,7 @@ public class WorkerManager{
 							if(!a.location().isOnMap())
 								continue;
 							if(a.unitType() == u) {
-								if(ws.units.size() == 0 || infoMan.isReachable(gc.unit(ws.units.get(0)).location().mapLocation(),a.location().mapLocation()) && nav.optimalStepsTo(gc.unit(ws.units.get(0)).location().mapLocation(),a.location().mapLocation()) < 10){
+								if(ws.units.size() == 0 || infoMan.isReachable(gc.unit(ws.units.get(0)).location().mapLocation(),a.location().mapLocation()) && nav.optimalStepsTo(gc.unit(ws.units.get(0)).location().mapLocation(),a.location().mapLocation()) < 20){
 									ws.requestedUnits.remove(ws.requestedUnits.indexOf(u));
 									ws.units.add(a.id());
 									infoMan.unassignedUnits.remove(i);
@@ -114,7 +114,7 @@ public class WorkerManager{
 							wsn.update();
 							infoMan.workerSquads.add(wsn);
 							didSomething = true;
-							Utils.log("creating new ws");
+							Utils.log("creating new ws 2");
 							break;
 						}
 					}
