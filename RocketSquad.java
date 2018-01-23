@@ -4,22 +4,54 @@ import java.util.ArrayList;
 public class RocketSquad extends Squad {
 
 	boolean isInSpace = false;
-	int launchRound;
-
 	int countdown;
-
 	// NOTE: rocket is always unit at index 0 (maintained by manager)
+	Unit rocket;
 
-	public RocketSquad(InfoManager infoMan, MapLocation rocketLoc, int lr){
+	public RocketSquad(InfoManager infoMan, MapLocation rocketLoc){
 		super(infoMan);
 		objective = Objective.BOARD_ROCKET;
 		targetLoc = rocketLoc;
-		launchRound = lr;
 		countdown = 99999;
 	}
 
 	public void update(){
+		update(Strategy.defaultRocketComposition);
+	}
 
+	public void update(int[] idealComposition){
+		// first, are we in space?
+		if (isInSpace) return;
+
+		rocket = gc.unit(units.get(0));
+
+		// see which units to request
+
+		// NOTE: ideal composition is a list of ints:
+		//		# knight, mage, ranger, healer, worker
+		int[] counts = {0,0,0,0,0};
+		for (int id : units) {
+			switch(gc.unit(id).unitType()){
+				case Knight: counts[0]++; break;
+				case Mage  : counts[1]++; break;
+				case Ranger: counts[2]++; break;
+				case Healer: counts[3]++; break;
+				case Worker: counts[4]++; break;
+			}
+		}
+		requestedUnits.clear();
+		long capacity = gc.unit(rocket).structureMaxCapacity();
+		// *arbitrary order of importance*
+		int[] order = {2, 3, 1, 0, 4};
+		for (int ind : order){
+			long diff = idealComposition[ind] - counts[ind];
+			if (diff > capacity - units.size() - requestedUnits.size() + 1){
+				diff = capacity - units.size() - requestedUnits.size() + 1;
+			}
+			for (int i = 0; i < diff; i++){
+				requestedUnits.add(Utils.robotTypes[ind]);
+			}
+		}
 	}
 
 	public void move(Nav nav){
@@ -34,8 +66,8 @@ public class RocketSquad extends Squad {
 			Unit astronaut = gc.unit(id);
 			if(astronaut.location().isInGarrison()){
 				numUnitsInside++;
-			} else if(gc.canLoad(units.get(0), id)){
-				gc.load(units.get(0), id);
+			} else if(gc.canLoad(rocket, id)){
+				gc.load(rocket, id);
 				numUnitsInside++;
 			} else if(!astronaut.location().mapLocation().isAdjacentTo(targetLoc) && gc.isMoveReady(id)) {
 				//Move towards the target location
@@ -48,30 +80,33 @@ public class RocketSquad extends Squad {
 			}
 		}
 
-		if (numUnitsInside >= gc.unit(units.get(0)).structureMaxCapacity()){
+		if (numUnitsInside >= gc.unit(rocket).structureMaxCapacity()){
 			beginCountdown();
 		}
 
 		if (shouldLaunch(numUnitsInside)){
 			MapLocation dest = nav.getNextMarsDest();
-			if(gc.canLaunchRocket(units.get(0), dest)){
-				gc.launchRocket(units.get(0), dest);
+			if(gc.canLaunchRocket(rocket, dest)){
+				gc.launchRocket(rocket, dest);
+				isInSpace = true;
 			}
 		}
 	}
 
 	public void beginCountdown(){
 		countdown = infoMan.magicNums.ROCKET_COUNTDOWN;
+		// TODO: also warn nearby tiles of damage
 	}
 
 	public boolean shouldLaunch(int numUnitsInside){
 		/* TODO: things to consider:
-		 	* countdown
+		 	* countdown (done)
+		 	* flood (done)
 		 	* orbital pattern
 		 	* if the rocket is close to death
 		 	* surrounding units (friends and foes)
 		*/
 
-		return countdown <= 0;
+		return countdown <= 0 || gc.round() + 1 == infoMan.magicNums.EARTH_FLOOD_ROUND;
 	}
 }

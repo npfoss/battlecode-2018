@@ -12,6 +12,8 @@ public class Utils{
     public static Direction[] orderedDiagonals =
         {Direction.Southeast, Direction.Southwest,
          Direction.Northwest, Direction.Northeast};
+    public static UnitType[] robotTypes =
+        {UnitType.Knight, UnitType.Mage, UnitType.Ranger, UnitType.Healer, UnitType.Worker};
 
     public static Direction[] directionsTowardButNotIncluding(Direction dir) {
     	 Direction left = dir;

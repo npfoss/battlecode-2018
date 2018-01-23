@@ -14,6 +14,8 @@ public class Strategy{
 	int[] combatComposition;
 	int[] rocketLaunchSchedule;
 	int[] rocketComposition;
+    static int[] defaultRocketComposition = {0, 0, 4, 2, 2};
+                            // knight, mage, ranger, healer, worker
 	MapLocation[] rocketLaunchLocations;
 	int maxWorkers;
 	int maxFactories;
@@ -28,8 +30,7 @@ public class Strategy{
 		//TODO: make this depend on stuff
 		researchOrder = new UnitType[]{UnitType.Ranger,UnitType.Worker,UnitType.Healer,UnitType.Healer,UnitType.Healer,UnitType.Ranger,UnitType.Ranger};
 		combatComposition = new int[]{0, 0, 3, 2}; //knight,mage,ranger,healer
-        rocketComposition = new int[]{0, 0, 4, 2, 2};
-                            // knight, mage, ranger, healer, worker
+        rocketComposition = defaultRocketComposition;
 	}
 
 	public void update(){

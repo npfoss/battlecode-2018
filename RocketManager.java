@@ -20,15 +20,13 @@ public class RocketManager{
     public void update(Strategy strat){
         // modifies rocketSquads as necessary and launches rockets
         // remember, those are in infoMan
-    	//sets the squad to be in space or not
-    	
-    	//move unassigned units into rocket squads
-    	//get info from mars to make smart decisions
+        
+    	// sets the squad to be in space or not
     	
         // also update() on each squad after
 
         
-        // first, adjust for rocket deaths
+        // adjust for rocket deaths
         ArrayList<Integer> toRemove = new ArrayList<Integer>();
         for (int i = infoMan.rocketSquads.size() - 1; i >= 0; i--){
             // make sure each squad has a rocket at index 0. if no rocket, delete it
@@ -40,7 +38,10 @@ public class RocketManager{
             infoMan.rocketSquads.remove(i);
         }
 
-        // second, find new (unassigned) rockets and make squads
+        // find new (unassigned) rockets and make squads
+
+
+        // udpate each squad so we know what units to find
 
     }
 }

@@ -38,6 +38,8 @@ public class MagicNumbers{
     double SWARM_FACTOR_RANGER_MOVE_ATTACK = 1.5; 
 	double g;
 
+    int EARTH_FLOOD_ROUND = 750;
+
     // for rockets
     // how many turns to wait before launch
     int ROCKET_COUNTDOWN = 5;
