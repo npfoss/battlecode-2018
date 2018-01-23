@@ -79,7 +79,7 @@ public class CombatManager{
 		if((infoMan.combatSquads.size()==1 && infoMan.combatSquads.get(0).objective == Objective.EXPLORE) || infoMan.myPlanet == Planet.Mars){
 			//Utils.log("here");
 			for(TargetUnit tu: infoMan.targetUnits.values()){
-				Utils.log("sup");
+				//Utils.log("sup");
 				addCombatSquad(tu.myLoc,Objective.ATTACK_LOC, strat);
 			}
 		}
@@ -101,6 +101,7 @@ public class CombatManager{
 				for(int i : infoMan.unassignedUnits) {
 					Unit a = gc.unit(i);
 					if(cs.requestedUnits.contains(a.unitType())) {
+						Utils.log("adding to cs maybe");
 						if(cs.targetLoc != null && 
 						((!turnUnassigned.containsKey(a.id()) && gc.round() == 1) || (turnUnassigned.containsKey(a.id()) && turnUnassigned.get(a.id()) == gc.round()))){
 							MapLocation ml = cs.targetLoc;
@@ -142,7 +143,7 @@ public class CombatManager{
 		cs.objective = obj;
 		cs.targetLoc = targetLoc;
 		cs.update();
-		//Utils.log("adding cs " + cs.units.size());
+		Utils.log("adding cs");
 		//Utils.log("targetLoc = " + targetLoc);
 		infoMan.combatSquads.add(cs);
 		//for(CombatSquad cs2: infoMan.combatSquads){
