@@ -12,8 +12,8 @@ public class RocketDoNothing extends RocketManager{
 
     public void update(){
     	for(RocketSquad s : infoMan.rocketSquads) {
-    		if(gc.unit(s.rocketID).structureGarrison().size() == 0) {
-    			gc.disintegrateUnit(s.rocketID);
+    		if(gc.unit(s.units.get(0)).structureGarrison().size() == 0) {
+    			gc.disintegrateUnit(s.units.get(0));
     		}
     	}
     }

@@ -11,16 +11,18 @@ public class Squad{
     MapLocation targetLoc;
     ArrayList<UnitType> requestedUnits;
     GameController gc;
+    InfoManager infoMan;
 
     Objective objective;
 
-    public Squad(GameController g){
+    public Squad(InfoManager im){
         units = new ArrayList<Integer>();
         urgency = 0;
         targetLoc = null;
         requestedUnits = new ArrayList<UnitType>();
         objective = Objective.NONE;
-        gc = g;
+        infoMan = im;
+        gc = infoMan.gc;
     }
 
     public void update(){

@@ -3,7 +3,6 @@ import bc.*;
 public class MagicNumbers{
 	/* Options - global constants/adjustment stuff
     */
-    int PI = 3;
     int SQUAD_SEPARATION_THRESHOLD = 50;
     int RANGER_MIN_RANGE = 11;
     int RANGER_RANGE = 50;
@@ -38,4 +37,8 @@ public class MagicNumbers{
     double DISTANCE_FACTOR_RANGER_MOVE_ATTACK = 10.0;
     double SWARM_FACTOR_RANGER_MOVE_ATTACK = 1.5; 
 	double g;
+
+    // for rockets
+    // how many turns to wait before launch
+    int ROCKET_COUNTDOWN = 5;
 }

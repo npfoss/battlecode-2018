@@ -49,7 +49,8 @@ public class InfoManager {
 
 	// here lies map info (mostly for nav)
     ArrayList<Region> regions;
-    Tile[][] tiles;	
+    Tile[][] tiles;
+    int marsx, marsy; // TODO: don't use this system, it sucks
 
 	public InfoManager(GameController g, MagicNumbers mn) {
 		gc = g;
@@ -83,6 +84,9 @@ public class InfoManager {
         tiles = new Tile[width][height];
         regions = new ArrayList<Region>();
         initMap();
+
+        marsx = 0;
+        marsy = 0;
 	}
 
 	public void update() {
@@ -338,11 +342,56 @@ public class InfoManager {
         //      check illegal locs sometimes
         return /*isOnMap(loc1) && isOnMap(loc2) &&*/ tiles[loc1.getX()][loc1.getY()].region == tiles[loc2.getX()][loc2.getY()].region;
     }
+
+    public MapLocation getNextMarsDest(){
+        if (myPlanet == Planet.Earth){
+            // TODO: check comms for what Mars is saying
+
+        } else {
+            // TODO: calculate something intelligent, send it to earth
+
+        }
+        // TODO: what if mars has nowhere to land???
+        
+        // for now :(
+        // TODO: remove
+        PlanetMap startingMap = gc.startingMap(Planet.Mars);
+        MapLocation bestloc = null;
+        for (int x = marsx; x < startingMap.getWidth(); x++){
+            for (int y = marsy; y < startingMap.getHeight(); y++){
+                MapLocation loc = new MapLocation(Planet.Mars, x, y);
+                if (startingMap.isPassableTerrainAt(loc) > 0){
+                    bestloc = loc;
+                    if (x <= marsx && marsy <= y){
+                        break;
+                    }
+                }
+            }
+        }
+        // so we don't land in the same place twice (unless we run out)
+        try{
+            marsx = bestloc.getX();
+            marsy = bestloc.getY() + 1;
+            if (marsy == startingMap.getHeight()){
+                marsy = 0;
+                marsx++;
+            }
+            if (marsx == startingMap.getWidth()){
+                marsx = 0;
+            }
+        } catch (Exception e) {
+            // cry, mars is impassible
+        }
+
+        return bestloc;
+    }
+
+
+/*******  FOR LOGGING AND DEBUGGING *********/
     
     public void logTimeCheckpoint(String identifier){
     	long duration = System.nanoTime() - lastCheckpoint;
     	lastCheckpoint = System.nanoTime();
     	// Utils.log(identifier + ": " + duration + " ns since last checkpoint.");
     }
-    
 }

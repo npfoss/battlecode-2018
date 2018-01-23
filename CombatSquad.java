@@ -10,7 +10,6 @@ public class CombatSquad extends Squad{
 	//keep track of units into two groups: those with the main swarm and those separated from it
 	static HashMap<Integer,CombatUnit> combatUnits; //ID to CombatUnit
 	ArrayList<Integer> separatedUnits;
-	static InfoManager infoMan;
 	MapLocation swarmLoc;
 	int numEnemyUnits;
 	int goalRangerDistance;
@@ -21,10 +20,9 @@ public class CombatSquad extends Squad{
 	final int[] dy = {-1,0,1,-1,0,1,-1,0,1};
 
 	public CombatSquad(GameController g, InfoManager im, MagicNumbers mn, int[] ucg) {
-		super(g);
+		super(im);
 		combatUnits = new HashMap<Integer,CombatUnit>();
 		separatedUnits = new ArrayList<Integer>();
-		infoMan = im;
 		magicNums = mn;
 		unitCounts = new int[]{0,0,0,0}; //knight,mage,ranger,healer
 		unitCompGoal = ucg;

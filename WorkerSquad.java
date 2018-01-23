@@ -4,13 +4,13 @@ import java.util.ArrayList;
 public class WorkerSquad extends Squad {
 
 	UnitType toBuild;
-	InfoManager infoMan;
 	MapLocation targetKarboniteLoc = null;
+
 	public WorkerSquad(GameController g, InfoManager im) {
-		super(g);
-		infoMan = im;
+		super(im);
 		toBuild = UnitType.Factory;
 	}
+
 	final int[] dx = {-1,-1,-1,0,0,0,1,1,1};
 	final int[] dy = {-1,0,1,-1,0,1,-1,0,1};
 	public void update() {
@@ -18,6 +18,7 @@ public class WorkerSquad extends Squad {
 			requestedUnits.add(UnitType.Worker);
 		urgency = 64-8*units.size();
 	}
+	
 	public void moveTowardsBuildLoc(int id, Unit worker, Nav nav) {
 		if(!worker.location().mapLocation().isAdjacentTo(targetLoc) && gc.isMoveReady(id)) {
 			//Move towards the target location
