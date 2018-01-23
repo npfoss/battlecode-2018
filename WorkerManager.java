@@ -67,6 +67,7 @@ public class WorkerManager{
 				ws.objective = Objective.BUILD;
 				ws.update();
 				infoMan.workerSquads.add(ws);
+				Utils.log("creating new ws");
 			}
 
 			// assign unassigned workers to build.
@@ -113,6 +114,7 @@ public class WorkerManager{
 							wsn.update();
 							infoMan.workerSquads.add(wsn);
 							didSomething = true;
+							Utils.log("creating new ws");
 							break;
 						}
 					}
@@ -174,7 +176,11 @@ public class WorkerManager{
 
 				}
 			}
-
+			// TODO: VERY TEMPORARY
+			if (gc.round() == strat.nextRocketBuild){
+				// rocket!
+				produceRocket();
+			}
 
 			//TODO intelligently pick locations for the next factories
 			//System.out.println("My objective is: " + ((infoMan.workerSquads.get(0).objective == Objective.BUILD) ? "Building" : "NONE"));
@@ -223,13 +229,6 @@ public class WorkerManager{
 					}
 				}
 			}
-			System.out.flush();
-			
-			// TODO: VERY TEMPORARY
-			if (gc.round() == strat.nextRocketBuild){
-				// rocket!
-				produceRocket();
-			}
 		}
 
 	}
@@ -244,6 +243,7 @@ public class WorkerManager{
 				w.targetLoc = null;
 				w.update();
 				ws = w;
+				Utils.log("creating new ws");
 				break;
 			}
 		}
