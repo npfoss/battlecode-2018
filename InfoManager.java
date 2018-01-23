@@ -110,6 +110,7 @@ public class InfoManager {
 		HashSet<Integer> ids = new HashSet<Integer>();
 		for (int i = 0; i < units.size(); i++) {
 			Unit unit = units.get(i);
+            if(unit.location().isInSpace()) continue;
 			if(unit.team() == gc.team()){
 				ids.add(unit.id());
 				switch (unit.unitType()) {
@@ -132,8 +133,7 @@ public class InfoManager {
 						unassignedUnits.add(unit.id());
 					break;
 				}
-			}
-			else{
+			} else {
 				addEnemyUnit(unit.id(),unit.unitType());
 				enemyLastSeen.put(unit.id(),(int) gc.round());
 				if(!unit.location().isOnMap())
