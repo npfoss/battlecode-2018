@@ -17,6 +17,7 @@ public class InfoManager {
 	MagicNumbers magicNums;
 	int height, width;
 	long lastCheckpoint;
+	boolean builtRocket;
 	//int totalUnitCount;
 
 	ArrayList<Unit> rockets;
@@ -87,10 +88,14 @@ public class InfoManager {
 
         marsx = 0;
         marsy = 0;
+        builtRocket = true;
 	}
 
-	public void update() {
+	public void update(Strategy strat) {
 		lastCheckpoint = System.nanoTime();
+		
+		if(gc.round() == strat.nextRocketBuild)
+			builtRocket = false;
 		
 		// called at the beginning of each turn
 		comms.update();
@@ -125,6 +130,7 @@ public class InfoManager {
 				case Rocket:
 					rockets.add(unit);
                     Utils.log("THERE IS A ROCKET!");
+                    builtRocket = true;
 					if (!isInSquads2(unit, rocketSquads))
 						newRockets.add(unit);
 					break;

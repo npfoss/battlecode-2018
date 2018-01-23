@@ -45,7 +45,7 @@ public class Overseer{
         Utils.log("Current round: " + gc.round());
         int start = gc.getTimeLeftMs();
         
-        infoMan.update();
+        infoMan.update(strat);
         strat.update();
         researchMan.update(strat);
         rocketMan.update(strat);

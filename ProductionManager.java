@@ -23,7 +23,6 @@ public class ProductionManager{
     public void update(Strategy strat){
         // find squads with highest urgency and find factories to build them. etc junk
     	// TODO: stuff
-
     }
 
     public void move(){
@@ -42,6 +41,8 @@ public class ProductionManager{
     			if(!didSomething)
     				break;
     		}
+    		if(!infoMan.builtRocket)
+    			continue;
     		infoMan.combatSquads.sort(Squad.byUrgency());
     		infoMan.rocketSquads.sort(Squad.byUrgency());
     		Squad toFill = null;

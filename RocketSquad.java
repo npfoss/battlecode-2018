@@ -53,12 +53,17 @@ public class RocketSquad extends Squad {
 				requestedUnits.add(Utils.robotTypes[ind]);
 			}
 		}
+		urgency = 100;
+		if(requestedUnits.size() == 0)
+			urgency = 0;
 	}
 
 	public void move(Nav nav){
 		if(isInSpace)
 			return;
 		countdown--;
+		
+		Utils.log("rocketsquad reporting size = " + units.size() + " urgency = " + urgency);
 
 		int numUnitsInside = 0;
 		// start at 1 because rocket is first one
