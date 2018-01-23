@@ -10,7 +10,7 @@ As the scheduled launch nears, sets up rocket squads to fill each rocket
 */
 public class RocketManager{
     InfoManager infoMan;
-    public static GameController gc;
+    public GameController gc;
 
     public RocketManager(GameController g, InfoManager im){
         gc = g;
@@ -39,11 +39,63 @@ public class RocketManager{
         }
 
         // udpate() each squad so we know what units to find
+        // and poach nearby units if reasonable
         for (RocketSquad rs : infoMan.rocketSquads){
             rs.update(strat.rocketComposition);
+
+            // how many to look for
+            int[] requests = {0,0,0,0,0};
+            for (UnitType t : rs.requestedUnits) {
+                switch(t){
+                    case Knight: requests[0]++; break;
+                    case Mage  : requests[1]++; break;
+                    case Ranger: requests[2]++; break;
+                    case Healer: requests[3]++; break;
+                    case Worker: requests[4]++; break;
+                }
+            }
+            for (int ind = 0; ind < requests.length; ind++){
+                stealClosestApplicableUnitsOfType(rs, Utils.robotTypes[ind], requests[ind]);
+            }
+        }
+    }
+
+    public void stealClosestApplicableUnitsOfType(RocketSquad rs, UnitType type, int num){
+        if (num <= 0) return;
+
+        // get closest legal units
+        Unit[] toSteal = new Unit[num];
+        int maxInd = 0;
+        long maxDist = 999999;
+        ArrayList<Unit> list = type == UnitType.Worker ? infoMan.workers : infoMan.fighters;
+        for (Unit unit : list){
+            if ((toSteal[maxInd] == null || rs.targetLoc.distanceSquaredTo(unit.location().mapLocation()) < maxDist)
+                    && canStealUnit(rs, unit)){
+                toSteal[maxInd] = unit;
+                maxInd = Utils.maxDistIndex(toSteal, rs.targetLoc);
+                maxDist = toSteal[maxInd] == null ? 999999 : rs.targetLoc.distanceSquaredTo(unit.location().mapLocation());
+            }
         }
 
-        // poach nearby units if reasonable
-        
+        // do the deed
+        for (Unit unit : toSteal){
+            if (unit != null){
+                Squad squad = infoMan.getSquad(unit);
+                rs.units.add(unit.id());
+                squad.units.remove(squad.units.indexOf(unit.id()));
+                squad.update();
+            }
+        }
+    }
+
+    public boolean canStealUnit(RocketSquad rs, Unit unit){
+        Squad squad = infoMan.getSquad(unit);
+        if (squad == null) return true;
+
+        if (infoMan.isInSquads2(unit, infoMan.rocketSquads)) return false;
+
+        // TODO: compare urgencies of rs and the unit's squad
+
+        return true;
     }
 }

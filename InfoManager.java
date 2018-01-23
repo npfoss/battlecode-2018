@@ -228,6 +228,9 @@ public class InfoManager {
 		}	
 	}
 
+    public boolean isInSquads(Unit unit){
+        return getSquad(unit) != null;
+    }
 	public boolean isInSquads1(Unit unit, ArrayList<WorkerSquad> squad) {
 		for (Squad s : squad) {
 			for (int uid : s.units) {
@@ -258,6 +261,56 @@ public class InfoManager {
 		}
 		return false;
 	}
+
+    public Squad getSquad(Unit unit){
+        if (!unassignedUnits.contains(unit.id())){
+            Squad s;
+            switch(unit.unitType()){
+                case Rocket: return getSquad2(unit, rocketSquads);
+                case Worker:
+                    s = getSquad2(unit, rocketSquads);
+                    return s == null ? getSquad1(unit, workerSquads) : s;
+                case Ranger:
+                case Mage:
+                case Knight:
+                case Healer:
+                    s = getSquad2(unit, rocketSquads);
+                    return s == null ? getSquad3(unit, combatSquads) : s;
+            }
+        }
+        return null;
+    }
+
+    public Squad getSquad2(Unit unit, ArrayList<RocketSquad> squad){
+        for (Squad s : squad) {
+            for (int uid : s.units) {
+                if (unit.id() == uid){
+                    return s;
+                }
+            }
+        }
+        return null;
+    }
+    public Squad getSquad1(Unit unit, ArrayList<WorkerSquad> squad){
+        for (Squad s : squad) {
+            for (int uid : s.units) {
+                if (unit.id() == uid){
+                    return s;
+                }
+            }
+        }
+        return null;
+    }
+    public Squad getSquad3(Unit unit, ArrayList<CombatSquad> squad){
+        for (Squad s : squad) {
+            for (int uid : s.units) {
+                if (unit.id() == uid){
+                    return s;
+                }
+            }
+        }
+        return null;
+    }
 
     public TreeSet<TargetUnit> getTargetUnits(MapLocation ml, int radius, boolean hostileOnly){
         TreeSet<TargetUnit> ret = new TreeSet<TargetUnit>(new descendingPriorityComp());
