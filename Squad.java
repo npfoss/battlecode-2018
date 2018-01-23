@@ -33,6 +33,10 @@ public class Squad{
         // actually move the units
     }
     
+    public void removeUnit(int id){
+    	units.remove(units.indexOf(id));
+    }
+    
     //not sure if i flipped the order lol
 	public static Comparator<Squad> byUrgency()
     {   

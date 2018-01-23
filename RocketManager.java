@@ -82,7 +82,7 @@ public class RocketManager{
             if (unit != null){
                 Squad squad = infoMan.getSquad(unit);
                 rs.units.add(unit.id());
-                squad.units.remove(squad.units.indexOf(unit.id()));
+                squad.removeUnit(unit.id());
                 squad.update();
             }
         }

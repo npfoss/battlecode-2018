@@ -226,7 +226,7 @@ public class WorkerManager{
 		//TODO:assign workers who are just mining karbonite if there's something better to do, add to rocket squads if necessary
 
 		// TODO: VERY TEMPORARY
-		if ((gc.round() + 1) % 100 == 0){
+		if (gc.round() == strat.nextRocketBuild){
 			// rocket!
 			produceRocket();
 		}

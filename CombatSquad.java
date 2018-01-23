@@ -45,8 +45,8 @@ public class CombatSquad extends Squad{
 		update();
 	}
 	
-	public void removeUnit(int index, int id){
-		units.remove(index);
+	public void removeUnit(int id){
+		super.removeUnit(id);
 		if(separatedUnits.contains(id))
 			separatedUnits.remove(separatedUnits.indexOf(id));
 		else{

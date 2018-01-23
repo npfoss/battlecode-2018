@@ -12,7 +12,7 @@ public class Strategy{
 	GameController gc;
 	UnitType[] researchOrder;
 	int[] combatComposition;
-	int[] rocketLaunchSchedule;
+	int nextRocketBuild;
 	int[] rocketComposition;
     static int[] defaultRocketComposition = {0, 0, 4, 2, 2};
                             // knight, mage, ranger, healer, worker
@@ -28,12 +28,15 @@ public class Strategy{
 	
 	private void determineInitalStrat() {
 		//TODO: make this depend on stuff
-		researchOrder = new UnitType[]{UnitType.Ranger,UnitType.Worker,UnitType.Healer,UnitType.Healer,UnitType.Healer,UnitType.Ranger,UnitType.Ranger};
+		researchOrder = new UnitType[]{UnitType.Ranger,UnitType.Worker,UnitType.Rocket,UnitType.Healer,UnitType.Healer,UnitType.Healer,UnitType.Ranger,UnitType.Ranger};
 		combatComposition = new int[]{0, 0, 3, 2}; //knight,mage,ranger,healer
         rocketComposition = defaultRocketComposition;
+        nextRocketBuild = 101;
 	}
 
 	public void update(){
         //TODO: make it adjust stuff if necessary
+		if(gc.round() > nextRocketBuild)
+			nextRocketBuild+=50;
     }
 }

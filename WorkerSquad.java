@@ -202,6 +202,7 @@ public class WorkerSquad extends Squad {
 		}
 	}
 	public void move(Nav nav) {
+		Utils.log("ws reporting: size = " + units.size() + " toBuild = " + toBuild);
 		for(int id: units) {
 			Unit worker = gc.unit(id);
 			if(worker.location().isInSpace() || worker.location().isInGarrison())
