@@ -81,7 +81,7 @@ public class RocketManager{
 
         // do the deed
         for (Unit unit : toSteal){
-            if (unit != null){
+            if (unit != null && unit.location().isOnMap()){
                 Squad squad = infoMan.getSquad(unit);
                 if(squad == null)
                 	continue;
