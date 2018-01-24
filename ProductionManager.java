@@ -53,11 +53,11 @@ public class ProductionManager{
     			toFill = infoMan.rocketSquads.get(0);
     		//if(infoMan.workerSquads.size()>0 && (toFill == null || infoMan.workerSquads.get(0).urgency > toFill.urgency))
     			//toFill = infoMan.workerSquads.get(0);
-    		UnitType toMake = UnitType.Ranger;
+    		UnitType toMake = null;
     		if(toFill != null && toFill.requestedUnits.size() > 0){
     			toMake = toFill.requestedUnits.get(0);
     		}
-    		if(gc.canProduceRobot(id,toMake)) {
+    		if(toMake != null && gc.canProduceRobot(id,toMake)) {
     			gc.produceRobot(id, toMake);
     		}
     	}
