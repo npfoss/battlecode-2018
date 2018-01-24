@@ -1,6 +1,9 @@
 import bc.*;
 import java.util.ArrayList;
 
+/*
+just does the turn, update()ing everything then move()ing everything
+*/
 public class Overseer{
     GameController gc;
     MagicNumbers magicNums;
