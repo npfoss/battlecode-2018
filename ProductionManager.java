@@ -56,6 +56,8 @@ public class ProductionManager{
     		UnitType toMake = null;
     		if(toFill != null && toFill.requestedUnits.size() > 0){
     			toMake = toFill.requestedUnits.get(0);
+    			if(infoMan.workers.size() < 3)
+    				toMake = UnitType.Worker;
     		}
     		if(toMake != null && gc.canProduceRobot(id,toMake)) {
     			gc.produceRobot(id, toMake);

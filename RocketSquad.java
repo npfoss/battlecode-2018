@@ -56,7 +56,7 @@ public class RocketSquad extends Squad {
 					requestedUnits.add(Utils.robotTypes[ind]);
 			}
 		}
-		urgency = 100;
+		urgency = 60;
 		if(requestedUnits.size() == 0)
 			urgency = 0;
 	}
