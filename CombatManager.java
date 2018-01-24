@@ -42,6 +42,11 @@ public class CombatManager{
 	// remember, the squads will move on their own after you update everything
 	public void update(Strategy strat){
 		// set units whose objective is NONE (meaning they completed it) to unassignedUnits
+		//Utils.log("sup");
+		
+		if(infoMan.myPlanet == Planet.Mars)
+			Utils.log("There are " + infoMan.combatSquads.size() + " cs's.");
+		
 		ArrayList<CombatSquad> toRemove = new ArrayList<CombatSquad>();
 		for(CombatSquad cs: infoMan.combatSquads){
 			if(cs.objective == Objective.NONE){
@@ -53,8 +58,9 @@ public class CombatManager{
 			}
 		}
 
-		for(CombatSquad cs: toRemove)
+		for(CombatSquad cs: toRemove){
 			infoMan.combatSquads.remove(cs);
+		}
 		
 		//defend factories and rockets
 		for(Unit u: infoMan.factories){
@@ -73,8 +79,10 @@ public class CombatManager{
 			}
 		}
 		
-		if(infoMan.combatSquads.size()==1 && infoMan.combatSquads.get(0).objective == Objective.EXPLORE){
+		if((infoMan.combatSquads.size()==1 && infoMan.combatSquads.get(0).objective == Objective.EXPLORE) || infoMan.myPlanet == Planet.Mars){
+			//Utils.log("here");
 			for(TargetUnit tu: infoMan.targetUnits.values()){
+				//Utils.log("sup");
 				addCombatSquad(tu.myLoc,Objective.ATTACK_LOC, strat);
 			}
 		}
@@ -88,6 +96,7 @@ public class CombatManager{
 
 		boolean didSomething = false;
 		while(infoMan.unassignedUnits.size() > 0) {
+			//Utils.log("here2");
 			didSomething = false;
 			infoMan.combatSquads.sort(Squad.byUrgency());
 			boolean tryAgain = false;
@@ -95,6 +104,7 @@ public class CombatManager{
 				for(int i : infoMan.unassignedUnits) {
 					Unit a = gc.unit(i);
 					if(cs.requestedUnits.contains(a.unitType())) {
+						Utils.log("adding to cs maybe");
 						if(cs.targetLoc != null && 
 						((!turnUnassigned.containsKey(a.id()) && gc.round() == 1) || (turnUnassigned.containsKey(a.id()) && turnUnassigned.get(a.id()) == gc.round()))){
 							MapLocation ml = cs.targetLoc;
@@ -105,7 +115,9 @@ public class CombatManager{
 							if(!infoMan.isReachable(cs.targetLoc, ml))
 								continue;
 						}
-						//System.out.println("adding to cs");
+						//Utils.log("adding to cs");
+						//if(cs.targetLoc != null)
+							//Utils.log("targetLoc = " + cs.targetLoc);
 						cs.addUnit(a);
 						tryAgain = true;
 						didSomething = true;
@@ -134,7 +146,12 @@ public class CombatManager{
 		cs.objective = obj;
 		cs.targetLoc = targetLoc;
 		cs.update();
+		Utils.log("adding cs");
+		//Utils.log("targetLoc = " + targetLoc);
 		infoMan.combatSquads.add(cs);
+		//for(CombatSquad cs2: infoMan.combatSquads){
+		//	Utils.log("size = " + cs2.units.size());
+		//}
 	}
 
 }

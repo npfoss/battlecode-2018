@@ -210,4 +210,8 @@ public class Nav{
             nextLocs = new ArrayList<MapLocation>();
         }
     }
+
+    public MapLocation getNextMarsDest(){
+        return infoMan.getNextMarsDest();
+    }
 }

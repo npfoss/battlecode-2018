@@ -10,10 +10,22 @@ public class RocketDoNothing extends RocketManager{
         super(g, im);
     }
 
-    public void update(){
-    	for(RocketSquad s : infoMan.rocketSquads) {
-    		if(gc.unit(s.rocketID).structureGarrison().size() == 0) {
-    			gc.disintegrateUnit(s.rocketID);
+    public void update(Strategy strat){
+    	for(Unit r: infoMan.rockets) {
+    		boolean didSomething;
+    		while(r.structureGarrison().size() > 0) {
+    			didSomething = false;
+    			for(Direction dirToUnload : Utils.orderedDirections){
+    				if(gc.canUnload(r.id(), dirToUnload)) {
+    					gc.unload(r.id(), dirToUnload);
+    					didSomething = true;
+    				}
+                }
+    			if(!didSomething)
+    				break;
+    		}
+    		if(r.structureGarrison().size() == 0) {
+    			gc.disintegrateUnit(r.id());
     		}
     	}
     }

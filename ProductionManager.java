@@ -22,11 +22,11 @@ public class ProductionManager{
 
     public void update(Strategy strat){
         // find squads with highest urgency and find factories to build them. etc junk
-    	// stuff
-
+    	// TODO: stuff
     }
 
     public void move(){
+        // go through the factories (in infoMan) and make them produce stuff
     	for(Unit factory : infoMan.factories) {
     		int id = factory.id();
     		//TODO: pick an intelligent direction
@@ -41,22 +41,27 @@ public class ProductionManager{
     			if(!didSomething)
     				break;
     		}
+    		if(!infoMan.builtRocket)
+    			continue;
     		infoMan.combatSquads.sort(Squad.byUrgency());
     		infoMan.rocketSquads.sort(Squad.byUrgency());
+    		infoMan.workerSquads.sort(Squad.byUrgency());
     		Squad toFill = null;
     		if(infoMan.combatSquads.size()>0 && infoMan.fighters.size() < magicNums.MAX_FIGHTER_COUNT)
     			toFill = infoMan.combatSquads.get(0);
     		if(infoMan.rocketSquads.size()>0 && (toFill == null || infoMan.rocketSquads.get(0).urgency > toFill.urgency))
     			toFill = infoMan.rocketSquads.get(0);
-    		UnitType toMake = UnitType.Ranger;
+    		//if(infoMan.workerSquads.size()>0 && (toFill == null || infoMan.workerSquads.get(0).urgency > toFill.urgency))
+    			//toFill = infoMan.workerSquads.get(0);
+    		UnitType toMake = null;
     		if(toFill != null && toFill.requestedUnits.size() > 0){
     			toMake = toFill.requestedUnits.get(0);
+    			if(infoMan.workers.size() < 3)
+    				toMake = UnitType.Worker;
     		}
-    		if(gc.canProduceRobot(id,toMake)) {
+    		if(toMake != null && gc.canProduceRobot(id,toMake) && gc.round() < 650) {
     			gc.produceRobot(id, toMake);
     		}
     	}
-    	// go through the factories (in infoMan) and make them produce stuff
-
     }
 }

@@ -17,14 +17,18 @@ public class InfoManager {
 	MagicNumbers magicNums;
 	int height, width;
 	long lastCheckpoint;
+	boolean builtRocket;
 	//int totalUnitCount;
 
 	ArrayList<Unit> rockets;
 	ArrayList<Unit> workers;
 	ArrayList<Unit> factories;
 	ArrayList<Unit> fighters;
+	
+	int workerCount;
 
-	HashSet<Integer> unassignedUnits;
+	HashSet<Integer> unassignedUnits; // *no rockets*
+    ArrayList<Unit> newRockets;
 
 	// tracking enemies
 	HashSet<Integer> enemyRockets;
@@ -48,7 +52,9 @@ public class InfoManager {
 
 	// here lies map info (mostly for nav)
     ArrayList<Region> regions;
-    Tile[][] tiles;	
+    Tile[][] tiles;
+    int marsx, marsy; // TODO: don't use this system, it sucks
+    ArrayList<MapLocation> placesWeveSentTo;
 
 	public InfoManager(GameController g, MagicNumbers mn) {
 		gc = g;
@@ -73,6 +79,8 @@ public class InfoManager {
 		enemyLastSeen = new HashMap<Integer,Integer>();
 
 		targetUnits = new HashMap<Integer,TargetUnit>();
+
+        newRockets = new ArrayList<Unit>();
 		
         height = (int) gc.startingMap(myPlanet).getHeight();
         width = (int) gc.startingMap(myPlanet).getWidth();
@@ -80,10 +88,18 @@ public class InfoManager {
         tiles = new Tile[width][height];
         regions = new ArrayList<Region>();
         initMap();
+
+        marsx = 0;
+        marsy = 0;
+        builtRocket = true;
+        placesWeveSentTo = new ArrayList<MapLocation>();
 	}
 
-	public void update() {
+	public void update(Strategy strat) {
 		lastCheckpoint = System.nanoTime();
+		
+		if(gc.round() == strat.nextRocketBuild)
+			builtRocket = false;
 		
 		// called at the beginning of each turn
 		comms.update();
@@ -94,6 +110,7 @@ public class InfoManager {
 		fighters = new ArrayList<Unit>();
 
 		unassignedUnits = new HashSet<Integer>();
+        newRockets.clear();
 		
 		targetUnits.clear();
 
@@ -102,6 +119,9 @@ public class InfoManager {
 		HashSet<Integer> ids = new HashSet<Integer>();
 		for (int i = 0; i < units.size(); i++) {
 			Unit unit = units.get(i);
+            if(unit.location().isInSpace()){
+                continue;
+            }
 			if(unit.team() == gc.team()){
 				ids.add(unit.id());
 				switch (unit.unitType()) {
@@ -115,17 +135,22 @@ public class InfoManager {
 					break;
 				case Rocket:
 					rockets.add(unit);
+                    Utils.log("THERE IS A ROCKET!");
 					if (!isInSquads2(unit, rocketSquads))
-						unassignedUnits.add(unit.id());
+						newRockets.add(unit);
 					break;
 				default:
+					//if(myPlanet == Planet.Mars)
+					//	Utils.log("wow");
 					fighters.add(unit);
-					if (!isInSquads3(unit, combatSquads) && !isInSquads2(unit,rocketSquads))
+					if (!isInSquads3(unit, combatSquads) && !isInSquads2(unit,rocketSquads)){
+						//if(myPlanet == Planet.Mars)
+						//	Utils.log("no way");
 						unassignedUnits.add(unit.id());
+					}
 					break;
 				}
-			}
-			else{
+			} else {
 				addEnemyUnit(unit.id(),unit.unitType());
 				enemyLastSeen.put(unit.id(),(int) gc.round());
 				if(!unit.location().isOnMap())
@@ -150,7 +175,7 @@ public class InfoManager {
 			for(int i = s.units.size()-1; i >= 0; i--){
 				int id = s.units.get(i);
 				if(!ids.contains(id)){
-					s.units.remove(i);
+					s.removeUnit(id);
 				}
 			}
 			s.update();
@@ -160,17 +185,17 @@ public class InfoManager {
 			for(int i = s.units.size()-1; i >= 0; i--){
 				int id = s.units.get(i);
 				if(!ids.contains(id)){
-					s.units.remove(i);
+					s.removeUnit(id);
 				}
 			}
-			s.update();
+			// s.update(); // rocket squads get updated by rocketMan anyways
 		}
 
 		for(CombatSquad s: combatSquads){
 			for(int i = s.units.size()-1; i >= 0; i--){
 				int id = s.units.get(i);
 				if(!ids.contains(id)){
-					s.removeUnit(i,id);
+					s.removeUnit(id);
 				}
 			}
 			s.update();
@@ -191,6 +216,8 @@ public class InfoManager {
 			}
 		}
 		
+		workerCount = workers.size();
+
 		logTimeCheckpoint("infoMan update done");
 	}
 
@@ -220,6 +247,9 @@ public class InfoManager {
 		}	
 	}
 
+    public boolean isInSquads(Unit unit){
+        return getSquad(unit) != null;
+    }
 	public boolean isInSquads1(Unit unit, ArrayList<WorkerSquad> squad) {
 		for (Squad s : squad) {
 			for (int uid : s.units) {
@@ -251,6 +281,56 @@ public class InfoManager {
 		return false;
 	}
 
+    public Squad getSquad(Unit unit){
+        if (!unassignedUnits.contains(unit.id())){
+            Squad s;
+            switch(unit.unitType()){
+                case Rocket: return getSquad2(unit, rocketSquads);
+                case Worker:
+                    s = getSquad2(unit, rocketSquads);
+                    return s == null ? getSquad1(unit, workerSquads) : s;
+                case Ranger:
+                case Mage:
+                case Knight:
+                case Healer:
+                    s = getSquad2(unit, rocketSquads);
+                    return s == null ? getSquad3(unit, combatSquads) : s;
+            }
+        }
+        return null;
+    }
+
+    public Squad getSquad2(Unit unit, ArrayList<RocketSquad> squad){
+        for (Squad s : squad) {
+            for (int uid : s.units) {
+                if (unit.id() == uid){
+                    return s;
+                }
+            }
+        }
+        return null;
+    }
+    public Squad getSquad1(Unit unit, ArrayList<WorkerSquad> squad){
+        for (Squad s : squad) {
+            for (int uid : s.units) {
+                if (unit.id() == uid){
+                    return s;
+                }
+            }
+        }
+        return null;
+    }
+    public Squad getSquad3(Unit unit, ArrayList<CombatSquad> squad){
+        for (Squad s : squad) {
+            for (int uid : s.units) {
+                if (unit.id() == uid){
+                    return s;
+                }
+            }
+        }
+        return null;
+    }
+
     public TreeSet<TargetUnit> getTargetUnits(MapLocation ml, int radius, boolean hostileOnly){
         TreeSet<TargetUnit> ret = new TreeSet<TargetUnit>(new descendingPriorityComp());
         for(TargetUnit tu: targetUnits.values()){
@@ -258,6 +338,17 @@ public class InfoManager {
                 ret.add(tu);
         }
         return ret;
+    }
+    
+    public int distToHostile(MapLocation ml){
+    	TreeSet<TargetUnit> tus = getTargetUnits(ml,150,true);
+    	int closest = 150;
+    	for(TargetUnit tu: tus){
+    		if(ml.distanceSquaredTo(tu.myLoc) < closest){
+    			closest = (int) ml.distanceSquaredTo(tu.myLoc);
+    		}
+    	}
+    	return closest;
     }
 
 /******** Map related functions below this line *******/
@@ -277,7 +368,7 @@ public class InfoManager {
                         regions.add(newRegion);
                     } else {
                         // impassible terrain
-                        tiles[x][y] = new Tile(x, y, false, startingMap.initialKarboniteAt(loc), null, loc, magicNums, this);
+                        tiles[x][y] = new Tile(false, startingMap.initialKarboniteAt(loc), null, loc, magicNums, this);
                     }
                 }
             }
@@ -288,7 +379,7 @@ public class InfoManager {
     //      from it to the given region
     public void floodfill(PlanetMap startingMap, Region region, MapLocation loc){
         long karbs = startingMap.initialKarboniteAt(loc);
-        tiles[loc.getX()][loc.getY()] = new Tile(loc.getX(), loc.getY(), true, karbs, region, loc, magicNums, this);
+        tiles[loc.getX()][loc.getY()] = new Tile(true, karbs, region, loc, magicNums, this);
         region.tiles.add(tiles[loc.getX()][loc.getY()]);
         region.karbonite += karbs;
 
@@ -334,11 +425,81 @@ public class InfoManager {
         //      check illegal locs sometimes
         return /*isOnMap(loc1) && isOnMap(loc2) &&*/ tiles[loc1.getX()][loc1.getY()].region == tiles[loc2.getX()][loc2.getY()].region;
     }
+
+    public MapLocation getNextMarsDest(){
+        if (myPlanet == Planet.Earth){
+            // TODO: check comms for what Mars is saying
+
+        } else {
+            // TODO: calculate something intelligent, send it to earth
+
+        }
+        // TODO: what if mars has nowhere to land???
+        
+        // for now :(
+        // TODO: remove
+        long bestDist = -1;
+        PlanetMap startingMap = gc.startingMap(Planet.Mars);
+        MapLocation bestloc = null;
+        int numChecked = 0;
+        int x,y;
+        while(numChecked < 7){
+        	// Utils.log("checking x = " + x + " y = " + y);
+        	x = (int)(Math.random()*(startingMap.getWidth()));
+        	y = (int)(Math.random()*(startingMap.getHeight()));
+        	MapLocation loc = new MapLocation(Planet.Mars, x, y);
+        	if (startingMap.isPassableTerrainAt(loc) > 0){
+        		numChecked++;
+        		long minDist = 10000;
+        		for(MapLocation l: placesWeveSentTo){
+        			if(l.distanceSquaredTo(loc) < minDist){
+        				minDist = l.distanceSquaredTo(loc);
+        			}
+        		}
+        		if(minDist > bestDist){
+        			bestDist = minDist;
+        			bestloc = loc;
+        		}
+        	}
+        }
+        //Utils.log("bestloc = " + bestloc);
+        placesWeveSentTo.add(bestloc);
+        return bestloc;
+        
+// so we don't land in the same place twice (unless we run out)
+        
+        /*try{
+            marsx = bestloc.getX();
+            marsy = bestloc.getY() + 1;
+            if (marsy == startingMap.getHeight()){
+                marsy = 0;
+                marsx++;
+            }
+            if (marsx == startingMap.getWidth()){
+                marsx = 0;
+            }
+            marsy++;
+            if (marsy == startingMap.getHeight()){
+                marsy = 0;
+                marsx++;
+            }
+            if (marsx == startingMap.getWidth()){
+                marsx = 0;
+            }
+        } catch (Exception e) {
+            // cry, mars is impassible
+        }
+        
+        Utils.log("marsx = " + marsx + " marsy = " + marsy);
+         */
+    }
+
+
+/*******  FOR LOGGING AND DEBUGGING *********/
     
     public void logTimeCheckpoint(String identifier){
     	long duration = System.nanoTime() - lastCheckpoint;
     	lastCheckpoint = System.nanoTime();
     	//Utils.log(identifier + ": " + duration + " ns since last checkpoint.");
     }
-    
 }
