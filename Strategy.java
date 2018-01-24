@@ -17,9 +17,10 @@ public class Strategy{
     static int[] defaultRocketComposition = {0, 0, 4, 2, 2};
                             // knight, mage, ranger, healer, worker
 	MapLocation[] rocketLaunchLocations;
+    int rocketLaunchFrequency; // (# rounds between each)
 	int maxWorkers;
 	int maxFactories;
-	
+
     public Strategy(InfoManager im, GameController g){
     	infoMan = im;
     	gc = g;
@@ -38,7 +39,15 @@ public class Strategy{
 	public void update(){
         //TODO: make it adjust stuff if necessary
 		if(gc.round() > nextRocketBuild){
-			nextRocketBuild+=50;
+            if (gc.round() > infoMan.magicNums.EARTH_FLOOD_ROUND - 10){
+                // give up, not enough time
+                nextRocketBuild = 999;
+            }
+            int roundsLeft = infoMan.magicNums.EARTH_FLOOD_ROUND - (int)(gc.round());
+            if(roundsLeft < 300){
+                rocketComposition = new int[]{0, 0, 5, 3, 0};
+            }
+			nextRocketBuild += 55 - (int)(((650.0 - roundsLeft) / 650)*((650.0 - roundsLeft) / 650)*30) - (int)((infoMan.fighters.size() / 150.0)*20);
 			maxWorkers += 2;
 		}
     }
