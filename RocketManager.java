@@ -2,11 +2,15 @@ import bc.*;
 import java.util.ArrayList;
 
 /*
-creates and assigns empty RocketSquads to rockets
-launches rockets when it's time
+for Earth
 
-Schedules rocket launches.
-As the scheduled launch nears, sets up rocket squads to fill each rocket
+creates and assigns RocketSquads when we build new rockets
+
+NOTE: infoMan decides where to send rockets
+
+TODO:
+-coordinate multiple simultaneous launches if Mars says to
+    (will have to communicate that to squads)
 */
 public class RocketManager{
     InfoManager infoMan;
@@ -17,7 +21,7 @@ public class RocketManager{
         infoMan = im;
     }
 
-    /* modifies rocketSquads as necessary and launches rockets
+    /* modifies rocketSquads as necessary
             (remember, those are in infoMan) */
     public void update(Strategy strat){
 
