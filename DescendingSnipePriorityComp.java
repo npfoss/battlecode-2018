@@ -1,5 +1,8 @@
 import java.util.Comparator;
 
+/*
+comparator for target units exclusively for determining whom to snipe
+*/
 public class DescendingSnipePriorityComp implements Comparator<TargetUnit> {
 
 	@Override

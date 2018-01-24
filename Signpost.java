@@ -1,5 +1,8 @@
 import bc.*;
 
+/*
+data structure for Nav's BFS caching thing
+*/
 public class Signpost{
     Direction direction;
     int stepsToDest;

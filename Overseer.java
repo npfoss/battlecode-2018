@@ -1,6 +1,9 @@
 import bc.*;
 import java.util.ArrayList;
 
+/*
+just does the turn, update()ing everything then move()ing everything
+*/
 public class Overseer{
     GameController gc;
     MagicNumbers magicNums;
@@ -45,7 +48,7 @@ public class Overseer{
         Utils.log("Current round: " + gc.round());
         int start = gc.getTimeLeftMs();
         
-        infoMan.update();
+        infoMan.update(strat);
         strat.update();
         researchMan.update(strat);
         rocketMan.update(strat);
@@ -59,13 +62,15 @@ public class Overseer{
         	rs.move(nav);
         }
         for(WorkerSquad ws : infoMan.workerSquads){
-            ws.move(nav);
+            ws.move(nav,strat);
         }
         for(CombatSquad cs : infoMan.combatSquads){
             cs.move(nav);
         }
 
-        Utils.log("turn took " + (start + 50 - gc.getTimeLeftMs()) + ". " + gc.getTimeLeftMs() + " ms left");
         gc.nextTurn();
+        // this has to go after
+        //      because getTimeLeftMs is the same during the same turn
+        Utils.log("previous turn took " + (start + 50 - gc.getTimeLeftMs()) + " ms. " + gc.getTimeLeftMs() + " ms left");
     }
 }

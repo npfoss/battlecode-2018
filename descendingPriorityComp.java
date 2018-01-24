@@ -1,5 +1,8 @@
 import java.util.Comparator;
 
+/*
+decides who to shoot
+*/
 public class descendingPriorityComp implements Comparator<TargetUnit> {
 
 	@Override

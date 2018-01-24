@@ -3,6 +3,15 @@ import java.lang.Math;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/* [description]
+any time you want to know the direction to go to a place
+also exploring
+important functs:
+
+NOTE: always make sure unit doesn't need to cool down.
+also, may return Direction.Center which will confuse gc.move()
+    (so if it returns Center, don't move)(that's what it's telling you)
+*/
 /* TODO
 maybe have units all claim tiles and optimize that?
 -or maybe look at the duck's code for pathing around units
@@ -164,6 +173,16 @@ public class Nav{
 
         return bestDir;
     }
+    
+    public Direction dirToMoveEfficient(MapLocation start, MapLocation target){
+        // TODO
+        return dirToMove(start, start.directionTowards(target));
+    }
+    
+    public Direction dirToMoveSafelyEfficient(MapLocation start, MapLocation target){
+        // TODO
+        return dirToMoveSafely(start, start.directionTowards(target));
+    }
 
     public Direction dirToExplore(MapLocation loc){
         return dirToMoveSafely(loc, Utils.orderedDirections[(int)(Math.random()*8)]);
@@ -209,5 +228,9 @@ public class Nav{
             currentLocs = nextLocs;
             nextLocs = new ArrayList<MapLocation>();
         }
+    }
+
+    public MapLocation getNextMarsDest(){
+        return infoMan.getNextMarsDest();
     }
 }

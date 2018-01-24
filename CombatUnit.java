@@ -3,9 +3,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.TreeMap;
-
 import bc.*;
 
+/*
+data structure for storing unit info.
+basically a copy of Unit augmented for our needs
+like TargetUnit, but for friendlies
+*/
 public class CombatUnit {
 	int ID;
 	int damage;
@@ -16,9 +20,11 @@ public class CombatUnit {
 	boolean canSnipe;
 	boolean canOvercharge;
 	int stepsFromTarget;
+	int distFromNearestHostile;
 	MapLocation myLoc;
 	UnitType type;
 	long maxHealth;
+	boolean notOnMap;
 	
 	public CombatUnit(){
 		
@@ -41,18 +47,23 @@ public class CombatUnit {
 		case Mage: maxHealth = 80; break;
 		case Healer: maxHealth = 100;
 		}
+		notOnMap = true;
 	}
 	
 	public void update(GameController gc, int sft){
 		//System.out.println("updating " + ID);
 		//System.out.flush();
 		Unit u = gc.unit(ID);
+		if(notOnMap && u.location().isOnMap()){
+			myLoc = u.location().mapLocation();
+			notOnMap = false;
+		}
 		stepsFromTarget = sft;
 		health = u.health();
 		canAttack = u.attackHeat() < 10 && !(type == UnitType.Ranger && u.rangerIsSniping() != 0);
 		canMove = u.movementHeat() < 10 && !(type == UnitType.Ranger && u.rangerIsSniping() != 0);
 		canSnipe = (gc.researchInfo().getLevel(UnitType.Ranger) == 3 && type == UnitType.Ranger && u.abilityHeat() < 10 && u.rangerIsSniping() == 0);
-		canSnipe = (gc.researchInfo().getLevel(UnitType.Healer) == 3 && type == UnitType.Healer && u.abilityHeat() < 10);
+		canOvercharge = (gc.researchInfo().getLevel(UnitType.Healer) == 3 && type == UnitType.Healer && u.abilityHeat() < 10);
 	}
 	
 	public boolean equals(Object o){

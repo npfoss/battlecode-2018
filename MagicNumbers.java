@@ -3,7 +3,6 @@ import bc.*;
 public class MagicNumbers{
 	/* Options - global constants/adjustment stuff
     */
-    int PI = 3;
     int SQUAD_SEPARATION_THRESHOLD = 50;
     int RANGER_MIN_RANGE = 11;
     int RANGER_RANGE = 50;
@@ -14,13 +13,12 @@ public class MagicNumbers{
     int MAX_DIST_THEY_COULD_HIT_NEXT_TURN = 72;
     int MAX_DIST_THEY_COULD_HIT = 50;
     int ENEMY_UNIT_DIST_THRESHOLD = 200;
-    int MAX_FIGHTER_COUNT = 200;
+    int MAX_FIGHTER_COUNT = 100;
     int RANGER_RUN_AWAY_HEALTH_THRESH = 0;
     double AGGRESION_FACTOR = 1.0; //bigger = more aggressive
-    //the bigger, the less we care:
-    double ABILITY_HEAT_OVERCHARGE_FACTOR = 50.0; 
-    double HEALER_HEALTH_FACTOR = 10.0;
     //the bigger, the more we care:
+    double HEALER_HEALTH_FACTOR = 0.1;
+    double ABILITY_HEAT_OVERCHARGE_FACTOR = 0.02; 
     double HOSTILE_FACTOR_RUN_AWAY = 2.0; 
     double SWARM_FACTOR_RUN_AWAY = 1.0; 
     double DAMAGE_FACTOR_RUN_AWAY = 100.0;
@@ -38,4 +36,10 @@ public class MagicNumbers{
     double DISTANCE_FACTOR_RANGER_MOVE_ATTACK = 10.0;
     double SWARM_FACTOR_RANGER_MOVE_ATTACK = 1.5; 
 	double g;
+
+    int EARTH_FLOOD_ROUND = 750;
+
+    // for rockets
+    // how many turns to wait before launch
+    int ROCKET_COUNTDOWN = 5;
 }

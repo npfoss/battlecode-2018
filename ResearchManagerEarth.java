@@ -1,5 +1,8 @@
 import bc.*;
 
+/*
+controls research related things
+*/
 public class ResearchManagerEarth extends ResearchManager{
 	// remember, has infoMan
 	public ResearchManagerEarth(GameController g, InfoManager im){

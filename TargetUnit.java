@@ -1,9 +1,11 @@
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.TreeSet;
-
 import bc.*;
 
+/*
+data structure for keeping track of enemy units
+*/
 public class TargetUnit {
 	int ID;
 	long health;
@@ -28,13 +30,13 @@ public class TargetUnit {
 		range = r;
 		defense = d;
 		switch(ut){
-		case Rocket: priority = (ml.getPlanet() == Planet.Earth ? 7 : 1); break;
-		case Factory: priority = 6; break;
-		case Mage: priority = 5; break;
-		case Healer: priority = 4; break;
-		case Knight: priority = 3; break;
-		case Ranger: priority = 2; break;
-		case Worker: priority = 1;
+		    case Rocket: priority = (ml.getPlanet() == Planet.Earth ? 7 : 1); break;
+		    case Factory: priority = 6; break;
+		    case Mage: priority = 5; break;
+		    case Healer: priority = 4; break;
+		    case Knight: priority = 3; break;
+		    case Ranger: priority = 2; break;
+		    case Worker: priority = 1;
 		}
 		infoMan = im;
 	}

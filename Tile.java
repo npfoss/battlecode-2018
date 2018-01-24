@@ -4,6 +4,9 @@ import java.util.HashSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+/*
+data structure for caching all kinds of map data and doing nav
+*/
 public class Tile{
     int x;
     int y;
@@ -32,9 +35,9 @@ public class Tile{
     boolean containsUpdated;
     //boolean accessible; //contains no unit or our unit that is move ready
     
-    public Tile(int ex, int why, boolean walkable, long karb, Region reg, MapLocation ml, MagicNumbers mn, InfoManager im){
-        x = ex;
-        y = why;
+    public Tile(boolean walkable, long karb, Region reg, MapLocation ml, MagicNumbers mn, InfoManager im){
+        x = ml.getX();
+        y = ml.getY();
         isWalkable = walkable;
         karbonite = karb;
         region = reg;
@@ -59,7 +62,9 @@ public class Tile{
 
     public void updateKarbonite(long newKarb){
         if (newKarb != karbonite){
-            region.karbonite += newKarb - karbonite;
+            if(region != null){
+                region.karbonite += newKarb - karbonite;
+            }
             karbonite = newKarb;
         }
     }
@@ -98,6 +103,7 @@ public class Tile{
     	if(enemiesUpdated)
     		return;
     	//infoMan.logTimeCheckpoint("before update");
+    	//Utils.log("updating tile " + x + " " + y);
     	enemiesUpdated = true;
     	enemiesWithinRangerRange.clear();
     	enemiesWithinMageRange.clear();
@@ -163,7 +169,7 @@ public class Tile{
     	}
     	//infoMan.logTimeCheckpoint("after update");
     }
-
+    
 	public TreeSet<TargetUnit> getEnemiesWithinRange(UnitType type) {
 		switch(type){
 		case Ranger: return enemiesWithinRangerRange;

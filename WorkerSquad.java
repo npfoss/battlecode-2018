@@ -1,23 +1,30 @@
 import bc.*;
 import java.util.ArrayList;
 
+/*
+controlled by WorkerManager
+basically just carry out assigned objective (build thing or idly mine)
+sets objective to NONE when done (to be reassigned by manager)
+*/
 public class WorkerSquad extends Squad {
 
 	UnitType toBuild;
-	InfoManager infoMan;
 	MapLocation targetKarboniteLoc = null;
+
 	public WorkerSquad(GameController g, InfoManager im) {
-		super(g);
-		infoMan = im;
+		super(im);
 		toBuild = UnitType.Factory;
 	}
+
 	final int[] dx = {-1,-1,-1,0,0,0,1,1,1};
 	final int[] dy = {-1,0,1,-1,0,1,-1,0,1};
+
 	public void update() {
 		if(requestedUnits.isEmpty())
 			requestedUnits.add(UnitType.Worker);
-		urgency = 64-8*units.size();
+		urgency = 8-units.size();
 	}
+	
 	public void moveTowardsBuildLoc(int id, Unit worker, Nav nav) {
 		if(!worker.location().mapLocation().isAdjacentTo(targetLoc) && gc.isMoveReady(id)) {
 			//Move towards the target location
@@ -73,6 +80,7 @@ public class WorkerSquad extends Squad {
 			objective = Objective.NONE;
 		}
 	}
+
 	public int safeX(int x) {
 		if(x < 0)
 			return 0;
@@ -80,6 +88,7 @@ public class WorkerSquad extends Squad {
 			return infoMan.width-1;
 		return x;
 	}
+
 	public int safeY(int y) {
 		if(y < 0)
 			return 0;
@@ -119,7 +128,7 @@ public class WorkerSquad extends Squad {
 			for(int i = 0; i < m.size(); i++) {
 				int x = m.get(i).getX();
 				int y= m.get(i).getY();
-				if(infoMan.tiles[x][y].karbonite > 0 && infoMan.isReachable(myLoc, m.get(i))) {
+				if(infoMan.tiles[x][y].karbonite > 0 && infoMan.isReachable(myLoc, m.get(i)) && infoMan.distToHostile(m.get(i)) > 200) {
 					targetKarboniteLoc = m.get(i);
 					break;
 				}
@@ -134,12 +143,16 @@ public class WorkerSquad extends Squad {
 			}
 		}else {
 			//For now probably nothing better todo :(
-			gc.disintegrateUnit(id);
+			//gc.disintegrateUnit(id);
+			Direction dirToMove = Utils.orderedDirections[(int) (8*Math.random())];
+			if(gc.canMove(id, dirToMove))
+				gc.moveRobot(id, dirToMove);
 		}
 		//long end = System.nanoTime();
 		//Utils.log("aaron just wasted " + (end-start) + " ns.");
 	}
 	public boolean tryToMine(int id) {
+		// TODO: prefer to mine higher karbonite spots?
 		if(gc.canHarvest(id,Direction.Center)) {
 			gc.harvest(id, Direction.Center);
 			return true;
@@ -183,6 +196,7 @@ public class WorkerSquad extends Squad {
 			for(Direction dirToReplicate : Utils.directionsTowardButNotIncluding(gc.unit(id).location().mapLocation().directionTo(targetLoc))) {
 				if (gc.canReplicate(id, dirToReplicate)) {
 					gc.replicate(id, dirToReplicate);
+					infoMan.workerCount++;
 					break;
 				}
 			}
@@ -191,20 +205,23 @@ public class WorkerSquad extends Squad {
 			for(Direction dirToReplicate : Utils.orderedDirections) {
 				if (gc.canReplicate(id, dirToReplicate)) {
 					gc.replicate(id, dirToReplicate);
+					infoMan.workerCount++;
 					break;
 				}
 			}
 		}
 	}
-	public void move(Nav nav) {
+	public void move(Nav nav, Strategy strat) {
+		Utils.log("ws reporting: size = " + units.size() + " toBuild = " + toBuild + " objective = " + objective + " urgency = " + urgency);
+		if(targetLoc != null)
+			Utils.log("targetLoc = " + targetLoc);
 		for(int id: units) {
 			Unit worker = gc.unit(id);
 			if(worker.location().isInSpace() || worker.location().isInGarrison())
 				continue;
 			//For now we shall replicate at the start, to be optimized.
-			if(gc.round() == 1 || (infoMan.workers.size() < 6 && gc.round() < 50)) {
+			if((infoMan.workerCount < strat.maxWorkers && infoMan.myPlanet == Planet.Earth) || (infoMan.myPlanet == Planet.Mars && (gc.round() > 700 || gc.karbonite() > 200))) {
 				replicateWorker(id);
-				
 			}
 			switch (objective) {
 			case BUILD:
