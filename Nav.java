@@ -1,3 +1,7 @@
+/****************/
+/* REFACTOR ME! */
+/****************/
+
 import bc.*;
 import java.lang.Math;
 import java.util.ArrayList;
