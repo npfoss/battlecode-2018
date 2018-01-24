@@ -1,6 +1,16 @@
 import bc.*;
 import java.util.ArrayList;
 
+/*
+moves units to rocket
+decides when to launch
+launches rocket
+
+NOTE: infoMan decides destination loc
+
+TODO:
+-improve launch trigger (take into account orbital stuff, coordinated launch from RocketManager)
+*/
 public class RocketSquad extends Squad {
 
 	boolean isInSpace = false;
