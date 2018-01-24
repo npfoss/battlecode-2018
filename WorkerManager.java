@@ -315,7 +315,7 @@ public class WorkerManager{
 		// choose a squad or create a new one
 		WorkerSquad ws = null;
 		for (WorkerSquad w : infoMan.workerSquads){
-			if (w.objective == Objective.MINE || infoMan.factories.size() > 1 && w.objective == Objective.BUILD && w.toBuild == UnitType.Factory){
+			if (w.objective == Objective.MINE/* || infoMan.factories.size() > 1 && w.objective == Objective.BUILD && w.toBuild == UnitType.Factory*/){
 				w.objective = Objective.BUILD;
 				w.toBuild = UnitType.Rocket;
 				w.targetLoc = null;
