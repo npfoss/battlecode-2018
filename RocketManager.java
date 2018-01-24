@@ -58,6 +58,8 @@ public class RocketManager{
                 }
             }
             for (int ind = 0; ind < requests.length; ind++){
+            	if(Utils.robotTypes[ind] == UnitType.Worker && rs.rocket.structureIsBuilt() == 0)
+            		continue;
                 stealClosestApplicableUnitsOfType(rs, Utils.robotTypes[ind], requests[ind]);
             }
         }
