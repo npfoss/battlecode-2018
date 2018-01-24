@@ -1,5 +1,8 @@
 import java.util.Comparator;
 
+/*
+just a comparator used for organizing combat--(to move in an intelligent order)
+*/
 public class AscendingStepsComp implements Comparator<CombatUnit> {
 
 	@Override
