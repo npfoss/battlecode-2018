@@ -50,7 +50,8 @@ public class Strategy{
                 rocketComposition = new int[]{0, 0, 5, 3, 0};
             }
 			nextRocketBuild += 55 - (int)(((650.0 - roundsLeft) / 650)*30) - (int)((infoMan.fighters.size() / 150.0)*30);
-			maxWorkers += 1;
+			if(gc.round()<350)
+				maxWorkers += 1;
 		}
     }
 }

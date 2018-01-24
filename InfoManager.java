@@ -136,7 +136,6 @@ public class InfoManager {
 				case Rocket:
 					rockets.add(unit);
                     Utils.log("THERE IS A ROCKET!");
-                    builtRocket = true;
 					if (!isInSquads2(unit, rocketSquads))
 						newRockets.add(unit);
 					break;

@@ -59,7 +59,7 @@ public class ProductionManager{
     			if(infoMan.workers.size() < 3)
     				toMake = UnitType.Worker;
     		}
-    		if(toMake != null && gc.canProduceRobot(id,toMake)) {
+    		if(toMake != null && gc.canProduceRobot(id,toMake) && gc.round() < 650) {
     			gc.produceRobot(id, toMake);
     		}
     	}
