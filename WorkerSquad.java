@@ -1,6 +1,11 @@
 import bc.*;
 import java.util.ArrayList;
 
+/*
+controlled by WorkerManager
+basically just carry out assigned objective (build thing or idly mine)
+sets objective to NONE when done (to be reassigned by manager)
+*/
 public class WorkerSquad extends Squad {
 
 	UnitType toBuild;
