@@ -1,5 +1,8 @@
 import java.util.Comparator;
 
+/*
+TODO: delete and use Ascending instead in all places
+*/
 public class DescendingStepsComp implements Comparator<CombatUnit> {
 	@Override
 	public int compare(CombatUnit o1, CombatUnit o2) {
