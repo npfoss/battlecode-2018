@@ -238,7 +238,7 @@ public class WorkerManager{
 								maxHostileDist = dist;
 								ws.targetLoc = v.get(i);
 							}
-							if(maxHostileDist == 250)
+							if(maxHostileDist == 150)
 								break;
 						}
 					}

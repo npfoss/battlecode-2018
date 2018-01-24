@@ -342,8 +342,8 @@ public class InfoManager {
     }
     
     public int distToHostile(MapLocation ml){
-    	TreeSet<TargetUnit> tus = getTargetUnits(ml,250,true);
-    	int closest = 250;
+    	TreeSet<TargetUnit> tus = getTargetUnits(ml,150,true);
+    	int closest = 150;
     	for(TargetUnit tu: tus){
     		if(ml.distanceSquaredTo(tu.myLoc) < closest){
     			closest = (int) ml.distanceSquaredTo(tu.myLoc);
