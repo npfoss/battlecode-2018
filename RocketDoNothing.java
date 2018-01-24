@@ -2,7 +2,8 @@ import bc.*;
 import java.util.ArrayList;
 
 /*
-for Mars
+responsible for unloading rockets which are on Mars
+TODO: don't destroy our rockets once empty
 */
 public class RocketDoNothing extends RocketManager{
 
