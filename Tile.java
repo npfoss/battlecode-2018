@@ -4,6 +4,9 @@ import java.util.HashSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+/*
+data structure for caching all kinds of map data and doing nav
+*/
 public class Tile{
     int x;
     int y;
