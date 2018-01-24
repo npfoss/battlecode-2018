@@ -3,9 +3,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.TreeMap;
-
 import bc.*;
 
+/*
+data structure for storing unit info.
+basically a copy of Unit augmented for our needs
+like TargetUnit, but for friendlies
+*/
 public class CombatUnit {
 	int ID;
 	int damage;
