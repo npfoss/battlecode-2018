@@ -16,10 +16,9 @@ public class MagicNumbers{
     int MAX_FIGHTER_COUNT = 100;
     int RANGER_RUN_AWAY_HEALTH_THRESH = 0;
     double AGGRESION_FACTOR = 1.0; //bigger = more aggressive
-    //the bigger, the less we care:
-    double ABILITY_HEAT_OVERCHARGE_FACTOR = 50.0; 
-    double HEALER_HEALTH_FACTOR = 10.0;
     //the bigger, the more we care:
+    double HEALER_HEALTH_FACTOR = 0.1;
+    double ABILITY_HEAT_OVERCHARGE_FACTOR = 0.02; 
     double HOSTILE_FACTOR_RUN_AWAY = 2.0; 
     double SWARM_FACTOR_RUN_AWAY = 1.0; 
     double DAMAGE_FACTOR_RUN_AWAY = 100.0;

@@ -500,6 +500,6 @@ public class InfoManager {
     public void logTimeCheckpoint(String identifier){
     	long duration = System.nanoTime() - lastCheckpoint;
     	lastCheckpoint = System.nanoTime();
-    	// Utils.log(identifier + ": " + duration + " ns since last checkpoint.");
+    	//Utils.log(identifier + ": " + duration + " ns since last checkpoint.");
     }
 }

@@ -68,6 +68,6 @@ public class Overseer{
         gc.nextTurn();
         // this has to go after
         //      because getTimeLeftMs is the same during the same turn
-        Utils.log("turn took " + (start + 50 - gc.getTimeLeftMs()) + ". " + gc.getTimeLeftMs() + " ms left");
+        Utils.log("previous turn took " + (start + 50 - gc.getTimeLeftMs()) + " ms. " + gc.getTimeLeftMs() + " ms left");
     }
 }
