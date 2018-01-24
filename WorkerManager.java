@@ -1,10 +1,10 @@
 import bc.*;
 import java.util.ArrayList;
 /*
-rearrange worker squads (includes assigning to rocketsquads and
-    empty squads for specific factories),
+rearrange worker squads (includes assigning empty squads for specific factories),
 Re-allocate workers to new karbonite patches if mined out,
 Send idle workers to gather karbonite
+controlls worker replication (based on squad urgency)
  */
 public class WorkerManager{
 	InfoManager infoMan;
