@@ -8,7 +8,8 @@ import java.util.HashSet;
 /*
 manages overall decisions of combat units
 Assigns units to squads
-Rearranges combat squads (and gives units to rocketsquads) as needed
+Rearranges/makes/deletes combat squads as needed
+(does not handle rocketSquads)
  */
 public class CombatManager{
 	InfoManager infoMan;
