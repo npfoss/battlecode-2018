@@ -38,6 +38,8 @@ public class Strategy{
 
 	public void update(){
         //TODO: make it adjust stuff if necessary
+		if(infoMan.myPlanet == Planet.Mars)
+			return;
 		if(gc.round() > nextRocketBuild){
             if (gc.round() > infoMan.magicNums.EARTH_FLOOD_ROUND - 10){
                 // give up, not enough time
@@ -47,8 +49,8 @@ public class Strategy{
             if(roundsLeft < 300){
                 rocketComposition = new int[]{0, 0, 5, 3, 0};
             }
-			nextRocketBuild += 55 - (int)(((650.0 - roundsLeft) / 650)*((650.0 - roundsLeft) / 650)*30) - (int)((infoMan.fighters.size() / 150.0)*20);
-			maxWorkers += 2;
+			nextRocketBuild += 55 - (int)(((650.0 - roundsLeft) / 650)*((650.0 - roundsLeft) / 650)*30) - (int)((infoMan.fighters.size() / 150.0)*30);
+			maxWorkers += 3;
 		}
     }
 }
