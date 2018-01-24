@@ -47,7 +47,7 @@ public class Strategy{
             if(roundsLeft < 300){
                 rocketComposition = new int[]{0, 0, 5, 3, 0};
             }
-			nextRocketBuild += 55 - (int)(((650.0 - roundsLeft) / 650)*((650.0 - roundsLeft) / 650)*30) - (int)((infoMan.fighters.size() / 150.0)*20);
+			nextRocketBuild += 55 - (int)(((650.0 - roundsLeft) / 650)*30) - (int)((infoMan.fighters.size() / 150.0)*20);
 			maxWorkers += 2;
 		}
     }
