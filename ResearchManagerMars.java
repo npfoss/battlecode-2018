@@ -1,3 +1,7 @@
+/****************/
+/* REFACTOR ME! */
+/****************/
+
 import bc.*;
 
 public class ResearchManagerMars extends ResearchManager{
