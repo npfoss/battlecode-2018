@@ -19,17 +19,15 @@ public class CombatSquad extends Squad{
 	MapLocation swarmLoc;
 	int numEnemyUnits;
 	int goalRangerDistance;
-	MagicNumbers magicNums;
 	int[] unitCounts;
 	int[] unitCompGoal;
 	final int[] dx = {-1,-1,-1,0,0,0,1,1,1};
 	final int[] dy = {-1,0,1,-1,0,1,-1,0,1};
 
-	public CombatSquad(GameController g, InfoManager im, MagicNumbers mn, int[] ucg) {
+	public CombatSquad(GameController g, InfoManager im, int[] ucg) {
 		super(im);
 		combatUnits = new HashMap<Integer,CombatUnit>();
 		//separatedUnits = new ArrayList<Integer>();// use or remove
-		magicNums = mn;
 		unitCounts = new int[]{0,0,0,0}; //knight,mage,ranger,healer
 		unitCompGoal = ucg;
 		//System.out.println("ucg = " + ucg[0] + " " + ucg[1] + " " + ucg[2] + " " + ucg[3]);
@@ -120,7 +118,7 @@ public class CombatSquad extends Squad{
 		swarmLoc = targetLoc;
 		if(combatUnits.size() > 0)
 			swarmLoc = Utils.averageMapLocation(gc, combatUnits.values());
-		numEnemyUnits = infoMan.getTargetUnits(swarmLoc, magicNums.ENEMY_UNIT_DIST_THRESHOLD, false).size();
+		numEnemyUnits = infoMan.getTargetUnits(swarmLoc, MagicNumbers.ENEMY_UNIT_DIST_THRESHOLD, false).size();
 		//System.out.println("ru.size = " + requestedUnits.size());
 		//System.out.flush();
 		if(infoMan.myPlanet == Planet.Mars){
@@ -200,7 +198,7 @@ public class CombatSquad extends Squad{
 				continue;
 			MapLocation ml = u.location().mapLocation();
 			if(ml.distanceSquaredTo(swarmLoc) <= swarmThreshold ||
-				infoMan.getTargetUnits(ml, magicNums.MAX_DIST_THEY_COULD_HIT, false).size() > 0){
+				infoMan.getTargetUnits(ml, MagicNumbers.MAX_DIST_THEY_COULD_HIT, false).size() > 0){
 				separatedUnits.remove(i);
 				CombatUnit cu = new CombatUnit(u.id(),u.damage(),u.health(),u.movementHeat()<10,u.attackHeat()<10,
 						ml,u.unitType(),nav.optimalStepsTo(ml, targetLoc));
@@ -259,7 +257,7 @@ public class CombatSquad extends Squad{
 
 	private boolean areWeDone(){
 		switch(objective){
-		case ATTACK_LOC: return gc.senseNearbyUnitsByTeam(targetLoc, 5, gc.team()).size() > 0 && infoMan.getTargetUnits(targetLoc, magicNums.SQUAD_SEPARATION_THRESHOLD,false).size() == 0;
+		case ATTACK_LOC: return gc.senseNearbyUnitsByTeam(targetLoc, 5, gc.team()).size() > 0 && infoMan.getTargetUnits(targetLoc, MagicNumbers.SQUAD_SEPARATION_THRESHOLD,false).size() == 0;
 		case DEFEND_LOC: return infoMan.getTargetUnits(targetLoc, 100, false).size() == 0;
 		default: return false;
 		}
@@ -497,9 +495,9 @@ public class CombatSquad extends Squad{
 		for(CombatUnit o: overchargees){
 			switch(o.type){
 			case Healer: continue;
-			case Ranger: score = (gc.researchInfo().getLevel(UnitType.Ranger) == 3 ? gc.unit(o.ID).abilityHeat() * magicNums.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.distFromNearestHostile; break;
-			case Knight: score = (gc.researchInfo().getLevel(UnitType.Knight) == 3 ? gc.unit(o.ID).abilityHeat() * magicNums.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.distFromNearestHostile; break;
-			case Mage: score = (gc.researchInfo().getLevel(UnitType.Mage) == 4 ? gc.unit(o.ID).abilityHeat() * magicNums.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.distFromNearestHostile;
+			case Ranger: score = (gc.researchInfo().getLevel(UnitType.Ranger) == 3 ? gc.unit(o.ID).abilityHeat() * MagicNumbers.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.distFromNearestHostile; break;
+			case Knight: score = (gc.researchInfo().getLevel(UnitType.Knight) == 3 ? gc.unit(o.ID).abilityHeat() * MagicNumbers.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.distFromNearestHostile; break;
+			case Mage: score = (gc.researchInfo().getLevel(UnitType.Mage) == 4 ? gc.unit(o.ID).abilityHeat() * MagicNumbers.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.distFromNearestHostile;
 			}
 			if(score > bestScore){
 				tO = o;
@@ -550,7 +548,7 @@ public class CombatSquad extends Squad{
 		for(CombatUnit h: healees){
 			if(h.health + 10 >= h.maxHealth)
 				continue;
-			double score = -h.distFromNearestHostile - h.health * magicNums.HEALER_HEALTH_FACTOR;
+			double score = -h.distFromNearestHostile - h.health * MagicNumbers.HEALER_HEALTH_FACTOR;
 			if(score > bestScore){
 				tH = h;
 				toHeal = h.ID;
@@ -589,7 +587,7 @@ public class CombatSquad extends Squad{
     	TreeSet<CombatUnit> ret = new TreeSet<CombatUnit>(new AscendingStepsComp());
     	for(CombatUnit cu: combatUnits.values()){
     		int dist = (int) ml.distanceSquaredTo(cu.myLoc);
-    		if(dist <= magicNums.HEALER_RANGE)
+    		if(dist <= MagicNumbers.HEALER_RANGE)
     			ret.add(cu);
     	}
     	return ret;
@@ -598,23 +596,23 @@ public class CombatSquad extends Squad{
 	private CombatUnit rangerMoveAndAttack(CombatUnit cu, Nav nav) {
 		Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
 		//if we're not near any enemies nav, otherwise move and attack
-		if(myTile.distFromNearestHostile > magicNums.MAX_DIST_THEY_COULD_HIT_NEXT_TURN){
+		if(myTile.distFromNearestHostile > MagicNumbers.MAX_DIST_THEY_COULD_HIT_NEXT_TURN){
 			//Utils.log("navving " + cu.myLoc.getX() + " " + cu.myLoc.getY());
 			Direction d = nav.dirToMove(cu.myLoc, targetLoc);
 			return moveAndUpdate(cu,d);
 		}
-		return (cu.health <= magicNums.RANGER_RUN_AWAY_HEALTH_THRESH ? runAway(cu) : rangerMoveAndAttack(cu));
+		return (cu.health <= MagicNumbers.RANGER_RUN_AWAY_HEALTH_THRESH ? runAway(cu) : rangerMoveAndAttack(cu));
 	}
 	
 	private CombatUnit rangerMove(CombatUnit cu, Nav nav) {
 		Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
 		//if we're not near any enemies nav, otherwise move
-		if(myTile.distFromNearestHostile > magicNums.MAX_DIST_THEY_COULD_HIT_NEXT_TURN){
+		if(myTile.distFromNearestHostile > MagicNumbers.MAX_DIST_THEY_COULD_HIT_NEXT_TURN){
 			//Utils.log("navving " + cu.myLoc.getX() + " " + cu.myLoc.getY());
 			Direction d = nav.dirToMove(cu.myLoc, targetLoc);
 			return moveAndUpdate(cu,d);
 		}
-		return (cu.health <= magicNums.RANGER_RUN_AWAY_HEALTH_THRESH ? runAway(cu) : rangerMove(cu));
+		return (cu.health <= MagicNumbers.RANGER_RUN_AWAY_HEALTH_THRESH ? runAway(cu) : rangerMove(cu));
 	}
 	
 	private CombatUnit healerMove(CombatUnit cu, Nav nav) {
@@ -643,11 +641,11 @@ public class CombatSquad extends Squad{
 			Tile t = infoMan.tiles[nx][ny];
 			if(!t.isWalkable || t.containsUnit)
 				continue;
-			score = t.distFromNearestHostile * magicNums.HOSTILE_FACTOR_HEALER_MOVE
-					- (t.distFromNearestHostile - (goalRangerDistance+magicNums.HEALER_RANGE) > 0 ? t.distFromNearestHostile - (goalRangerDistance+magicNums.HEALER_RANGE) : 0) 
-					* magicNums.DISTANCE_FACTOR_RANGER_MOVE
-					- t.possibleDamage * magicNums.DAMAGE_FACTOR_HEALER_MOVE 
-					- t.myLoc.distanceSquaredTo(swarmLoc) * magicNums.SWARM_FACTOR_HEALER_MOVE;
+			score = t.distFromNearestHostile * MagicNumbers.HOSTILE_FACTOR_HEALER_MOVE
+					- (t.distFromNearestHostile - (goalRangerDistance+MagicNumbers.HEALER_RANGE) > 0 ? t.distFromNearestHostile - (goalRangerDistance+MagicNumbers.HEALER_RANGE) : 0) 
+					* MagicNumbers.DISTANCE_FACTOR_RANGER_MOVE
+					- t.possibleDamage * MagicNumbers.DAMAGE_FACTOR_HEALER_MOVE 
+					- t.myLoc.distanceSquaredTo(swarmLoc) * MagicNumbers.SWARM_FACTOR_HEALER_MOVE;
 			if(score>bestScore){
 				bestScore = score;
 				bestIndex = i;
@@ -673,11 +671,11 @@ public class CombatSquad extends Squad{
 			Tile t = infoMan.tiles[nx][ny];
 			if(!t.isWalkable || t.containsUnit)
 				continue;
-			score = t.distFromNearestHostile * magicNums.HOSTILE_FACTOR_RANGER_MOVE
-					- (t.distFromNearestHostile - goalRangerDistance > 0 ? t.distFromNearestHostile - goalRangerDistance : 0) * magicNums.DISTANCE_FACTOR_RANGER_MOVE
-					- t.possibleDamage * magicNums.DAMAGE_FACTOR_RANGER_MOVE
-					- t.myLoc.distanceSquaredTo(swarmLoc) * magicNums.SWARM_FACTOR_RANGER_MOVE
-					- t.myLoc.distanceSquaredTo(targetLoc) * magicNums.TARGET_FACTOR_RANGER_MOVE;
+			score = t.distFromNearestHostile * MagicNumbers.HOSTILE_FACTOR_RANGER_MOVE
+					- (t.distFromNearestHostile - goalRangerDistance > 0 ? t.distFromNearestHostile - goalRangerDistance : 0) * MagicNumbers.DISTANCE_FACTOR_RANGER_MOVE
+					- t.possibleDamage * MagicNumbers.DAMAGE_FACTOR_RANGER_MOVE
+					- t.myLoc.distanceSquaredTo(swarmLoc) * MagicNumbers.SWARM_FACTOR_RANGER_MOVE
+					- t.myLoc.distanceSquaredTo(targetLoc) * MagicNumbers.TARGET_FACTOR_RANGER_MOVE;
 			if(score>bestScore){
 				bestScore = score;
 				bestIndex = i;
@@ -689,7 +687,7 @@ public class CombatSquad extends Squad{
 	}
 	
 	private CombatUnit rangerMoveAndAttack(CombatUnit cu) {
-		if(cu.health < magicNums.RANGER_RUN_AWAY_HEALTH_THRESH)
+		if(cu.health < MagicNumbers.RANGER_RUN_AWAY_HEALTH_THRESH)
 			return runAway(cu);
 		int x,y,nx,ny;
 		x = cu.myLoc.getX();
@@ -708,21 +706,21 @@ public class CombatSquad extends Squad{
 			Tile t = infoMan.tiles[nx][ny];
 			if(!t.isWalkable || t.containsUnit)
 				continue;
-			score = t.distFromNearestHostile * magicNums.HOSTILE_FACTOR_HEALER_MOVE
-					- (t.distFromNearestHostile - goalRangerDistance > 0 ? t.distFromNearestHostile - goalRangerDistance : 0) * magicNums.DISTANCE_FACTOR_RANGER_MOVE
-					- t.possibleDamage * magicNums.DAMAGE_FACTOR_RANGER_MOVE
-					- t.myLoc.distanceSquaredTo(swarmLoc) * magicNums.SWARM_FACTOR_RANGER_MOVE
-					- t.myLoc.distanceSquaredTo(targetLoc) * magicNums.TARGET_FACTOR_RANGER_MOVE;
+			score = t.distFromNearestHostile * MagicNumbers.HOSTILE_FACTOR_HEALER_MOVE
+					- (t.distFromNearestHostile - goalRangerDistance > 0 ? t.distFromNearestHostile - goalRangerDistance : 0) * MagicNumbers.DISTANCE_FACTOR_RANGER_MOVE
+					- t.possibleDamage * MagicNumbers.DAMAGE_FACTOR_RANGER_MOVE
+					- t.myLoc.distanceSquaredTo(swarmLoc) * MagicNumbers.SWARM_FACTOR_RANGER_MOVE
+					- t.myLoc.distanceSquaredTo(targetLoc) * MagicNumbers.TARGET_FACTOR_RANGER_MOVE;
 			if(score>bestNormalScore){
 				bestNormalScore = score;
 				bestNormalIndex = i;
 			}
 			if(t.enemiesWithinRangerRange.size()==0)
 				continue;
-			score = t.distFromNearestHostile * magicNums.HOSTILE_FACTOR_RANGER_MOVE_ATTACK 
-					- (t.distFromNearestHostile - goalRangerDistance > 0 ? t.distFromNearestHostile - goalRangerDistance : 0) * magicNums.DISTANCE_FACTOR_RANGER_MOVE_ATTACK
-					- t.possibleDamage * magicNums.DAMAGE_FACTOR_RANGER_MOVE_ATTACK
-					- t.myLoc.distanceSquaredTo(swarmLoc) * magicNums.SWARM_FACTOR_RANGER_MOVE_ATTACK;
+			score = t.distFromNearestHostile * MagicNumbers.HOSTILE_FACTOR_RANGER_MOVE_ATTACK 
+					- (t.distFromNearestHostile - goalRangerDistance > 0 ? t.distFromNearestHostile - goalRangerDistance : 0) * MagicNumbers.DISTANCE_FACTOR_RANGER_MOVE_ATTACK
+					- t.possibleDamage * MagicNumbers.DAMAGE_FACTOR_RANGER_MOVE_ATTACK
+					- t.myLoc.distanceSquaredTo(swarmLoc) * MagicNumbers.SWARM_FACTOR_RANGER_MOVE_ATTACK;
 			if(score>bestScore){
 				bestScore = score;
 				bestIndex = i;
@@ -763,9 +761,9 @@ public class CombatSquad extends Squad{
 			Tile t = infoMan.tiles[nx][ny];
 			if(!t.isWalkable || t.containsUnit)
 				continue;
-			score = t.distFromNearestHostile*magicNums.HOSTILE_FACTOR_RUN_AWAY 
-					- t.myLoc.distanceSquaredTo(swarmLoc)*magicNums.SWARM_FACTOR_RUN_AWAY
-					- t.possibleDamage * magicNums.DAMAGE_FACTOR_RUN_AWAY;
+			score = t.distFromNearestHostile*MagicNumbers.HOSTILE_FACTOR_RUN_AWAY 
+					- t.myLoc.distanceSquaredTo(swarmLoc)*MagicNumbers.SWARM_FACTOR_RUN_AWAY
+					- t.possibleDamage * MagicNumbers.DAMAGE_FACTOR_RUN_AWAY;
 			if(score>bestScore){
 				bestScore = score;
 				bestIndex = i;
@@ -835,7 +833,7 @@ public class CombatSquad extends Squad{
 
 	private boolean shouldWeRetreat(){
 		//TODO: make this better
-		return numEnemyUnits > combatUnits.size() * magicNums.AGGRESION_FACTOR;
+		return numEnemyUnits > combatUnits.size() * MagicNumbers.AGGRESION_FACTOR;
 	}
 }
 

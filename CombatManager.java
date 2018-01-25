@@ -4,8 +4,8 @@
 
 import bc.*;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.Collection; //unused
+import java.util.Collections; //unused
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -18,13 +18,11 @@ Rearranges/makes/deletes combat squads as needed
 public class CombatManager{
 	InfoManager infoMan;
 	GameController gc;
-	MagicNumbers magicNums;
 	HashMap<Integer,Integer> turnUnassigned;
 
-	public CombatManager(InfoManager im, GameController g, MagicNumbers mn, Strategy strat){
+	public CombatManager(InfoManager im, GameController g, Strategy strat){
 		infoMan = im;
 		gc = g;
-		magicNums = mn;
 		turnUnassigned = new HashMap<Integer,Integer>();
 		if(infoMan.myPlanet == Planet.Mars)
 			return;
@@ -93,7 +91,7 @@ public class CombatManager{
 		}
 		
 		if(infoMan.combatSquads.size() == 0) {
-			CombatSquad cs = new CombatSquad(gc,infoMan,magicNums,strat.combatComposition);
+			CombatSquad cs = new CombatSquad(gc,infoMan,strat.combatComposition);
 			cs.objective = Objective.EXPLORE;
 			cs.update();
 			infoMan.combatSquads.add(cs);
@@ -142,12 +140,12 @@ public class CombatManager{
 	
 	public void addCombatSquad(MapLocation targetLoc, Objective obj, Strategy strat){
 		for(CombatSquad cs: infoMan.combatSquads){
-			if(cs.objective != Objective.EXPLORE &&
-			   (targetLoc.distanceSquaredTo(cs.targetLoc) < magicNums.SQUAD_SEPARATION_THRESHOLD || 
-			   targetLoc.distanceSquaredTo(cs.swarmLoc) < 75))
+			if(cs.objective != Objective.EXPLORE
+					&& (targetLoc.distanceSquaredTo(cs.targetLoc) < MagicNumbers.SQUAD_SEPARATION_THRESHOLD
+			   				|| targetLoc.distanceSquaredTo(cs.swarmLoc) < 75))
 				return;
 		}
-		CombatSquad cs = new CombatSquad(gc,infoMan,magicNums,strat.combatComposition);
+		CombatSquad cs = new CombatSquad(gc,infoMan,strat.combatComposition);
 		cs.objective = obj;
 		cs.targetLoc = targetLoc;
 		cs.update();
