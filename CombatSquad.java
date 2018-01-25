@@ -15,7 +15,7 @@ public class CombatSquad extends Squad{
 
 	//keep track of units into two groups: those with the main swarm and those separated from it
 	HashMap<Integer,CombatUnit> combatUnits; //ID to CombatUnit
-	//ArrayList<Integer> separatedUnits;// use or remove
+	//ArrayList<Integer> separatedUnits;// add back in
 	MapLocation swarmLoc;
 	int numEnemyUnits;
 	int goalRangerDistance;
@@ -76,28 +76,6 @@ public class CombatSquad extends Squad{
 		case Ranger:unitCounts[2]--; break;
 		case Healer:unitCounts[3]--; 
 		}
-		/*// use or remove
-		CombatUnit toRemove  = new CombatUnit();
-		boolean remove = false;
-		TreeSet<CombatUnit> newCombatUnits = new TreeSet<CombatUnit>(new AscendingStepsComp());
-		for(CombatUnit cu: combatUnits){
-			if(cu.ID == id){
-				toRemove = cu;
-				remove = true;
-				continue;
-			}
-			newCombatUnits.add(cu);
-		}
-		if(remove){
-			combatUnits = newCombatUnits;
-			switch(toRemove.type){
-			case Knight:unitCounts[0]--; break;
-			case Mage:unitCounts[1]--; break;
-			case Ranger:unitCounts[2]--; break;
-			case Healer:unitCounts[3]--; break;
-			default: break;
-			}
-		}*/
 	}
 
 	public void update(){
@@ -110,10 +88,7 @@ public class CombatSquad extends Squad{
 			urgency = 0;
 			return;
 		}
-		if(targetLoc == null){
-			// should it set the objective to NONE in this case or something?
-			return;
-		}
+
 		swarmLoc = targetLoc;
 		if(combatUnits.size() > 0)
 			swarmLoc = Utils.averageMapLocation(gc, combatUnits.values());
@@ -165,10 +140,10 @@ public class CombatSquad extends Squad{
 
 		if(objective == Objective.EXPLORE){
 			infoMan.logTimeCheckpoint("start of explore move");
-			// Utils.log("swarm size = " + units.size() + " obj = " + objective + " urgency = " + urgency); //does this still need to be here?
+			// Utils.log("swarm size = " + units.size() + " obj = " + objective + " urgency = " + urgency);
 			explore(nav);
 			if(infoMan.combatSquads.size() > 1)
-				objective = Objective.NONE; // wait what?
+				objective = Objective.NONE; // @eli to @eli : move to manager
 			infoMan.logTimeCheckpoint("done with CombatSquad move");
 			return;
 		}
@@ -211,7 +186,7 @@ public class CombatSquad extends Squad{
 		//moveToSwarm(nav);
 		boolean retreat = shouldWeRetreat();
 		infoMan.logTimeCheckpoint("starting micro");
-		doSquadMicro(retreat,nav);
+		doSquadMicro(retreat, nav);
 		//check if we're done with our objective
 		boolean done = areWeDone();
 		if(done){
@@ -220,42 +195,13 @@ public class CombatSquad extends Squad{
 		}
 		update();
 		infoMan.logTimeCheckpoint("done with CombatSquad move");
-		/* USE OR REMOVE
-		for(int id : units) {
-			Unit fighter = gc.unit(id);
-			if(fighter.location().isInSpace() || fighter.location().isInGarrison())
-				continue;
-			switch (objective) {
-			case EXPLORE:
-				VecUnit nearby = gc.senseNearbyUnits(fighter.location().mapLocation(),50);
-				for(int i=0;i<nearby.size();i++) {
-					Unit other = nearby.get(i);
-					if(other.team() != gc.team() && gc.isAttackReady(fighter.id()) && gc.canAttack(fighter.id(), other.id())) {
-						gc.attack(fighter.id(),other.id());
-					}
-				}
-				Direction dirToMove = nav.dirToExplore(fighter.location().mapLocation());
-				if(gc.isMoveReady(id) && gc.canMove(id, dirToMove)&&!gc.unit(id).location().isInGarrison())
-					gc.moveRobot(id, dirToMove);
-				fighter = gc.unit(id);
-				nearby = gc.senseNearbyUnits(fighter.location().mapLocation(),50);
-				for(int i=0;i<nearby.size();i++) {
-					Unit other = nearby.get(i);
-					if(other.team() != gc.team() && gc.isAttackReady(fighter.id()) && gc.canAttack(fighter.id(), other.id())) {
-						gc.attack(fighter.id(),other.id());
-					}
-				}
-				break;
-			default:
-				break;
-			}
-		}*/
 	}
 
 	private boolean areWeDone(){
 		switch(objective){
-		case ATTACK_LOC: return gc.senseNearbyUnitsByTeam(targetLoc, 5, gc.team()).size() > 0 && infoMan.getTargetUnits(targetLoc, MagicNumbers.SQUAD_SEPARATION_THRESHOLD,false).size() == 0;
-		case DEFEND_LOC: return infoMan.getTargetUnits(targetLoc, 100, false).size() == 0;
+		case ATTACK_LOC: return gc.senseNearbyUnitsByTeam(targetLoc, 5, gc.team()).size() > 0 // get rid of gc call // make 5 magicnum
+							&& infoMan.getTargetUnits(targetLoc, MagicNumbers.SQUAD_SEPARATION_THRESHOLD, false).size() == 0;
+		case DEFEND_LOC: return infoMan.getTargetUnits(targetLoc, 100, false).size() == 0; // 100 magic num (also somewhere else)
 		default: return false;
 		}
 	}
@@ -303,6 +249,7 @@ public class CombatSquad extends Squad{
 		long updateAccum = 0;
 		long otherAccum = 0;*/
 		int x,y,nx,ny;
+		goalRangerDistance = 9999;
 		for(CombatUnit cu: combatUnits.values()){
 			cu.update(gc,(int) cu.myLoc.distanceSquaredTo(targetLoc));
 			combatUnits.put(cu.ID, cu);
@@ -328,7 +275,7 @@ public class CombatSquad extends Squad{
 						continue;
 					nx = x + dx[i];
 					ny = y + dy[i];
-					if(nx >= infoMan.width || nx<0 || ny >= infoMan.height || ny<0 || !infoMan.tiles[nx][ny].isWalkable)
+					if(nx >= infoMan.width || nx < 0 || ny >= infoMan.height || ny < 0 || !infoMan.tiles[nx][ny].isWalkable)
 						continue;
 					infoMan.tiles[nx][ny].updateContains(gc);
 					//otherAccum += System.nanoTime() - last;// use or remove
@@ -353,7 +300,7 @@ public class CombatSquad extends Squad{
 		Utils.log("enemiesAccum = " + enemiesAccum);
 		*/
 		
-		goalRangerDistance = (goalRangerDistance < 50 ? 50: goalRangerDistance);
+		goalRangerDistance = (goalRangerDistance < 50 ? 50: goalRangerDistance); // magic number?
 
 		doKnightMicro(knights,retreat,nav);
 		doMageMicro(mages,retreat,nav);
@@ -361,7 +308,7 @@ public class CombatSquad extends Squad{
 		infoMan.logTimeCheckpoint("rangers microed");
 		doHealerMicro(healers,retreat,nav);
 		infoMan.logTimeCheckpoint("healers microed");
-		//update each unit from heal, overcharge
+		//update each unit from heal, overcharge (for sniping)
 		TreeSet<CombatUnit> updatedRangers = new TreeSet<CombatUnit>(new AscendingStepsComp());
 		for(CombatUnit cu: rangers){
 			updatedRangers.add(combatUnits.get(cu.ID));
@@ -684,11 +631,10 @@ public class CombatSquad extends Squad{
 	}
 	
 	private CombatUnit rangerMoveAndAttack(CombatUnit cu) {
-		if(cu.health < MagicNumbers.RANGER_RUN_AWAY_HEALTH_THRESH)
-			return runAway(cu);
 		int x,y,nx,ny;
 		x = cu.myLoc.getX();
 		y = cu.myLoc.getY();
+		// TODO: don't attack if it's not worth it to move there
 		int toAttack = -1;
 		int bestIndex = -1;
 		double bestScore = -1000000;
@@ -699,7 +645,7 @@ public class CombatSquad extends Squad{
 			nx = x + dx[i];
 			ny = y + dy[i];
 			if(nx<0||nx>=infoMan.width||ny<0||ny>=infoMan.height)
-				continue;
+				continue; // informan onMap (lots)
 			Tile t = infoMan.tiles[nx][ny];
 			if(!t.isWalkable || t.containsUnit)
 				continue;
@@ -799,7 +745,6 @@ public class CombatSquad extends Squad{
 			return cu;
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].containsUnit = false;
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].myUnit = -1;
-		System.out.flush();
 		cu.canMove = false;
 		cu.myLoc = cu.myLoc.add(d);
 		//Utils.log(cu.ID + " moving to " + cu.myLoc.getX() + " " + cu.myLoc.getY());
@@ -829,7 +774,8 @@ public class CombatSquad extends Squad{
 	}
 
 	private boolean shouldWeRetreat(){
-		//TODO: make this better
+		// TODO: make this better
+		// put in strategy too
 		return numEnemyUnits > combatUnits.size() * MagicNumbers.AGGRESION_FACTOR;
 	}
 }

@@ -94,7 +94,6 @@ public class CombatManager{
 		boolean didSomething = false;
 		while(infoMan.unassignedUnits.size() > 0) {
 			didSomething = false;
-			boolean tryAgain = false;
 			infoMan.combatSquads.sort(Squad.byUrgency());
 			for(CombatSquad cs : infoMan.combatSquads) {
 				for(int i : infoMan.unassignedUnits) {
@@ -113,13 +112,12 @@ public class CombatManager{
 								continue;
 						}
 						cs.addUnit(a);
-						tryAgain = true; // why are both of these a thing?
 						didSomething = true;
 					}
-					if(tryAgain)
+					if(didSomething)
 						break;
 				}
-				if(tryAgain)
+				if(didSomething)
 					break;
 			}
 			if(!didSomething)

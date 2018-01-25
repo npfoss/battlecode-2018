@@ -30,7 +30,7 @@ public class Strategy{
     	gc = g;
     	determineInitalStrat();
     }
-	
+
 	private void determineInitalStrat() {
 		//TODO: make this depend on stuff
 		researchOrder = new UnitType[]{UnitType.Ranger,UnitType.Worker,UnitType.Rocket,UnitType.Healer,UnitType.Healer,UnitType.Healer,UnitType.Ranger,UnitType.Ranger};
