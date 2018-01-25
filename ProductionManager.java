@@ -1,7 +1,3 @@
-/****************/
-/* REFACTOR ME! */
-/****************/
-
 import bc.*;
 import java.util.ArrayList;
 
@@ -14,17 +10,16 @@ does NOT handle worker replication, WorkerManager does that
 public class ProductionManager{
     InfoManager infoMan;
     GameController gc;
-    MagicNumbers magicNums;
 
     public ProductionManager(){}
     
-    public ProductionManager(InfoManager im, GameController g, MagicNumbers mn){
-    	magicNums = mn;
+    public ProductionManager(InfoManager im, GameController g){
         infoMan = im;
         gc = g;
     }
 
     public void update(Strategy strat){
+    	//REFACTOR: actually do the calcs here and find the n highest urgency squads for n factories, assign units to factories
         // find squads with highest urgency and find factories to build them. etc junk
     	// TODO: stuff
     }
@@ -35,7 +30,7 @@ public class ProductionManager{
     		int id = factory.id();
     		//TODO: pick an intelligent direction
     		boolean didSomething = false;
-    		while(gc.unit(id).structureGarrison().size() >0) {
+    		while(gc.unit(id).structureGarrison().size() > 0) {
     			didSomething = false;
     			for(Direction dirToUnload : Utils.orderedDirections)
     				if(gc.canUnload(factory.id(), dirToUnload)) {
@@ -51,18 +46,20 @@ public class ProductionManager{
     		infoMan.rocketSquads.sort(Squad.byUrgency());
     		infoMan.workerSquads.sort(Squad.byUrgency());
     		Squad toFill = null;
-    		if(infoMan.combatSquads.size()>0 && infoMan.fighters.size() < magicNums.MAX_FIGHTER_COUNT)
+    		if(infoMan.combatSquads.size() > 0 && infoMan.fighters.size() < MagicNumbers.MAX_FIGHTER_COUNT)
     			toFill = infoMan.combatSquads.get(0);
-    		if(infoMan.rocketSquads.size()>0 && (toFill == null || infoMan.rocketSquads.get(0).urgency > toFill.urgency))
+    		if(infoMan.rocketSquads.size() > 0 && (toFill == null || infoMan.rocketSquads.get(0).urgency > toFill.urgency))
     			toFill = infoMan.rocketSquads.get(0);
     		//if(infoMan.workerSquads.size()>0 && (toFill == null || infoMan.workerSquads.get(0).urgency > toFill.urgency))
     			//toFill = infoMan.workerSquads.get(0);
     		UnitType toMake = null;
     		if(toFill != null && toFill.requestedUnits.size() > 0){
     			toMake = toFill.requestedUnits.get(0);
+    			//REFACTOR: make 3 a magic number
     			if(infoMan.workers.size() < 3)
     				toMake = UnitType.Worker;
     		}
+    		//REFACTOR: make 650 a magic number
     		if(toMake != null && gc.canProduceRobot(id,toMake) && gc.round() < 650) {
     			gc.produceRobot(id, toMake);
     		}
