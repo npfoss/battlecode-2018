@@ -176,12 +176,12 @@ public class Nav{
     
     public Direction dirToMoveEfficient(MapLocation start, MapLocation target){
         // TODO
-        return dirToMove(start, start.directionTowards(target));
+        return dirToMove(start, start.directionTo(target));
     }
     
     public Direction dirToMoveSafelyEfficient(MapLocation start, MapLocation target){
         // TODO
-        return dirToMoveSafely(start, start.directionTowards(target));
+        return dirToMoveSafely(start, start.directionTo(target));
     }
 
     public Direction dirToExplore(MapLocation loc){
