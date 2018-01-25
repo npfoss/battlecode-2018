@@ -1,7 +1,3 @@
-/****************/
-/* REFACTOR ME! */
-/****************/
-
 import bc.*;
 import java.lang.Math;
 import java.util.ArrayList;
@@ -189,6 +185,7 @@ public class Nav{
     }
 
     public Direction dirToExplore(MapLocation loc){
+    	//REFACTOR: actually use this in other files
         return dirToMoveSafely(loc, Utils.orderedDirections[(int)(Math.random()*8)]);
     }
 
@@ -214,9 +211,11 @@ public class Nav{
                                     && Utils.isDiagonalDirection(sign.direction)){
                                 // prefer to not move diagonaly if it's the same dist.
                                 // may prevent bottlenecks
-                                sign.stepsToDest = dist;
+                                //sign.stepsToDest = dist;
                                 sign.direction = Utils.oppositeDirection(dir);
-                            } else if (sign.stepsToDest > dist){
+                            } 
+                            //REFACTOR: isn't below unnecessary?
+                            else if (sign.stepsToDest > dist){
                                 sign.stepsToDest = dist;
                                 sign.direction = Utils.oppositeDirection(dir);
                                 nextLocs.add(neighbor);
@@ -234,6 +233,7 @@ public class Nav{
         }
     }
 
+    //REFACTOR: why is this a thing?
     public MapLocation getNextMarsDest(){
         return infoMan.getNextMarsDest();
     }

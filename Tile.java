@@ -1,7 +1,3 @@
-/****************/
-/* REFACTOR ME! */
-/****************/
-
 import bc.*;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -187,6 +183,6 @@ public class Tile{
         if (!enemiesUpdated){
             updateEnemies(infoMan.gc);
         }
-        return 1.0 * possibleDamage;
+        return possibleDamage;
     }
 }
