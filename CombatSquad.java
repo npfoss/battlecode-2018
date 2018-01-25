@@ -9,11 +9,13 @@ import java.util.TreeSet;
 import java.util.Comparator;
 import java.util.HashMap;
 
+// oops missed a description... help
+
 public class CombatSquad extends Squad{
 
 	//keep track of units into two groups: those with the main swarm and those separated from it
 	HashMap<Integer,CombatUnit> combatUnits; //ID to CombatUnit
-	//ArrayList<Integer> separatedUnits;
+	//ArrayList<Integer> separatedUnits;// use or remove
 	MapLocation swarmLoc;
 	int numEnemyUnits;
 	int goalRangerDistance;
@@ -26,7 +28,7 @@ public class CombatSquad extends Squad{
 	public CombatSquad(GameController g, InfoManager im, MagicNumbers mn, int[] ucg) {
 		super(im);
 		combatUnits = new HashMap<Integer,CombatUnit>();
-		//separatedUnits = new ArrayList<Integer>();
+		//separatedUnits = new ArrayList<Integer>();// use or remove
 		magicNums = mn;
 		unitCounts = new int[]{0,0,0,0}; //knight,mage,ranger,healer
 		unitCompGoal = ucg;
@@ -60,7 +62,7 @@ public class CombatSquad extends Squad{
 	
 	public void removeUnit(int id){
 		super.removeUnit(id);
-		//if(separatedUnits.contains(id))
+		//if(separatedUnits.contains(id))// use or remove
 			//separatedUnits.remove(separatedUnits.indexOf(id));
 		removeCombatUnit(id);
 		update();
@@ -78,7 +80,7 @@ public class CombatSquad extends Squad{
 		case Ranger:unitCounts[2]--; break;
 		case Healer:unitCounts[3]--; 
 		}
-		/*
+		/*// use or remove
 		CombatUnit toRemove  = new CombatUnit();
 		boolean remove = false;
 		TreeSet<CombatUnit> newCombatUnits = new TreeSet<CombatUnit>(new AscendingStepsComp());
@@ -103,7 +105,7 @@ public class CombatSquad extends Squad{
 	}
 
 	public void update(){
-		//Utils.log("hi " + objective);
+		//Utils.log("hi " + objective);// probably don't need to leave this here
 		if(objective == Objective.EXPLORE){
 			requestedUnits.clear();
 			requestedUnits.add(UnitType.Ranger);
@@ -175,7 +177,7 @@ public class CombatSquad extends Squad{
 			infoMan.logTimeCheckpoint("done with CombatSquad move");
 			return;
 		}
-		/*
+		/* use or remove
 		if(combatUnits.size()==0){
 			for(int id: separatedUnits){
 				Unit u = gc.unit(id);
@@ -223,7 +225,7 @@ public class CombatSquad extends Squad{
 		}
 		update();
 		infoMan.logTimeCheckpoint("done with CombatSquad move");
-		/*
+		/* USE OR REMOVE
 		for(int id : units) {
 			Unit fighter = gc.unit(id);
 			if(fighter.location().isInSpace() || fighter.location().isInGarrison())
@@ -263,7 +265,7 @@ public class CombatSquad extends Squad{
 		}
 	}
 	
-	/*
+	/* use or remove
 	private void moveToSwarm(Nav nav){
 		//TODO: micro more if you see enemies on the way
 		for(int uid: separatedUnits){
@@ -301,7 +303,7 @@ public class CombatSquad extends Squad{
 		TreeSet<CombatUnit> mages = new TreeSet<CombatUnit>(new AscendingStepsComp());
 
 		//update combat units and tiles near them
-		/*long last = System.nanoTime();
+		/*long last = System.nanoTime(); // use or remove
 		long enemiesAccum = 0;
 		long updateAccum = 0;
 		long otherAccum = 0;*/
@@ -311,15 +313,15 @@ public class CombatSquad extends Squad{
 			combatUnits.put(cu.ID, cu);
 			if(cu.notOnMap)
 				continue;
-			//updateAccum += System.nanoTime() - last;
+			//updateAccum += System.nanoTime() - last; // use or remove
 			//last = System.nanoTime();
 			x = cu.myLoc.getX();
 			y = cu.myLoc.getY();
 			infoMan.tiles[x][y].updateContains(gc);
-			//otherAccum += System.nanoTime() - last;
+			//otherAccum += System.nanoTime() - last;// use or remove
 			//last = System.nanoTime();
 			infoMan.tiles[x][y].updateEnemies(gc);
-			//enemiesAccum += System.nanoTime() - last;
+			//enemiesAccum += System.nanoTime() - last;// use or remove
 			//last = System.nanoTime();
 			if(cu.type == UnitType.Ranger && infoMan.tiles[x][y].distFromNearestHostile < goalRangerDistance)
 				goalRangerDistance = infoMan.tiles[x][y].distFromNearestHostile;
@@ -334,10 +336,10 @@ public class CombatSquad extends Squad{
 					if(nx >= infoMan.width || nx<0 || ny >= infoMan.height || ny<0 || !infoMan.tiles[nx][ny].isWalkable)
 						continue;
 					infoMan.tiles[nx][ny].updateContains(gc);
-					//otherAccum += System.nanoTime() - last;
+					//otherAccum += System.nanoTime() - last;// use or remove
 					//last = System.nanoTime();
 					infoMan.tiles[nx][ny].updateEnemies(gc);
-					//enemiesAccum += System.nanoTime() - last;
+					//enemiesAccum += System.nanoTime() - last;// use or remove
 					//last = System.nanoTime();
 				}
 			}
@@ -350,7 +352,7 @@ public class CombatSquad extends Squad{
 		}
 		
 		infoMan.logTimeCheckpoint("units and tiles updated");
-		/*
+		/*// use or remove
 		Utils.log("updateAccum = " + updateAccum);
 		Utils.log("otherAccum = " + otherAccum);
 		Utils.log("enemiesAccum = " + enemiesAccum);
@@ -489,7 +491,7 @@ public class CombatSquad extends Squad{
 	private CombatUnit performOvercharge(CombatUnit cu, boolean retreat, Nav nav) {
 		TreeSet<CombatUnit> overchargees = getUnitsToHeal(cu.myLoc);
 		boolean overchargeSomeone = false;
-		CombatUnit tO = new CombatUnit();
+		CombatUnit tO = new CombatUnit(); // t0 is not very descriptive
 		double bestScore = -10000;
 		double score = 0;
 		for(CombatUnit o: overchargees){
@@ -510,7 +512,7 @@ public class CombatSquad extends Squad{
 			gc.overcharge(cu.ID, tO.ID);
 			cu.canOvercharge = false;
 			tO.update(gc, nav.optimalStepsTo(tO.myLoc, targetLoc));
-			//removeCombatUnit(toO);
+			//removeCombatUnit(toO);// use or remove
 			TreeSet<CombatUnit> temp = new TreeSet<CombatUnit>(new AscendingStepsComp());
 			temp.add(tO);
 			int x = tO.myLoc.getX();
@@ -530,12 +532,12 @@ public class CombatSquad extends Squad{
 			case Mage: doMageMicro(temp,retreat,nav); break;
 			default:
 			}
-			//tO = combatUnits.get(tO.ID);
+			//tO = combatUnits.get(tO.ID); // use or remove
 			//tO.update(gc, nav.optimalStepsTo(tO.myLoc, targetLoc));
 			combatUnits.put(tO.ID, tO);
 			//System.out.println("adding " + temp.first().ID + " 3");
 			//System.out.flush();
-			//combatUnits.add(temp.first());
+			//combatUnits.add(temp.first());// use or remove
 		}
 		return cu;
 	}
@@ -558,7 +560,7 @@ public class CombatSquad extends Squad{
 		if(toHeal != -1){
 			gc.heal(cu.ID, toHeal);
 			cu.canAttack = false;
-			//removeCombatUnit(toHeal);
+			//removeCombatUnit(toHeal);// use or remove
 			switch((int)(gc.researchInfo().getLevel(UnitType.Healer))){
 			case 0: tH.health += 10; break;
 			case 1: tH.health += 12; break;
@@ -567,12 +569,12 @@ public class CombatSquad extends Squad{
 			combatUnits.put(tH.ID, tH);
 			//System.out.println("adding " + toHeal + " 4");
 			//System.out.flush();
-			//combatUnits.add(tH);
+			//combatUnits.add(tH);// use or remove
 		}
 		return cu;
 	}
 	
-	/* not sure if it's actually faster :(
+	/* not sure if it's actually faster :(// use or remove
 	private static final int[] healdx = {0,0,0,0,0,1,1,1,1,1,1,2,2,2,2,2,2,3,3,3,3,3,4,4,4,4,5,5,5,
 										 0,0,0,0,0,1,1,1,1,1,2,2,2,2,2,3,3,3,3,4,4,4,5,5,
 										 -1,-1,-1,-1,-1,-1,-2,-2,-2,-2,-2,-2,-3,-3,-3,-3,-3,-4,-4,-4,-4,-5,-5,-5,
@@ -739,7 +741,7 @@ public class CombatSquad extends Squad{
 			return cu;
 		}
 		//otherwise do normal move
-		//Direction d = nav.dirToMove(cu.myLoc, targetLoc);
+		//Direction d = nav.dirToMove(cu.myLoc, targetLoc);// use or remove
 		//cu = moveAndUpdate(cu,d);
 		//return cu;
 		Direction d = indexToDirection(bestNormalIndex);
@@ -798,7 +800,7 @@ public class CombatSquad extends Squad{
 	}
 
 	private CombatUnit moveAndUpdate(CombatUnit cu, Direction d){
-		if(d==Direction.Center)
+		if(d == Direction.Center)
 			return cu;
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].containsUnit = false;
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].myUnit = -1;
@@ -835,9 +837,9 @@ public class CombatSquad extends Squad{
 		//TODO: make this better
 		return numEnemyUnits > combatUnits.size() * magicNums.AGGRESION_FACTOR;
 	}
-
 }
 
+// use or remove
 /* Below lies too complicated micro
  * 
  *

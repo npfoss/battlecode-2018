@@ -14,11 +14,12 @@ data structure for storing unit info.
 basically a copy of Unit augmented for our needs
 like TargetUnit, but for friendlies
 */
+// can this be combined with target unit?
 public class CombatUnit {
-	int ID;
+	int ID; // technically shouldn't be captialized right?
 	int damage;
 	long health;
-	int dependencyID;
+	int dependencyID; // what does this mean?
 	boolean canAttack;
 	boolean canMove;
 	boolean canSnipe;
@@ -30,7 +31,7 @@ public class CombatUnit {
 	long maxHealth;
 	boolean notOnMap;
 	
-	public CombatUnit(){
+	public CombatUnit(){ // does this need to be here?
 		
 	}
 	
@@ -46,7 +47,7 @@ public class CombatUnit {
 		type = ut;
 		stepsFromTarget = sft;
 		switch(type){
-		case Ranger: maxHealth = 200; break;
+		case Ranger: maxHealth = 200; break; // should be magic numbers in case they change
 		case Knight: maxHealth = 250; break;
 		case Mage: maxHealth = 80; break;
 		case Healer: maxHealth = 100;
@@ -79,7 +80,7 @@ public class CombatUnit {
 		return ID == cu.ID;
 	}
 	
-	/*
+	/* // use or remove
 	public void addOption(int opt, Tile tile) {
 		if(attackOptions.containsKey(opt)){
 			ArrayList<Tile> alt = attackOptions.get(opt);
@@ -92,5 +93,4 @@ public class CombatUnit {
 			attackOptions.put(opt, alt);
 		}
 	}*/
-	
 }
