@@ -1,7 +1,3 @@
-/****************/
-/* REFACTOR ME! */
-/****************/
-
 import bc.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,6 +58,8 @@ public class InfoManager {
     Tile[][] tiles;
     int marsx, marsy; // TODO: don't use this system, it sucks
     ArrayList<MapLocation> placesWeveSentTo;
+    
+    int[] researchLevels;
 
 	public InfoManager(GameController g, MagicNumbers mn) {
 		gc = g;
@@ -100,6 +98,8 @@ public class InfoManager {
         marsy = 0;
         builtRocket = true;
         placesWeveSentTo = new ArrayList<MapLocation>();
+        
+        researchLevels = new int[]{0,0,0,0,0,0}; //worker,rocket,knight,mage,ranger,healer
 	}
 
 	public void update(Strategy strat) {

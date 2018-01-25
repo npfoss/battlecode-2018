@@ -1,7 +1,3 @@
-/****************/
-/* REFACTOR ME! */
-/****************/
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -10,6 +6,17 @@ import java.util.TreeSet;
 import bc.*;
 
 public class Utils{
+	public static int typeToInd(UnitType ut){
+		switch(ut){
+			case Worker: return 0;
+			case Rocket: return 1;
+			case Knight: return 2;
+			case Mage  : return 3;
+			case Ranger: return 4;
+			default    : return 5;
+		}
+	}
+	
     public static Direction[] orderedDirections =
         {Direction.East, Direction.Southeast, Direction.South, Direction.Southwest,
          Direction.West, Direction.Northwest, Direction.North, Direction.Northeast};
