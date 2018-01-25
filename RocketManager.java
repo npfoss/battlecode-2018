@@ -1,7 +1,3 @@
-/****************/
-/* REFACTOR ME! */
-/****************/
-
 import bc.*;
 import java.util.ArrayList;
 
@@ -41,6 +37,7 @@ public class RocketManager{
         for(int i : toRemove){
             infoMan.rocketSquads.remove(i);
         }
+        //TODO: add these to unassigned units since InfoMan has already gone.
 
         // find new (unassigned) rockets and make squads
         for (Unit rocket : infoMan.newRockets){
@@ -52,6 +49,7 @@ public class RocketManager{
 
         // udpate() each squad so we know what units to find
         // and poach nearby units if reasonable
+        // TODO: if its near a flood or launch time take all unitTypes? not just requested ones.
         for (RocketSquad rs : infoMan.rocketSquads){
             rs.update(strat.rocketComposition);
 

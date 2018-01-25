@@ -1,7 +1,3 @@
-/****************/
-/* REFACTOR ME! */
-/****************/
-
 import bc.*;
 
 public class MagicNumbers{

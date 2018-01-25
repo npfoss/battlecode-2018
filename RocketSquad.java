@@ -1,7 +1,3 @@
-/****************/
-/* REFACTOR ME! */
-/****************/
-
 import bc.*;
 import java.util.ArrayList;
 
@@ -14,6 +10,7 @@ NOTE: infoMan decides destination loc
 
 TODO:
 -improve launch trigger (take into account orbital stuff, coordinated launch from RocketManager)
+//RocketSquads should be deleted as soon as they are in space TODO
 */
 public class RocketSquad extends Squad {
 
