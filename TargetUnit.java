@@ -10,6 +10,7 @@ import bc.*;
 /*
 data structure for keeping track of enemy units
 */
+// can this be combined with ComabtUnit? we should call and talk about it
 public class TargetUnit {
 	int ID;
 	long health;
@@ -48,10 +49,7 @@ public class TargetUnit {
 	public boolean equals(Object o){
 		if(!(o instanceof TargetUnit))
 			return false;
-		
-		TargetUnit tu = (TargetUnit)o;
-		
-		return ID == tu.ID;
+		return ID == ((TargetUnit)o).ID;
 	}
 	
 	public void updateSnipePriority(MapLocation swarmLoc){

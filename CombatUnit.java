@@ -17,7 +17,10 @@ like TargetUnit, but for friendlies
 // can this be combined with target unit?
 public class CombatUnit {
 	int ID; // technically shouldn't be captialized right?
-	int damage;
+	int damage; // unused?
+	UnitType type;
+	long maxHealth;
+
 	long health;
 	int dependencyID; // what does this mean?
 	boolean canAttack;
@@ -25,10 +28,8 @@ public class CombatUnit {
 	boolean canSnipe;
 	boolean canOvercharge;
 	int stepsFromTarget;
-	int distFromNearestHostile;
+	int distFromNearestHostile; // unused?
 	MapLocation myLoc;
-	UnitType type;
-	long maxHealth;
 	boolean notOnMap;
 	
 	public CombatUnit(){ // does this need to be here?
@@ -47,37 +48,35 @@ public class CombatUnit {
 		type = ut;
 		stepsFromTarget = sft;
 		switch(type){
-		case Ranger: maxHealth = 200; break; // should be magic numbers in case they change
-		case Knight: maxHealth = 250; break;
-		case Mage: maxHealth = 80; break;
-		case Healer: maxHealth = 100;
+			case Ranger: maxHealth = 200; break; // should be magic numbers in case they change the specs
+			case Knight: maxHealth = 250; break;
+			case Mage: maxHealth = 80; break;
+			case Healer: maxHealth = 100;
 		}
 		notOnMap = true;
 	}
 	
 	public void update(GameController gc, int sft){
-		//System.out.println("updating " + ID);
-		//System.out.flush();
 		Unit u = gc.unit(ID);
 		if(notOnMap && u.location().isOnMap()){
 			myLoc = u.location().mapLocation();
 			notOnMap = false;
 		}
+		// should there be a check for being on the map here? you can't attack and stuff if not on the map
 		stepsFromTarget = sft;
 		health = u.health();
 		canAttack = u.attackHeat() < 10 && !(type == UnitType.Ranger && u.rangerIsSniping() != 0);
 		canMove = u.movementHeat() < 10 && !(type == UnitType.Ranger && u.rangerIsSniping() != 0);
 		canSnipe = (gc.researchInfo().getLevel(UnitType.Ranger) == 3 && type == UnitType.Ranger && u.abilityHeat() < 10 && u.rangerIsSniping() == 0);
 		canOvercharge = (gc.researchInfo().getLevel(UnitType.Healer) == 3 && type == UnitType.Healer && u.abilityHeat() < 10);
+		// should you be updating distFromNearestHostile here too?
+		// technically damage could change too
 	}
 	
 	public boolean equals(Object o){
 		if(!(o instanceof CombatUnit))
 			return false;
-		
-		CombatUnit cu = (CombatUnit)o;
-		
-		return ID == cu.ID;
+		return ID == ((CombatUnit)o).ID;
 	}
 	
 	/* // use or remove
