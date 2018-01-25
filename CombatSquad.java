@@ -21,8 +21,8 @@ public class CombatSquad extends Squad{
 	int goalRangerDistance;
 	int[] unitCounts;
 	int[] unitCompGoal;
-	final int[] dx = {-1,-1,-1,0,0,0,1,1,1};
-	final int[] dy = {-1,0,1,-1,0,1,-1,0,1};
+	final int[] dx = {-1,-1,-1, 0,0,0, 1,1,1};
+	final int[] dy = {-1, 0, 1,-1,0,1,-1,0,1};
 
 	public CombatSquad(GameController g, InfoManager im, int[] ucg) {
 		super(im);
@@ -30,8 +30,6 @@ public class CombatSquad extends Squad{
 		//separatedUnits = new ArrayList<Integer>();// use or remove
 		unitCounts = new int[]{0,0,0,0}; //knight,mage,ranger,healer
 		unitCompGoal = ucg;
-		//System.out.println("ucg = " + ucg[0] + " " + ucg[1] + " " + ucg[2] + " " + ucg[3]);
-		//System.out.flush();
 	}
 	
 	public void addUnit(Unit u){
@@ -103,7 +101,6 @@ public class CombatSquad extends Squad{
 	}
 
 	public void update(){
-		//Utils.log("hi " + objective);// probably don't need to leave this here
 		if(objective == Objective.EXPLORE){
 			requestedUnits.clear();
 			requestedUnits.add(UnitType.Ranger);
@@ -113,14 +110,14 @@ public class CombatSquad extends Squad{
 			urgency = 0;
 			return;
 		}
-		if(targetLoc == null)
+		if(targetLoc == null){
+			// should it set the objective to NONE in this case or something?
 			return;
+		}
 		swarmLoc = targetLoc;
 		if(combatUnits.size() > 0)
 			swarmLoc = Utils.averageMapLocation(gc, combatUnits.values());
 		numEnemyUnits = infoMan.getTargetUnits(swarmLoc, MagicNumbers.ENEMY_UNIT_DIST_THRESHOLD, false).size();
-		//System.out.println("ru.size = " + requestedUnits.size());
-		//System.out.flush();
 		if(infoMan.myPlanet == Planet.Mars){
 			requestedUnits.clear();
 			requestedUnits.add(UnitType.Ranger);
@@ -133,10 +130,10 @@ public class CombatSquad extends Squad{
 		if(units.size() == 0)
 			urgency = 100;
 		else
-			urgency = (numEnemyUnits * 2 - units.size() + 15) * 10;
+			urgency = (numEnemyUnits * 2 - units.size() + 15) * 10; // TODO: tweak this formula, probably put it in strategy
 		if(urgency < 0)
 			urgency = 0;
-		if(urgency>100)
+		if(urgency > 100)
 			urgency = 100;
 	}
 
@@ -144,10 +141,10 @@ public class CombatSquad extends Squad{
 		int bestIndex = 0;
 		int bestScore = 10000;
 		for(int i = 0; i < 4; i++){
-			if(unitCompGoal[i]==0)
+			if(unitCompGoal[i] == 0)
 				continue;
-			int score = unitCounts[i]/unitCompGoal[i];
-			if(score<bestScore){
+			int score = unitCounts[i] / unitCompGoal[i];
+			if(score < bestScore){
 				bestScore = score;
 				bestIndex = i;
 			}
@@ -163,15 +160,15 @@ public class CombatSquad extends Squad{
 
 	public void move(Nav nav){
 		//reassign separated units to swarm if appropriate
-		if(units.size()==0)
+		if(units.size() == 0)
 			return;
-		//System.out.println("cs here");
+
 		if(objective == Objective.EXPLORE){
 			infoMan.logTimeCheckpoint("start of explore move");
-			Utils.log("swarm size = " + units.size() + " obj = " + objective + " urgency = " + urgency);
+			// Utils.log("swarm size = " + units.size() + " obj = " + objective + " urgency = " + urgency); //does this still need to be here?
 			explore(nav);
 			if(infoMan.combatSquads.size() > 1)
-				objective = Objective.NONE;
+				objective = Objective.NONE; // wait what?
 			infoMan.logTimeCheckpoint("done with CombatSquad move");
 			return;
 		}

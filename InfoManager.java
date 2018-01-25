@@ -21,6 +21,7 @@ public class InfoManager {
 	GameController gc;
 	Comms comms;
 	Planet myPlanet;
+    Team myTeam;
 	MagicNumbers magicNums;
 	int height, width;
 	long lastCheckpoint;
@@ -74,6 +75,7 @@ public class InfoManager {
 		combatSquads = new ArrayList<CombatSquad>();
 
 		myPlanet = gc.planet();
+        myTeam = gc.team();
 
 		enemyRockets = new HashSet<Integer>();
 		enemyWorkers = new HashSet<Integer>();
@@ -111,7 +113,7 @@ public class InfoManager {
 		// called at the beginning of each turn
 		comms.update();
 
-		rockets = new ArrayList<Unit>();
+		rockets = new ArrayList<Unit>(); // couldn't these be clear()ed instead?
 		workers = new ArrayList<Unit>();
 		factories = new ArrayList<Unit>();
 		fighters = new ArrayList<Unit>();
@@ -129,12 +131,12 @@ public class InfoManager {
             if(unit.location().isInSpace()){
                 continue;
             }
-			if(unit.team() == gc.team()){
+			if(unit.team() == myTeam){
 				ids.add(unit.id());
 				switch (unit.unitType()) {
 				case Worker:
 					workers.add(unit);
-					if (!isInSquads1(unit, workerSquads) && !isInSquads2(unit, rocketSquads))
+					if (!isInSquads(unit))
 						unassignedUnits.add(unit.id());
 					break;
 				case Factory:
@@ -142,24 +144,19 @@ public class InfoManager {
 					break;
 				case Rocket:
 					rockets.add(unit);
-                    Utils.log("THERE IS A ROCKET!");
-					if (!isInSquads2(unit, rocketSquads))
+					if (!isInSquads(unit))
 						newRockets.add(unit);
 					break;
 				default:
-					//if(myPlanet == Planet.Mars)
-					//	Utils.log("wow");
 					fighters.add(unit);
-					if (!isInSquads3(unit, combatSquads) && !isInSquads2(unit,rocketSquads)){
-						//if(myPlanet == Planet.Mars)
-						//	Utils.log("no way");
+					if (!isInSquads(unit)){
 						unassignedUnits.add(unit.id());
 					}
 					break;
 				}
 			} else {
-				addEnemyUnit(unit.id(),unit.unitType());
-				enemyLastSeen.put(unit.id(),(int) gc.round());
+				addEnemyUnit(unit.id(), unit.unitType());
+				enemyLastSeen.put(unit.id(), (int) gc.round());
 				if(!unit.location().isOnMap())
 					continue;
 				long defense = 0;
@@ -171,8 +168,8 @@ public class InfoManager {
 					damage = unit.damage();
 					range = unit.attackRange();
 				}
-				TargetUnit tu = new TargetUnit(unit.id(),unit.health(),damage,
-						unit.location().mapLocation(),unit.unitType(),range,defense, this);
+				TargetUnit tu = new TargetUnit(unit.id(), unit.health(), damage,
+						unit.location().mapLocation(), unit.unitType(), range, defense, this);
 				targetUnits.put(unit.id(), tu);
 			}
 		}
@@ -307,7 +304,7 @@ public class InfoManager {
         return null;
     }
 
-    public Squad getSquad2(Unit unit, ArrayList<RocketSquad> squad){
+    public Squad getSquad1(Unit unit, ArrayList<WorkerSquad> squad){
         for (Squad s : squad) {
             for (int uid : s.units) {
                 if (unit.id() == uid){
@@ -317,7 +314,7 @@ public class InfoManager {
         }
         return null;
     }
-    public Squad getSquad1(Unit unit, ArrayList<WorkerSquad> squad){
+    public Squad getSquad2(Unit unit, ArrayList<RocketSquad> squad){
         for (Squad s : squad) {
             for (int uid : s.units) {
                 if (unit.id() == uid){

@@ -28,15 +28,14 @@ public class CombatManager{
 			return;
 		VecUnit vu = gc.startingMap(infoMan.myPlanet).getInitial_units();
 		ArrayList<MapLocation> enemyStartingLocs = new ArrayList<MapLocation>();
-		for(int i=0; i<vu.size(); i++){
+		for(int i = 0; i < vu.size(); i++){
 			Unit u = vu.get(i);
 			if(u.team() == gc.team())
 				continue;
 			MapLocation loc = u.location().mapLocation();
-			addCombatSquad(loc,Objective.ATTACK_LOC,strat);
+			addCombatSquad(loc, Objective.ATTACK_LOC, strat);
 		}
 	}
-
 
 	// assign unassigned fighters
 	// shuffle fighter squads (and add to rocket squads if need be)
@@ -45,11 +44,6 @@ public class CombatManager{
 	// remember, the squads will move on their own after you update everything
 	public void update(Strategy strat){
 		// set units whose objective is NONE (meaning they completed it) to unassignedUnits
-		//Utils.log("sup");
-		
-		if(infoMan.myPlanet == Planet.Mars)
-			Utils.log("There are " + infoMan.combatSquads.size() + " cs's.");
-		
 		ArrayList<CombatSquad> toRemove = new ArrayList<CombatSquad>();
 		for(CombatSquad cs: infoMan.combatSquads){
 			if(cs.objective == Objective.NONE){
@@ -68,48 +62,48 @@ public class CombatManager{
 		//defend factories and rockets
 		for(Unit u: infoMan.factories){
 			MapLocation ml = u.location().mapLocation();
-			if(infoMan.getTargetUnits(ml, 100, true).size() > 0){
-				addCombatSquad(ml,Objective.DEFEND_LOC,strat);
+			if(infoMan.getTargetUnits(ml, 100, true).size() > 0){ // 100 should be magic number
+				addCombatSquad(ml, Objective.DEFEND_LOC, strat);
 			}
 		}
 		
 		if(infoMan.myPlanet == Planet.Earth){
 			for(Unit u: infoMan.rockets){
 				MapLocation ml = u.location().mapLocation();
-				if(infoMan.getTargetUnits(ml, 100, true).size() > 0){
-					addCombatSquad(ml,Objective.DEFEND_LOC,strat);
+				if(infoMan.getTargetUnits(ml, 100, true).size() > 0){ // 100 should be magic number
+					addCombatSquad(ml, Objective.DEFEND_LOC, strat);
 				}
 			}
 		}
 		
-		if((infoMan.combatSquads.size()==1 && infoMan.combatSquads.get(0).objective == Objective.EXPLORE) || infoMan.myPlanet == Planet.Mars){
+		// make more squads as necessary
+		if(infoMan.combatSquads.size() == 0) {
+			addCombatSquad(null, Objective.EXPLORE, strat);
+		}	
+
+		if((infoMan.combatSquads.size() == 1 && infoMan.combatSquads.get(0).objective == Objective.EXPLORE)
+				|| infoMan.myPlanet == Planet.Mars){
 			//Utils.log("here");
 			for(TargetUnit tu: infoMan.targetUnits.values()){
 				//Utils.log("sup");
-				addCombatSquad(tu.myLoc,Objective.ATTACK_LOC, strat);
+				addCombatSquad(tu.myLoc, Objective.ATTACK_LOC, strat);
 			}
 		}
-		
-		if(infoMan.combatSquads.size() == 0) {
-			CombatSquad cs = new CombatSquad(gc,infoMan,strat.combatComposition);
-			cs.objective = Objective.EXPLORE;
-			cs.update();
-			infoMan.combatSquads.add(cs);
-		}
 
+		// now deal with unassigned units
 		boolean didSomething = false;
 		while(infoMan.unassignedUnits.size() > 0) {
-			//Utils.log("here2");
 			didSomething = false;
-			infoMan.combatSquads.sort(Squad.byUrgency());
 			boolean tryAgain = false;
+			infoMan.combatSquads.sort(Squad.byUrgency());
 			for(CombatSquad cs : infoMan.combatSquads) {
 				for(int i : infoMan.unassignedUnits) {
 					Unit a = gc.unit(i);
 					if(cs.requestedUnits.contains(a.unitType())) {
-						Utils.log("adding to cs maybe");
-						if(cs.targetLoc != null && 
-						((!turnUnassigned.containsKey(a.id()) && gc.round() == 1) || (turnUnassigned.containsKey(a.id()) && turnUnassigned.get(a.id()) == gc.round()))){
+						if(cs.targetLoc != null
+								&& ((!turnUnassigned.containsKey(a.id()) && gc.round() == 1)
+									|| (turnUnassigned.containsKey(a.id()) && turnUnassigned.get(a.id()) == gc.round()))){
+									// what the point of all this unassigned checking stuff?
 							MapLocation ml = cs.targetLoc;
 							if(a.location().isOnMap())
 								ml = a.location().mapLocation();
@@ -118,11 +112,8 @@ public class CombatManager{
 							if(!infoMan.isReachable(cs.targetLoc, ml))
 								continue;
 						}
-						//Utils.log("adding to cs");
-						//if(cs.targetLoc != null)
-							//Utils.log("targetLoc = " + cs.targetLoc);
 						cs.addUnit(a);
-						tryAgain = true;
+						tryAgain = true; // why are both of these a thing?
 						didSomething = true;
 					}
 					if(tryAgain)
@@ -142,19 +133,15 @@ public class CombatManager{
 		for(CombatSquad cs: infoMan.combatSquads){
 			if(cs.objective != Objective.EXPLORE
 					&& (targetLoc.distanceSquaredTo(cs.targetLoc) < MagicNumbers.SQUAD_SEPARATION_THRESHOLD
-			   				|| targetLoc.distanceSquaredTo(cs.swarmLoc) < 75))
+			   				|| targetLoc.distanceSquaredTo(cs.swarmLoc) < 75)) // what's this for exactly? // also magic number
 				return;
 		}
-		CombatSquad cs = new CombatSquad(gc,infoMan,strat.combatComposition);
+		CombatSquad cs = new CombatSquad(gc, infoMan, strat.combatComposition);
 		cs.objective = obj;
 		cs.targetLoc = targetLoc;
 		cs.update();
 		Utils.log("adding cs");
-		//Utils.log("targetLoc = " + targetLoc);
 		infoMan.combatSquads.add(cs);
-		//for(CombatSquad cs2: infoMan.combatSquads){
-		//	Utils.log("size = " + cs2.units.size());
-		//}
 	}
 
 }

@@ -143,7 +143,7 @@ public class Utils{
     	return new MapLocation(gc.planet(),x/units.size(), y/units.size());
     }
     
-    public static boolean isTypeHostile(UnitType ut){
+    public static boolean isTypeHostile(UnitType ut){ // should healers be included?
     	return ut == UnitType.Knight || ut == UnitType.Ranger || ut == UnitType.Mage;
     }
     

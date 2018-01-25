@@ -22,7 +22,7 @@ public class MagicNumbers{
     static int MAX_DIST_THEY_COULD_HIT = 50; // UNUSED, delete pls
 
     // for tweaking CombatManager
-    static int SQUAD_SEPARATION_THRESHOLD = 50;
+    static int SQUAD_SEPARATION_THRESHOLD = 50; // this seems a little high to me
 
     // for tweaking CombatSquad
     static int ENEMY_UNIT_DIST_THRESHOLD = 200;
