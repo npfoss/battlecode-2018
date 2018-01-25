@@ -1,7 +1,3 @@
-/****************/
-/* REFACTOR ME! */
-/****************/
-
 import bc.*;
 import java.util.ArrayList;
 /*
@@ -13,6 +9,13 @@ controlls worker replication (based on squad urgency)
 
 TODO: delete/reorganize squads more
 --have a single 'mining' squad which doesn't stick together, is just an idle pool basically
+ */
+
+/* Overall refactor thoughts:
+ * - remove squads which have objective set to none
+ * - add control of worker replication
+ * - always have one mining squad which workers join if they can't do anything else
+ * - cooperate with prod manager to not make new things when we are about to build a new factory
  */
 public class WorkerManager{
 	InfoManager infoMan;
@@ -31,6 +34,8 @@ public class WorkerManager{
 	}
 
 	public boolean okayToBuild(MapLocation loc) {
+		//REFACTOR: replace gc calls by using tiles for everything
+		
 		if(!gc.startingMap(Planet.Earth).onMap(loc))
 			return false;
 
@@ -73,6 +78,8 @@ public class WorkerManager{
 	public void update(Strategy strat,Nav nav){
 		//Earth and Mars should probably do different things
 		if(gc.planet() == Planet.Earth) {
+			//REFACTOR: change the default squad to mining instead of building?
+			
 			// create new squads if necessary
 			if(infoMan.workerSquads.size()==0) {
 				WorkerSquad ws = new WorkerSquad(gc,infoMan);
@@ -81,7 +88,8 @@ public class WorkerManager{
 				infoMan.workerSquads.add(ws);
 				Utils.log("creating new ws 1");
 			}
-
+			
+			//REFACTOR: remove requiremenet of being within a certain distance, plus making new squads for no reason?
 			// assign unassigned workers to build.
 			boolean didSomething = false;
 			while(infoMan.unassignedUnits.size() > 0) {
@@ -135,6 +143,7 @@ public class WorkerManager{
 				if(!didSomething)
 					break;
 			}
+			//REFACTOR: possibly choose just one place to build a factory and make the others mine?
 			if(gc.round() == 1) {
 				//Pick a place to build the first factory
 				if(true) {
@@ -189,17 +198,16 @@ public class WorkerManager{
 
 				}
 			}
-			// TODO: VERY TEMPORARY
+
 			if (gc.round() == strat.nextRocketBuild){
 				// rocket!
 				produceRocket();
 			}
 
-			//TODO intelligently pick locations for the next factories
-			//System.out.println("My objective is: " + ((infoMan.workerSquads.get(0).objective == Objective.BUILD) ? "Building" : "NONE"));
-			//System.out.println(infoMan.factories.size());
+			//REFACTOR: build in opposite direction of nearest hostile instead of considering all possible locations?
+			//REFACTOR: remove squads with objective set to none?
 
-			if(infoMan.factories.size() < 4 && gc.karbonite() > 100) {
+			if(infoMan.factories.size() < strat.maxFactories && gc.karbonite() >= MagicNumbers.FACTORY_COST) {
 				for(WorkerSquad ws : infoMan.workerSquads) {
 					if((ws.objective == Objective.NONE  || ws.objective == Objective.MINE) && ws.units.size() > 0) {
 						// System.out.println("Trying to build a third factory");
@@ -227,12 +235,17 @@ public class WorkerManager{
 					}
 				}
 			}
+			
+			//REFACTOR: remove squads with objective set to none?
+			
+			
 			for(WorkerSquad ws : infoMan.workerSquads) {
 				if(ws.objective == Objective.NONE) {
 					ws.objective = Objective.MINE;
 					break;
 				}
 				// added for rocket stuff. TODO: make nicer
+				//REFACTOR: again build based on score, try to build far away from enemies and far from friendlies to avoid crowding
 				else if (ws.targetLoc == null && ws.units.size() > 0 && ws.objective == Objective.BUILD && ws.toBuild == UnitType.Rocket){
 					// choose where to put the rocket
 					// TODO: do this intelligently
@@ -255,6 +268,7 @@ public class WorkerManager{
 			}
 		}
 		else{
+			//REFACTOR: just put everything in a mine squad?
 			if(infoMan.workerSquads.size()==0) {
 				WorkerSquad ws = new WorkerSquad(gc,infoMan);
 				ws.objective = Objective.MINE;

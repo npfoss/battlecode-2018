@@ -10,6 +10,10 @@ controlled by WorkerManager
 basically just carry out assigned objective (build thing or idly mine)
 sets objective to NONE when done (to be reassigned by manager)
 */
+
+/* Overall refactor thoughts: general logic is good but helper functions need to be optimized
+ * less gc calls, cooperate with infoMan, tile, etc.
+ */
 public class WorkerSquad extends Squad {
 
 	UnitType toBuild;
@@ -17,6 +21,7 @@ public class WorkerSquad extends Squad {
 
 	public WorkerSquad(GameController g, InfoManager im) {
 		super(im);
+		//REFACTOR: remove the auto toBuild?
 		toBuild = UnitType.Factory;
 	}
 
@@ -24,6 +29,7 @@ public class WorkerSquad extends Squad {
 	final int[] dy = {-1,0,1,-1,0,1,-1,0,1};
 
 	public void update() {
+		//TODO: think more about this
 		if(requestedUnits.isEmpty())
 			requestedUnits.add(UnitType.Worker);
 		urgency = 8-units.size();
@@ -54,6 +60,7 @@ public class WorkerSquad extends Squad {
 		
 	}
 	public void tryToBuild (int id, Unit worker) {
+		//REFACTOR: remove all/most of the gc calls
 		if(gc.hasUnitAtLocation(targetLoc) && gc.senseUnitAtLocation(targetLoc).unitType() == toBuild && gc.senseUnitAtLocation(targetLoc).structureIsBuilt() != 0) {
 			objective = Objective.NONE;
 			return; 
@@ -124,6 +131,8 @@ public class WorkerSquad extends Squad {
 		MapLocation myLoc = gc.unit(id).location().mapLocation();
 		int maxDist = 2;
 		
+		//REFACTOR: have infoMan keep track of karbonite regions and have a method to get the nearest one. just call that and go there.
+		
 		if(targetKarboniteLoc != null && infoMan.tiles[targetKarboniteLoc.getX()][targetKarboniteLoc.getY()].karbonite == 0)
 			targetKarboniteLoc = null;
 		while(targetKarboniteLoc == null && maxDist < 257) {
@@ -156,7 +165,7 @@ public class WorkerSquad extends Squad {
 		//Utils.log("aaron just wasted " + (end-start) + " ns.");
 	}
 	public boolean tryToMine(int id) {
-		// TODO: prefer to mine higher karbonite spots?
+		//REFACTOR: Use tile checks instead of gc.canHarvest
 		if(gc.canHarvest(id,Direction.Center)) {
 			gc.harvest(id, Direction.Center);
 			return true;
@@ -195,6 +204,7 @@ public class WorkerSquad extends Squad {
 		}
 		return false;
 	}
+	
 	public void replicateWorker(int id) {
 		if(targetLoc != null) {
 			for(Direction dirToReplicate : Utils.directionsTowardButNotIncluding(gc.unit(id).location().mapLocation().directionTo(targetLoc))) {
@@ -223,7 +233,7 @@ public class WorkerSquad extends Squad {
 			Unit worker = gc.unit(id);
 			if(worker.location().isInSpace() || worker.location().isInGarrison())
 				continue;
-			//For now we shall replicate at the start, to be optimized.
+			//REFACTOR: only replicate if you are told to by your manager
 			if((infoMan.workerCount < strat.maxWorkers && infoMan.myPlanet == Planet.Earth) || (infoMan.myPlanet == Planet.Mars && (gc.round() > 700 || gc.karbonite() > 200))) {
 				replicateWorker(id);
 			}

@@ -1,7 +1,3 @@
-/****************/
-/* REFACTOR ME! */
-/****************/
-
 import bc.*;
 
 public class MagicNumbers{
@@ -46,4 +42,7 @@ public class MagicNumbers{
     // for rockets
     // how many turns to wait before launch
     int ROCKET_COUNTDOWN = 5;
+    
+    //for workers
+    static int FACTORY_COST = 100;
 }

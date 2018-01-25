@@ -1,7 +1,3 @@
-/****************/
-/* REFACTOR ME! */
-/****************/
-
 import bc.*;
 
 /*controls:
@@ -38,6 +34,7 @@ public class Strategy{
         rocketComposition = defaultRocketComposition;
         nextRocketBuild = 101;
         maxWorkers = 6;
+        maxFactories = 4;
 	}
 
 	public void update(){

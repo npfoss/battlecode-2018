@@ -1,7 +1,3 @@
-/****************/
-/* REFACTOR ME! */
-/****************/
-
 import bc.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -122,6 +118,8 @@ public class InfoManager {
 		targetUnits.clear();
 
 		//keeping track of our/enemy units, squad management
+		//REFACTOR: while going through units, add to tiles whether or not there is a unit there so we don't have to call gc.hasUnitAtLocation;
+		//also, make a function which both moves a robot and updates the tile bools.
 		VecUnit units = gc.units();
 		HashSet<Integer> ids = new HashSet<Integer>();
 		for (int i = 0; i < units.size(); i++) {
