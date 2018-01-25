@@ -32,7 +32,7 @@ public class Tile{
     TreeSet<TargetUnit> enemiesWithinMageRange;
     //boolean claimed;
     boolean enemiesUpdated;
-    boolean containsUpdated;
+    int unitID;
     //boolean accessible; //contains no unit or our unit that is move ready
     
     public Tile(boolean walkable, long karb, Region reg, MapLocation ml, MagicNumbers mn, InfoManager im){
@@ -55,7 +55,7 @@ public class Tile{
         //claimed = false;
         enemiesUpdated = false;
         containsUnit = false;
-        containsUpdated = false;
+        unitID = -1;
         distFromNearestHostile = 100;
         myUnit = -1;
     }

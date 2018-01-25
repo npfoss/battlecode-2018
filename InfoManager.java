@@ -21,6 +21,8 @@ public class InfoManager {
 	int height, width;
 	long lastCheckpoint;
 	boolean builtRocket;
+	int factoriesToBeBuilt;
+	PlanetMap startingMap;
 	//int totalUnitCount;
 
 	ArrayList<Unit> rockets;
@@ -85,8 +87,9 @@ public class InfoManager {
 
         newRockets = new ArrayList<Unit>();
 		
-        height = (int) gc.startingMap(myPlanet).getHeight();
-        width = (int) gc.startingMap(myPlanet).getWidth();
+        startingMap = gc.startingMap(myPlanet);
+        height = (int) startingMap.getHeight();
+        width = (int) startingMap.getWidth();
 
         tiles = new Tile[width][height];
         regions = new ArrayList<Region>();
@@ -96,6 +99,7 @@ public class InfoManager {
         marsy = 0;
         builtRocket = true;
         placesWeveSentTo = new ArrayList<MapLocation>();
+        factoriesToBeBuilt = 0;
 	}
 
 	public void update(Strategy strat) {
@@ -107,25 +111,48 @@ public class InfoManager {
 		// called at the beginning of each turn
 		comms.update();
 
-		rockets = new ArrayList<Unit>();
-		workers = new ArrayList<Unit>();
-		factories = new ArrayList<Unit>();
-		fighters = new ArrayList<Unit>();
+		rockets.clear();
+		workers.clear();
+		factories.clear();
+		fighters.clear();
 
-		unassignedUnits = new HashSet<Integer>();
+		unassignedUnits.clear();
         newRockets.clear();
 		
 		targetUnits.clear();
 
+		//updating map info
+				for(int x = 0; x < tiles.length; x++){
+					for(int y = 0; y < tiles[0].length; y++){
+						MapLocation loc = tiles[x][y].myLoc;
+						if(gc.canSenseLocation(loc)){
+							tiles[x][y].roundLastUpdated = (int) gc.round();
+		                    tiles[x][y].updateKarbonite(gc.karboniteAt(loc));
+		                    tiles[x][y].enemiesUpdated = false;
+		                    tiles[x][y].unitID = -1;
+		                    if(startingMap.isPassableTerrainAt(loc) > 0)
+		                    	tiles[x][y].isWalkable = true;
+		                    // TODO: check if there's now a factory there
+		                    //      (to update walkability)
+		                }
+					}
+				}
+		
 		//keeping track of our/enemy units, squad management
 		//REFACTOR: while going through units, add to tiles whether or not there is a unit there so we don't have to call gc.hasUnitAtLocation;
-		//also, make a function which both moves a robot and updates the tile bools.
 		VecUnit units = gc.units();
 		HashSet<Integer> ids = new HashSet<Integer>();
 		for (int i = 0; i < units.size(); i++) {
 			Unit unit = units.get(i);
             if(unit.location().isInSpace()){
                 continue;
+            }
+            if(unit.location().isOnMap()) {
+            	int x = unit.location().mapLocation().getX();
+            	int y = unit.location().mapLocation().getY();
+            	tiles[x][y].unitID = unit.id();
+            	if(unit.unitType() == UnitType.Factory || unit.unitType() == UnitType.Rocket)
+            		tiles[x][y].isWalkable = false;
             }
 			if(unit.team() == gc.team()){
 				ids.add(unit.id());
@@ -174,6 +201,7 @@ public class InfoManager {
 				targetUnits.put(unit.id(), tu);
 			}
 		}
+		units.delete();
 
 		//check for dead units + remove from squads
 		for(Squad s: workerSquads){
@@ -204,21 +232,6 @@ public class InfoManager {
 				}
 			}
 			s.update();
-		}
-
-		//updating map info
-		for(int x = 0; x < tiles.length; x++){
-			for(int y = 0; y < tiles[0].length; y++){
-				MapLocation loc = tiles[x][y].myLoc;
-				if(gc.canSenseLocation(loc)){
-					tiles[x][y].roundLastUpdated = (int) gc.round();
-                    tiles[x][y].updateKarbonite(gc.karboniteAt(loc));
-                    tiles[x][y].enemiesUpdated = false;
-                    tiles[x][y].containsUpdated = false;
-                    // TODO: check if there's now a factory there
-                    //      (to update walkability)
-                }
-			}
 		}
 		
 		workerCount = workers.size();
@@ -360,7 +373,6 @@ public class InfoManager {
     
     // initializes all the Tile and Region stuff
     public void initMap(){
-        PlanetMap startingMap = gc.startingMap(myPlanet);
         for (int x = 0; x < tiles.length; x++){
             for (int y = 0; y < tiles[0].length; y++){
                 if (tiles[x][y] == null){
@@ -369,7 +381,7 @@ public class InfoManager {
                     if (startingMap.isPassableTerrainAt(loc) > 0){
                         // new region! floodfill it
                         Region newRegion = new Region();
-                        floodfill(startingMap, newRegion, loc);
+                        floodfill(newRegion, loc);
                         regions.add(newRegion);
                     } else {
                         // impassible terrain
@@ -382,7 +394,7 @@ public class InfoManager {
 
     // takes a passable maplocation, adds it and everything reachable
     //      from it to the given region
-    public void floodfill(PlanetMap startingMap, Region region, MapLocation loc){
+    public void floodfill(Region region, MapLocation loc){
         long karbs = startingMap.initialKarboniteAt(loc);
         tiles[loc.getX()][loc.getY()] = new Tile(true, karbs, region, loc, magicNums, this);
         region.tiles.add(tiles[loc.getX()][loc.getY()]);
@@ -394,7 +406,7 @@ public class InfoManager {
             if (isOnMap(neighbor)
                     && tiles[neighbor.getX()][neighbor.getY()] == null
                     && startingMap.isPassableTerrainAt(neighbor) > 0){
-                floodfill(startingMap, region, neighbor);
+                floodfill(region, neighbor);
             }
         }
     }
@@ -444,16 +456,16 @@ public class InfoManager {
         // for now :(
         // TODO: remove
         long bestDist = -1;
-        PlanetMap startingMap = gc.startingMap(Planet.Mars);
+        PlanetMap marsStart = gc.startingMap(Planet.Mars);
         MapLocation bestloc = null;
         int numChecked = 0;
         int x,y;
         while(numChecked < 7){
         	// Utils.log("checking x = " + x + " y = " + y);
-        	x = (int)(Math.random()*(startingMap.getWidth()));
-        	y = (int)(Math.random()*(startingMap.getHeight()));
+        	x = (int)(Math.random()*(marsStart.getWidth()));
+        	y = (int)(Math.random()*(marsStart.getHeight()));
         	MapLocation loc = new MapLocation(Planet.Mars, x, y);
-        	if (startingMap.isPassableTerrainAt(loc) > 0){
+        	if (marsStart.isPassableTerrainAt(loc) > 0){
         		numChecked++;
         		long minDist = 10000;
         		for(MapLocation l: placesWeveSentTo){
@@ -499,7 +511,14 @@ public class InfoManager {
          */
     }
 
-
+    public void moveAndUpdate(int id, Direction d) {
+    	MapLocation start = gc.unit(id).location().mapLocation();
+    	gc.moveRobot(id, d);
+    	tiles[start.getX()][start.getY()].unitID = -1;
+    	MapLocation end = start.add(d);
+    	tiles[end.getX()][end.getY()].unitID = id;
+    }
+    
 /*******  FOR LOGGING AND DEBUGGING *********/
     
     public void logTimeCheckpoint(String identifier){

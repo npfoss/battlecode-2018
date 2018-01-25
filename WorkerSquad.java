@@ -10,6 +10,9 @@ sets objective to NONE when done (to be reassigned by manager)
 /* Overall refactor thoughts: general logic is good but helper functions need to be optimized
  * less gc calls, cooperate with infoMan, tile, etc.
  */
+
+//TODO: when you lay down a blueprint, decrement factoriesToBeBuilt
+
 public class WorkerSquad extends Squad {
 
 	UnitType toBuild;

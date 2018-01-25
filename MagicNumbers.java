@@ -35,6 +35,8 @@ public class MagicNumbers{
     double DAMAGE_FACTOR_RANGER_MOVE_ATTACK = 100.0;
     double DISTANCE_FACTOR_RANGER_MOVE_ATTACK = 10.0;
     double SWARM_FACTOR_RANGER_MOVE_ATTACK = 1.5; 
+    static double MINIMUM_SCORE_TO_STEAL = 0;
+	static int MAX_DIST_TO_STEAL = 50;
 	double g;
 
     int EARTH_FLOOD_ROUND = 750;

@@ -20,6 +20,7 @@ public class Strategy{
     int rocketLaunchFrequency; // (# rounds between each)
 	int maxWorkers;
 	int maxFactories;
+	int minFactories;
 
     public Strategy(InfoManager im, GameController g){
     	infoMan = im;
@@ -33,8 +34,8 @@ public class Strategy{
 		combatComposition = new int[]{0, 0, 3, 2}; //knight,mage,ranger,healer
         rocketComposition = defaultRocketComposition;
         nextRocketBuild = 101;
-        maxWorkers = 6;
-        maxFactories = 4;
+        maxFactories = 1;
+        minFactories = 0;
 	}
 
 	public void update(){
