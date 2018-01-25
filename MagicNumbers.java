@@ -28,6 +28,7 @@ public class MagicNumbers{
     static int ENEMY_UNIT_DIST_THRESHOLD = 200;
     static int RANGER_RUN_AWAY_HEALTH_THRESH = 0;
     static double AGGRESION_FACTOR = 1.0; //bigger = more aggressive
+    //the bigger, the more we care:
     static double HEALER_HEALTH_FACTOR = 0.1;
     static double ABILITY_HEAT_OVERCHARGE_FACTOR = 0.02; 
     static double HOSTILE_FACTOR_RUN_AWAY = 2.0; 
