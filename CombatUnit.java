@@ -28,7 +28,7 @@ public class CombatUnit {
 	boolean canSnipe;
 	boolean canOvercharge;
 	int stepsFromTarget;
-	int distFromNearestHostile; // unused?
+	int distFromNearestHostile;
 	MapLocation myLoc;
 	boolean notOnMap;
 	
@@ -61,8 +61,10 @@ public class CombatUnit {
 		if(notOnMap && u.location().isOnMap()){
 			myLoc = u.location().mapLocation();
 			notOnMap = false;
+		} else if (!notOnMap && !u.location().isOnMap()){
+			notOnMap = true;
+			// didn't see this anywhere so I added it. probably didn't cause problems before but can't hurt
 		}
-		// should there be a check for being on the map here? you can't attack and stuff if not on the map
 		stepsFromTarget = sft;
 		health = u.health();
 		canAttack = u.attackHeat() < 10 && !(type == UnitType.Ranger && u.rangerIsSniping() != 0);

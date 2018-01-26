@@ -399,7 +399,7 @@ public class InfoManager {
     }
 
     public boolean isOnMap(int x, int y){
-        return 0 <= x && 0 <= y && x < tiles.length && y < tiles[0].length;
+        return 0 <= x && 0 <= y && x < width && y < height;
     }
 
     public boolean isOnMap(MapLocation loc){

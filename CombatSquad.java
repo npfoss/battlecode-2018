@@ -38,13 +38,13 @@ public class CombatSquad extends Squad{
 		//separatedUnits.add(u.id());
 		infoMan.unassignedUnits.remove(u.id());
 		switch(u.unitType()){
-		case Knight:unitCounts[0]++; break;
-		case Mage:unitCounts[1]++; break;
-		case Ranger:unitCounts[2]++; break;
-		case Healer:unitCounts[3]++; break;
+		case Knight: unitCounts[0]++; break;
+		case Mage: unitCounts[1]++; break;
+		case Ranger: unitCounts[2]++; break;
+		case Healer: unitCounts[3]++; break;
 		default: break;
 		}
-		MapLocation ml = new MapLocation(infoMan.myPlanet,0,0);
+		MapLocation ml = new MapLocation(infoMan.myPlanet, 0, 0);
 		if(u.location().isOnMap())
 			ml = u.location().mapLocation();
 		else
@@ -102,6 +102,7 @@ public class CombatSquad extends Squad{
 		}
 		else if(requestedUnits.isEmpty())
 			requestedUnits.add(getRequestedUnit());
+
 		if(units.size() == 0)
 			urgency = 100;
 		else
@@ -124,13 +125,7 @@ public class CombatSquad extends Squad{
 				bestIndex = i;
 			}
 		}
-		switch(bestIndex){
-			case 0: return UnitType.Knight;
-			case 1: return UnitType.Mage;
-			case 2: return UnitType.Ranger;
-			case 3: return UnitType.Healer;
-			default: return UnitType.Knight;
-		}
+		return Utils.robotTypes[bestIndex];
 	}
 
 	public void move(Nav nav){
@@ -188,12 +183,11 @@ public class CombatSquad extends Squad{
 		infoMan.logTimeCheckpoint("starting micro");
 		doSquadMicro(retreat, nav);
 		//check if we're done with our objective
-		boolean done = areWeDone();
-		if(done){
+		if(areWeDone()){
 			Utils.log("setting obj to none");
 			objective = Objective.NONE;
 		}
-		update();
+		update(); // REFACTOR: why?
 		infoMan.logTimeCheckpoint("done with CombatSquad move");
 	}
 
@@ -248,25 +242,26 @@ public class CombatSquad extends Squad{
 		long enemiesAccum = 0;
 		long updateAccum = 0;
 		long otherAccum = 0;*/
-		int x,y,nx,ny;
+		int x, y, nx, ny;
 		goalRangerDistance = 9999;
 		for(CombatUnit cu: combatUnits.values()){
-			cu.update(gc,(int) cu.myLoc.distanceSquaredTo(targetLoc));
-			combatUnits.put(cu.ID, cu);
+			cu.update(gc, nav.optimalStepsTo(cu.myLoc, targetLoc));
 			if(cu.notOnMap)
 				continue;
 			//updateAccum += System.nanoTime() - last; // use or remove
 			//last = System.nanoTime();
 			x = cu.myLoc.getX();
 			y = cu.myLoc.getY();
-			infoMan.tiles[x][y].updateContains(gc);
+			infoMan.tiles[x][y].containsUnit = true;
+			infoMan.tiles[x][y].containsUpdated = true;
 			//otherAccum += System.nanoTime() - last;// use or remove
 			//last = System.nanoTime();
 			infoMan.tiles[x][y].updateEnemies(gc);
 			//enemiesAccum += System.nanoTime() - last;// use or remove
 			//last = System.nanoTime();
-			if(cu.type == UnitType.Ranger && infoMan.tiles[x][y].distFromNearestHostile < goalRangerDistance)
+			if(cu.type == UnitType.Ranger && infoMan.tiles[x][y].distFromNearestHostile < goalRangerDistance){
 				goalRangerDistance = infoMan.tiles[x][y].distFromNearestHostile;
+			}
 			cu.distFromNearestHostile = infoMan.tiles[x][y].distFromNearestHostile;
 			if(cu.canMove){
 				//System.out.println("microing unit " + cu.ID + " x = " + x + " y = " + y);
@@ -275,7 +270,7 @@ public class CombatSquad extends Squad{
 						continue;
 					nx = x + dx[i];
 					ny = y + dy[i];
-					if(nx >= infoMan.width || nx < 0 || ny >= infoMan.height || ny < 0 || !infoMan.tiles[nx][ny].isWalkable)
+					if(!infoMan.isOnMap(nx, ny) || !infoMan.tiles[nx][ny].isWalkable)
 						continue;
 					infoMan.tiles[nx][ny].updateContains(gc);
 					//otherAccum += System.nanoTime() - last;// use or remove
@@ -300,22 +295,21 @@ public class CombatSquad extends Squad{
 		Utils.log("enemiesAccum = " + enemiesAccum);
 		*/
 		
-		goalRangerDistance = (goalRangerDistance < 50 ? 50: goalRangerDistance); // magic number?
+		goalRangerDistance = (goalRangerDistance < 50 ? 50 : goalRangerDistance); // magic number?
 
-		doKnightMicro(knights,retreat,nav);
-		doMageMicro(mages,retreat,nav);
-		doRangerMicro(rangers,retreat,nav);
+		doKnightMicro(knights, retreat, nav);
+		doMageMicro(mages, retreat, nav);
+		doRangerMicro(rangers, retreat, nav);
 		infoMan.logTimeCheckpoint("rangers microed");
-		doHealerMicro(healers,retreat,nav);
+		doHealerMicro(healers, retreat, nav);
 		infoMan.logTimeCheckpoint("healers microed");
 		//update each unit from heal, overcharge (for sniping)
 		TreeSet<CombatUnit> updatedRangers = new TreeSet<CombatUnit>(new AscendingStepsComp());
 		for(CombatUnit cu: rangers){
-			updatedRangers.add(combatUnits.get(cu.ID));
+			updatedRangers.add(combatUnits.get(cu.ID));// shouldn't have to do this, cus get updated
 		}
-		doSnipes(updatedRangers,retreat,nav);
-		infoMan.logTimeCheckpoint("sniped done");
-		
+		doSnipes(updatedRangers, retreat, nav);
+		infoMan.logTimeCheckpoint("snipes done");	
 	}
 
 	private void doRangerMicro(TreeSet<CombatUnit> rangers, boolean retreat, Nav nav) {
@@ -330,9 +324,8 @@ public class CombatSquad extends Squad{
 				//System.out.println("type = " + myTile.enemiesWithinRangerRange.first().type + " priority = " + myTile.enemiesWithinRangerRange.first().priority);
 				//System.out.flush();
 				gc.attack(cu.ID, myTile.enemiesWithinRangerRange.first().ID);
-				updateDamage(cu,myTile.enemiesWithinRangerRange.first());
+				updateDamage(cu, myTile.enemiesWithinRangerRange.first());
 				cu.canAttack = false;
-				combatUnits.put(cu.ID, cu);
 			}
 		}
 
@@ -340,12 +333,13 @@ public class CombatSquad extends Squad{
 		if(retreat){
 			for(CombatUnit cu: rangers.descendingSet()){
 				if(cu.canMove){
-					cu = runAway(cu);
-					combatUnits.put(cu.ID, cu);
+					runAway(cu);
 				}
 			}
 			return;
 		}
+
+		// REFACTOR: it seems suboptimal to always attack if we can when a better target may be presented by moving first
 
 		//otherwise, do moves and attacks heuristically
 		for(CombatUnit cu: rangers){
@@ -355,8 +349,7 @@ public class CombatSquad extends Squad{
 			if(cu.canAttack){
 				cu = rangerMoveAndAttack(cu,nav);
 				combatUnits.put(cu.ID, cu);
-			}
-			else{
+			} else {
 				cu = rangerMove(cu,nav);
 				combatUnits.put(cu.ID, cu);
 			}
@@ -381,8 +374,7 @@ public class CombatSquad extends Squad{
 					combatUnits.put(cu.ID, cu);
 				}
 				if(cu.canMove){
-					cu = runAway(cu);
-					combatUnits.put(cu.ID, cu);
+					runAway(cu);
 				}
 			}
 			return;
@@ -410,7 +402,7 @@ public class CombatSquad extends Squad{
 				snipers.add(cu);
 		}
 		
-		if(snipers.size()==0)
+		if(snipers.size() == 0)
 			return;
 		
 		TreeSet<TargetUnit> snipees = new TreeSet<TargetUnit>(new DescendingSnipePriorityComp());
@@ -463,7 +455,7 @@ public class CombatSquad extends Squad{
 			for(int i = 0; i < 9; i++){
 				nx = x + dx[i];
 				ny = y + dy[i];
-				if(nx >= infoMan.width || nx<0 || ny >= infoMan.height || ny<0 || !infoMan.tiles[nx][ny].isWalkable)
+				if(!infoMan.isOnMap(nx, ny) || !infoMan.tiles[nx][ny].isWalkable)
 					continue;
 				infoMan.tiles[nx][ny].updateContains(gc);
 				infoMan.tiles[nx][ny].updateEnemies(gc);
@@ -502,16 +494,11 @@ public class CombatSquad extends Squad{
 		if(toHeal != -1){
 			gc.heal(cu.ID, toHeal);
 			cu.canAttack = false;
-			//removeCombatUnit(toHeal);// use or remove
-			switch((int)(gc.researchInfo().getLevel(UnitType.Healer))){
+			switch((int)(gc.researchInfo().getLevel(UnitType.Healer))){ // REFACTOR: probably a better way to do this
 			case 0: tH.health += 10; break;
 			case 1: tH.health += 12; break;
 			default: tH.health += 17;
 			}
-			combatUnits.put(tH.ID, tH);
-			//System.out.println("adding " + toHeal + " 4");
-			//System.out.flush();
-			//combatUnits.add(tH);// use or remove
 		}
 		return cu;
 	}
@@ -543,7 +530,7 @@ public class CombatSquad extends Squad{
 		if(myTile.distFromNearestHostile > MagicNumbers.MAX_DIST_THEY_COULD_HIT_NEXT_TURN){
 			//Utils.log("navving " + cu.myLoc.getX() + " " + cu.myLoc.getY());
 			Direction d = nav.dirToMove(cu.myLoc, targetLoc);
-			return moveAndUpdate(cu,d);
+			return moveAndUpdate(cu, d);
 		}
 		return (cu.health <= MagicNumbers.RANGER_RUN_AWAY_HEALTH_THRESH ? runAway(cu) : rangerMoveAndAttack(cu));
 	}
@@ -554,7 +541,7 @@ public class CombatSquad extends Squad{
 		if(myTile.distFromNearestHostile > MagicNumbers.MAX_DIST_THEY_COULD_HIT_NEXT_TURN){
 			//Utils.log("navving " + cu.myLoc.getX() + " " + cu.myLoc.getY());
 			Direction d = nav.dirToMove(cu.myLoc, targetLoc);
-			return moveAndUpdate(cu,d);
+			return moveAndUpdate(cu, d);
 		}
 		return (cu.health <= MagicNumbers.RANGER_RUN_AWAY_HEALTH_THRESH ? runAway(cu) : rangerMove(cu));
 	}
@@ -564,7 +551,7 @@ public class CombatSquad extends Squad{
 		//if we're not near any enemies nav, otherwise run away
 		if(numEnemyUnits == 0){
 			Direction d = nav.dirToMoveSafely(cu.myLoc, targetLoc);
-			cu = moveAndUpdate(cu,d);
+			cu = moveAndUpdate(cu, d);
 			return cu;
 		}
 		return healerMove(cu);
@@ -580,10 +567,10 @@ public class CombatSquad extends Squad{
 		for(int i = 0; i < 9; i++){
 			nx = x + dx[i];
 			ny = y + dy[i];
-			if(nx<0||nx>=infoMan.width||ny<0||ny>=infoMan.height)
+			if(!infoMan.isOnMap(nx, ny))
 				continue;
 			Tile t = infoMan.tiles[nx][ny];
-			if(!t.isWalkable || t.containsUnit)
+			if(!infoMan.isLocationClear(t.myLoc))
 				continue;
 			score = t.distFromNearestHostile * MagicNumbers.HOSTILE_FACTOR_HEALER_MOVE
 					- (t.distFromNearestHostile - (goalRangerDistance+MagicNumbers.HEALER_RANGE) > 0 ? t.distFromNearestHostile - (goalRangerDistance+MagicNumbers.HEALER_RANGE) : 0) 
@@ -610,17 +597,17 @@ public class CombatSquad extends Squad{
 		for(int i = 0; i < 9; i++){
 			nx = x + dx[i];
 			ny = y + dy[i];
-			if(nx<0||nx>=infoMan.width||ny<0||ny>=infoMan.height)
+			if(!infoMan.isOnMap(nx, ny))
 				continue;
 			Tile t = infoMan.tiles[nx][ny];
-			if(!t.isWalkable || t.containsUnit)
+			if(!infoMan.isLocationClear(t.myLoc))
 				continue;
 			score = t.distFromNearestHostile * MagicNumbers.HOSTILE_FACTOR_RANGER_MOVE
 					- (t.distFromNearestHostile - goalRangerDistance > 0 ? t.distFromNearestHostile - goalRangerDistance : 0) * MagicNumbers.DISTANCE_FACTOR_RANGER_MOVE
 					- t.possibleDamage * MagicNumbers.DAMAGE_FACTOR_RANGER_MOVE
 					- t.myLoc.distanceSquaredTo(swarmLoc) * MagicNumbers.SWARM_FACTOR_RANGER_MOVE
 					- t.myLoc.distanceSquaredTo(targetLoc) * MagicNumbers.TARGET_FACTOR_RANGER_MOVE;
-			if(score>bestScore){
+			if(score > bestScore){
 				bestScore = score;
 				bestIndex = i;
 			}
@@ -644,10 +631,10 @@ public class CombatSquad extends Squad{
 		for(int i = 0; i < 9; i++){
 			nx = x + dx[i];
 			ny = y + dy[i];
-			if(nx<0||nx>=infoMan.width||ny<0||ny>=infoMan.height)
+			if(!infoMan.isOnMap(nx, ny))
 				continue; // informan onMap (lots)
 			Tile t = infoMan.tiles[nx][ny];
-			if(!t.isWalkable || t.containsUnit)
+			if(!infoMan.isLocationClear(t.myLoc))
 				continue;
 			score = t.distFromNearestHostile * MagicNumbers.HOSTILE_FACTOR_HEALER_MOVE
 					- (t.distFromNearestHostile - goalRangerDistance > 0 ? t.distFromNearestHostile - goalRangerDistance : 0) * MagicNumbers.DISTANCE_FACTOR_RANGER_MOVE
@@ -683,10 +670,10 @@ public class CombatSquad extends Squad{
 		}
 		//otherwise do normal move
 		//Direction d = nav.dirToMove(cu.myLoc, targetLoc);// use or remove
-		//cu = moveAndUpdate(cu,d);
+		//cu = moveAndUpdate(cu, d);
 		//return cu;
 		Direction d = indexToDirection(bestNormalIndex);
-		return moveAndUpdate(cu,d);
+		return moveAndUpdate(cu, d);
 	}
 
 	private CombatUnit runAway(CombatUnit cu) {
@@ -699,21 +686,21 @@ public class CombatSquad extends Squad{
 		for(int i = 0; i < 9; i++){
 			nx = x + dx[i];
 			ny = y + dy[i];
-			if(nx<0||nx>=infoMan.width||ny<0||ny>=infoMan.height)
+			if(!infoMan.isOnMap(nx, ny))
 				continue;
 			Tile t = infoMan.tiles[nx][ny];
-			if(!t.isWalkable || t.containsUnit)
+			if(!infoMan.isLocationClear(t.myLoc))
 				continue;
 			score = t.distFromNearestHostile*MagicNumbers.HOSTILE_FACTOR_RUN_AWAY 
 					- t.myLoc.distanceSquaredTo(swarmLoc)*MagicNumbers.SWARM_FACTOR_RUN_AWAY
 					- t.possibleDamage * MagicNumbers.DAMAGE_FACTOR_RUN_AWAY;
-			if(score>bestScore){
+			if(score > bestScore){
 				bestScore = score;
 				bestIndex = i;
 			}
 		}
 		Direction toMove = indexToDirection(bestIndex);
-		cu = moveAndUpdate(cu,toMove);
+		cu = moveAndUpdate(cu, toMove);
 		return cu;
 	}
 
