@@ -37,6 +37,13 @@ public class CombatSquad extends Squad{
 			- t.myLoc.distanceSquaredTo(targetLoc) * MagicNumbers.TARGET_FACTOR_RANGER_MOVE;
 	}
 
+	public double healerMoveScore(Tile t, CombatUnit cu){
+		return t.distFromNearestHostile * MagicNumbers.HOSTILE_FACTOR_HEALER_MOVE
+			- (t.distFromNearestHostile - (goalRangerDistance+MagicNumbers.HEALER_RANGE) > 0 ? t.distFromNearestHostile - (goalRangerDistance + MagicNumbers.HEALER_RANGE) : 0) 
+					* MagicNumbers.DISTANCE_FACTOR_RANGER_MOVE
+			- t.possibleDamage * MagicNumbers.DAMAGE_FACTOR_HEALER_MOVE 
+			- t.myLoc.distanceSquaredTo(swarmLoc) * MagicNumbers.SWARM_FACTOR_HEALER_MOVE;
+	}
 
 /******************** END TWEAKING *******************/
 
@@ -329,7 +336,7 @@ public class CombatSquad extends Squad{
 		infoMan.logTimeCheckpoint("snipes done");	
 	}
 
-	private CombatUnit runAway(CombatUnit cu) {
+	private void runAway(CombatUnit cu) {
 		int x,y,nx,ny;
 		x = cu.myLoc.getX();
 		y = cu.myLoc.getY();
@@ -354,7 +361,6 @@ public class CombatSquad extends Squad{
 		}
 		Direction toMove = Utils.indexToDirection(bestIndex);
 		cu = moveAndUpdate(cu, toMove);
-		return cu;
 	}
 
 /*************************** UNIT-SPECIFIC MICRO STUFF *****************************/
@@ -466,7 +472,7 @@ public class CombatSquad extends Squad{
 		}
 	}
 
-	private CombatUnit performOvercharge(CombatUnit cu, boolean retreat, Nav nav) {
+	private void performOvercharge(CombatUnit cu, boolean retreat, Nav nav) {
 		TreeSet<CombatUnit> overchargees = getUnitsToHeal(cu.myLoc);
 		boolean overchargeSomeone = false;
 		CombatUnit tO = new CombatUnit(); // t0 is not very descriptive
@@ -517,10 +523,9 @@ public class CombatSquad extends Squad{
 			//System.out.flush();
 			//combatUnits.add(temp.first());// use or remove
 		}
-		return cu;
 	}
 
-	private CombatUnit healSomeone(CombatUnit cu) {
+	private void healSomeone(CombatUnit cu) {
 		TreeSet<CombatUnit> healees = getUnitsToHeal(cu.myLoc);
 		int toHeal = -1;
 		CombatUnit tH = new CombatUnit();
@@ -544,19 +549,7 @@ public class CombatSquad extends Squad{
 			default: tH.health += 17;
 			}
 		}
-		return cu;
 	}
-	
-	/* not sure if it's actually faster :(// use or remove
-	private static final int[] healdx = {0,0,0,0,0,1,1,1,1,1,1,2,2,2,2,2,2,3,3,3,3,3,4,4,4,4,5,5,5,
-										 0,0,0,0,0,1,1,1,1,1,2,2,2,2,2,3,3,3,3,4,4,4,5,5,
-										 -1,-1,-1,-1,-1,-1,-2,-2,-2,-2,-2,-2,-3,-3,-3,-3,-3,-4,-4,-4,-4,-5,-5,-5,
-										 -1,-1,-1,-1,-1,-2,-2,-2,-2,-2,-3,-3,-3,-3,-4,-4,-4,-5,-5};
-	private static final int[] healdy = {1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,0,1,2,3,0,1,2,
-										 -1,-2,-3,-4,-5,-1,-2,-3,-4,-5,-1,-2,-3,-4,-5,-1,-2,-3,-4,-1,-2,-3,-1,-2,
-										 0,1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,0,1,2,3,0,1,2,
-										 -1,-2,-3,-4,-5,-1,-2,-3,-4,-5,-1,-2,-3,-4,-1,-2,-3,-1,-2};
-	*/
 
 	private TreeSet<CombatUnit> getUnitsToHeal(MapLocation ml){
     	TreeSet<CombatUnit> ret = new TreeSet<CombatUnit>(new AscendingStepsComp());
@@ -568,29 +561,35 @@ public class CombatSquad extends Squad{
     	return ret;
     }
 
-	private CombatUnit rangerMoveAndAttack(CombatUnit cu, Nav nav) {
+	private void rangerMoveAndAttack(CombatUnit cu, Nav nav) {
 		Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
 		//if we're not near any enemies nav, otherwise move and attack
 		if(myTile.distFromNearestHostile > MagicNumbers.MAX_DIST_THEY_COULD_HIT_NEXT_TURN){
 			//Utils.log("navving " + cu.myLoc.getX() + " " + cu.myLoc.getY());
 			Direction d = nav.dirToMove(cu.myLoc, targetLoc);
-			return moveAndUpdate(cu, d);
+			moveAndUpdate(cu, d);
+		} else if (cu.health <= MagicNumbers.RANGER_RUN_AWAY_HEALTH_THRESH) {
+			runAway(cu);
+		} else {
+			rangerMoveAndAttack(cu);
 		}
-		return (cu.health <= MagicNumbers.RANGER_RUN_AWAY_HEALTH_THRESH ? runAway(cu) : rangerMoveAndAttack(cu));
 	}
 	
-	private CombatUnit rangerMove(CombatUnit cu, Nav nav) {
+	private void rangerMove(CombatUnit cu, Nav nav) {
 		Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
 		//if we're not near any enemies nav, otherwise move
 		if(myTile.distFromNearestHostile > MagicNumbers.MAX_DIST_THEY_COULD_HIT_NEXT_TURN){
 			//Utils.log("navving " + cu.myLoc.getX() + " " + cu.myLoc.getY());
 			Direction d = nav.dirToMove(cu.myLoc, targetLoc);
-			return moveAndUpdate(cu, d);
+			moveAndUpdate(cu, d);
+		} else if (cu.health <= MagicNumbers.RANGER_RUN_AWAY_HEALTH_THRESH){
+			runAway(cu);
+		} else {
+			rangerMove(cu);
 		}
-		return (cu.health <= MagicNumbers.RANGER_RUN_AWAY_HEALTH_THRESH ? runAway(cu) : rangerMove(cu));
 	}
 	
-	private CombatUnit healerMove(CombatUnit cu, Nav nav) {
+	private void healerMove(CombatUnit cu, Nav nav) {
 		Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
 		//if we're not near any enemies nav, otherwise run away
 		if(numEnemyUnits == 0){
@@ -601,39 +600,17 @@ public class CombatSquad extends Squad{
 		return healerMove(cu);
 	}
 
-	private CombatUnit healerMove(CombatUnit cu) {
-		int x,y,nx,ny;
-		x = cu.myLoc.getX();
-		y = cu.myLoc.getY();
-		int bestIndex = -1;
-		double bestScore = -10000;
-		double score;
-		for(int i = 0; i < 9; i++){
-			nx = x + Utils.dx[i];
-			ny = y + Utils.dy[i];
-			if(!infoMan.isOnMap(nx, ny))
-				continue;
-			Tile t = infoMan.tiles[nx][ny];
-			if(!infoMan.isLocationClear(t.myLoc))
-				continue;
-			score = t.distFromNearestHostile * MagicNumbers.HOSTILE_FACTOR_HEALER_MOVE
-					- (t.distFromNearestHostile - (goalRangerDistance+MagicNumbers.HEALER_RANGE) > 0 ? t.distFromNearestHostile - (goalRangerDistance+MagicNumbers.HEALER_RANGE) : 0) 
-					* MagicNumbers.DISTANCE_FACTOR_RANGER_MOVE
-					- t.possibleDamage * MagicNumbers.DAMAGE_FACTOR_HEALER_MOVE 
-					- t.myLoc.distanceSquaredTo(swarmLoc) * MagicNumbers.SWARM_FACTOR_HEALER_MOVE;
-			if(score > bestScore){
-				bestScore = score;
-				bestIndex = i;
-			}
-		}
-		Direction toMove = Utils.indexToDirection(bestIndex);
-		cu = moveAndUpdate(cu,toMove);
+	private void healerMove(CombatUnit cu) {
+		Direction toMove = highestScoringDir(cu, true, true, this::healerMoveScore);
+		if (toMove != null)
+			moveAndUpdate(cu, toMove);
 		return cu;
 	}
 	
-	private CombatUnit rangerMove(CombatUnit cu) {
+	private void rangerMove(CombatUnit cu) {
 		Direction toMove = highestScoringDir(cu, true, true, this::rangerMoveScore);
-		moveAndUpdate(cu, toMove);
+		if (toMove != null)
+			moveAndUpdate(cu, toMove);
 		return cu;
 	}
 
@@ -661,7 +638,7 @@ public class CombatSquad extends Squad{
 		return bestIndex == -1 ? null : Utils.indexToDirection(bestIndex);
 	}
 	
-	private CombatUnit rangerMoveAndAttack(CombatUnit cu) {
+	private void rangerMoveAndAttack(CombatUnit cu) {
 		int x,y,nx,ny;
 		x = cu.myLoc.getX();
 		y = cu.myLoc.getY();
@@ -720,7 +697,7 @@ public class CombatSquad extends Squad{
 		return moveAndUpdate(cu, d);
 	}
 
-	private CombatUnit moveAndUpdate(CombatUnit cu, Direction d){
+	private void moveAndUpdate(CombatUnit cu, Direction d){
 		if(d == Direction.Center)
 			return cu;
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].containsUnit = false;
@@ -759,9 +736,6 @@ public class CombatSquad extends Squad{
 		return numEnemyUnits > combatUnits.size() * MagicNumbers.AGGRESION_FACTOR;
 	}
 
-/*************** utility functs that shouldn't be in Utils **************/
-
-	public double scoreWithFunct(Tile t, CombatUnit cu, BiFunction<Tile, CombatUnit, Double> scoreFunct){
-		return scoreFunct.apply(t, cu);
-	}
+/*************** utility functs. mostly updating stuff when adding/removing **************/
+	
 }
