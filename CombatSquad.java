@@ -92,7 +92,6 @@ public class CombatSquad extends Squad{
 		swarmLoc = targetLoc;
 		if(combatUnits.size() > 0)
 			swarmLoc = Utils.averageMapLocation(gc, combatUnits.values());
-		numEnemyUnits = infoMan.getTargetUnits(swarmLoc, MagicNumbers.ENEMY_UNIT_DIST_THRESHOLD, false).size();
 		if(infoMan.myPlanet == Planet.Mars){
 			requestedUnits.clear();
 			requestedUnits.add(UnitType.Ranger);
@@ -129,9 +128,10 @@ public class CombatSquad extends Squad{
 	}
 
 	public void move(Nav nav){
-		//reassign separated units to swarm if appropriate
 		if(units.size() == 0)
 			return;
+
+		numEnemyUnits = infoMan.getTargetUnits(swarmLoc, MagicNumbers.ENEMY_UNIT_DIST_THRESHOLD, false).size();
 
 		if(objective == Objective.EXPLORE){
 			infoMan.logTimeCheckpoint("start of explore move");
@@ -142,6 +142,7 @@ public class CombatSquad extends Squad{
 			infoMan.logTimeCheckpoint("done with CombatSquad move");
 			return;
 		}
+		//reassign separated units to swarm if appropriate
 		/* use or remove
 		if(combatUnits.size()==0){
 			for(int id: separatedUnits){
@@ -187,7 +188,6 @@ public class CombatSquad extends Squad{
 			Utils.log("setting obj to none");
 			objective = Objective.NONE;
 		}
-		update(); // REFACTOR: why?
 		infoMan.logTimeCheckpoint("done with CombatSquad move");
 	}
 

@@ -137,7 +137,7 @@ public class Tile{
     		if(Utils.isTypeHostile(tu.type) && dist < distFromNearestHostile){
     			distFromNearestHostile = (int)dist;
     		}
-    		if(dist > magicNums.MAX_DIST_THEY_COULD_HIT_NEXT_TURN) // REFACTOR: seems like you're ignoring a lot of units here, why not only get ones this close?
+    		if(dist > magicNums.MAX_DIST_THEY_COULD_HIT_NEXT_TURN)
     			continue;
     		didSomething = false;
     		//System.out.println("here");
@@ -154,7 +154,7 @@ public class Tile{
     			didSomething = true;
     		}
     		if(didSomething){
-    			tu.tilesWhichHitMe.add(this); // @Nate to @Nate : come back to this
+    			tu.tilesWhichHitMe.add(this);
     			infoMan.targetUnits.put(tu.ID, tu);
     		}
     		if(!Utils.isTypeHostile(tu.type))
