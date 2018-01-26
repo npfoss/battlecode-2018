@@ -14,11 +14,11 @@ public class Player {
         while (true) {
             try{
                 overseer.takeTurn();
+                System.gc();
             } catch(Exception e) {
                 System.out.println("***ERROR AHHHHHHHHHHHHHHHHHHHHHHHHH***");
                 e.printStackTrace(System.out);
                 gc.nextTurn();
-                System.gc();
             }
             // try{Thread.sleep(25);}catch(Exception e){}
         }
