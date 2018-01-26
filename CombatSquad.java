@@ -25,10 +25,17 @@ public class CombatSquad extends Squad{
 
 /************ ALL THE THINGS TO TWEAK ****************/
 
-	public double testScore(Tile tile, CombatUnit cu){
+	public double testScore(Tile t, CombatUnit cu){
 		return 10.0;
 	}
 
+	public double rangerMoveScore(Tile t, CombatUnit cu){
+		return t.distFromNearestHostile * MagicNumbers.HOSTILE_FACTOR_RANGER_MOVE
+			- (t.distFromNearestHostile - goalRangerDistance > 0 ? t.distFromNearestHostile - goalRangerDistance : 0) * MagicNumbers.DISTANCE_FACTOR_RANGER_MOVE
+			- t.possibleDamage * MagicNumbers.DAMAGE_FACTOR_RANGER_MOVE
+			- t.myLoc.distanceSquaredTo(swarmLoc) * MagicNumbers.SWARM_FACTOR_RANGER_MOVE
+			- t.myLoc.distanceSquaredTo(targetLoc) * MagicNumbers.TARGET_FACTOR_RANGER_MOVE;
+	}
 
 
 /******************** END TWEAKING *******************/
@@ -625,34 +632,33 @@ public class CombatSquad extends Squad{
 	}
 	
 	private CombatUnit rangerMove(CombatUnit cu) {
-		int x,y,nx,ny;
+		Direction toMove = highestScoringDir(cu, true, true, this::rangerMoveScore);
+		moveAndUpdate(cu, toMove);
+		return cu;
+	}
+
+	public Direction highestScoringDir(CombatUnit cu, boolean includeCenter, boolean mustBeClear, BiFunction<Tile, CombatUnit, Double> scoreFunct){
+		int x, y, nx, ny;
 		x = cu.myLoc.getX();
 		y = cu.myLoc.getY();
 		int bestIndex = -1;
 		double bestScore = -1000000;
 		double score;
-		for(int i = 0; i < 9; i++){
+		for(int i = 0; i < 8 + (includeCenter?1:0); i++){
 			nx = x + Utils.dx[i];
 			ny = y + Utils.dy[i];
 			if(!infoMan.isOnMap(nx, ny))
 				continue;
 			Tile t = infoMan.tiles[nx][ny];
-			if(!infoMan.isLocationClear(t.myLoc))
+			if(mustBeClear && !infoMan.isLocationClear(t.myLoc))
 				continue;
-			score = scoreWithFunct(t, cu, this::testScore);
-			score = t.distFromNearestHostile * MagicNumbers.HOSTILE_FACTOR_RANGER_MOVE
-					- (t.distFromNearestHostile - goalRangerDistance > 0 ? t.distFromNearestHostile - goalRangerDistance : 0) * MagicNumbers.DISTANCE_FACTOR_RANGER_MOVE
-					- t.possibleDamage * MagicNumbers.DAMAGE_FACTOR_RANGER_MOVE
-					- t.myLoc.distanceSquaredTo(swarmLoc) * MagicNumbers.SWARM_FACTOR_RANGER_MOVE
-					- t.myLoc.distanceSquaredTo(targetLoc) * MagicNumbers.TARGET_FACTOR_RANGER_MOVE;
-			if(score > bestScore){
+			score = scoreFunct.apply(t, cu);
+			if (score > bestScore){
 				bestScore = score;
 				bestIndex = i;
 			}
 		}
-		Direction toMove = Utils.indexToDirection(bestIndex);
-		cu = moveAndUpdate(cu,toMove);
-		return cu;
+		return bestIndex == -1 ? null : Utils.indexToDirection(bestIndex);
 	}
 	
 	private CombatUnit rangerMoveAndAttack(CombatUnit cu) {
@@ -752,6 +758,8 @@ public class CombatSquad extends Squad{
 		// put in strategy too
 		return numEnemyUnits > combatUnits.size() * MagicNumbers.AGGRESION_FACTOR;
 	}
+
+/*************** utility functs that shouldn't be in Utils **************/
 
 	public double scoreWithFunct(Tile t, CombatUnit cu, BiFunction<Tile, CombatUnit, Double> scoreFunct){
 		return scoreFunct.apply(t, cu);
