@@ -101,7 +101,6 @@ public class WorkerManager{
 			assignUnassignedUnits();
 
 			while(strat.rocketsToBuild > 0){
-				// rocket!
 				if(createBuildSquad(UnitType.Rocket,true)){
 					strat.rocketsToBuild--;
 				}
@@ -110,14 +109,16 @@ public class WorkerManager{
 				}
 			}
 
-			//REFACTOR: build in opposite direction of nearest hostile instead of considering all possible locations?
-			//REFACTOR: remove squads with objective set to none?
-
 			if(infoMan.factories.size() < strat.maxFactories) {
 				boolean mustSteal = (strat.minFactories > infoMan.factories.size());
 				createBuildSquad(UnitType.Factory, mustSteal);
 			}
 
+			if(infoMan.workerCount < strat.maxWorkers){
+				boolean mustReplicate = infoMan.workerCount < strat.minWorkers;
+				
+			}
+			
 		}
 		else{
 			assignUnassignedUnits();

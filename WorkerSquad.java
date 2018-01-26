@@ -1,5 +1,7 @@
 import bc.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 
 /*
 controlled by WorkerManager
@@ -7,18 +9,13 @@ basically just carry out assigned objective (build thing or idly mine)
 sets objective to NONE when done (to be reassigned by manager)
 */
 
-/* Overall refactor thoughts: general logic is good but helper functions need to be optimized
- * less gc calls, cooperate with infoMan, tile, etc.
- */
-
-//TODO: persist karbonite targets by worker between rounds
-
 public class WorkerSquad extends Squad {
 
 	UnitType toBuild;
-	MapLocation targetKarboniteLoc = null;
 	Strategy strat;
 	private boolean blueprinted;
+	HashMap<Integer, MapLocation> targetKarbLocs;
+	HashSet<Integer> workersToRep;
 
 	public WorkerSquad(InfoManager im, Strategy s) {
 		super(im);
@@ -114,7 +111,16 @@ public class WorkerSquad extends Squad {
 		if(!gc.isMoveReady(id))
 			return;
 		MapLocation myLoc = gc.unit(id).location().mapLocation();
-		MapLocation karbLoc = infoMan.getClosestKarbonite(myLoc);
+		MapLocation karbLoc = myLoc;
+		if(targetKarbLocs.containsKey(id)){
+			MapLocation targetKarbLoc = targetKarbLocs.get(id);
+			if(infoMan.tiles[targetKarbLoc.getX()][targetKarbLoc.getY()].karbonite == 0)
+				karbLoc = infoMan.getClosestKarbonite(myLoc);
+		}
+		else{
+			karbLoc = infoMan.getClosestKarbonite(myLoc);
+		}
+		targetKarbLocs.put(id, karbLoc);
 		Direction d = nav.dirToMoveSafely(myLoc, karbLoc);
 		infoMan.moveAndUpdate(id, d, UnitType.Worker);
 	}
@@ -188,7 +194,7 @@ public class WorkerSquad extends Squad {
 			if(worker.location().isInSpace() || worker.location().isInGarrison())
 				continue;
 			//TODO: replicate based on manager's choice
-			if(worker.abilityHeat() < 10 && infoMan.workerCount < strat.minWorkers){
+			if(worker.abilityHeat() < 10 && workersToRep.contains(id)){
 				replicateWorker(id);
 			}
 			switch (objective) {
