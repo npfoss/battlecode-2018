@@ -63,6 +63,8 @@ public class InfoManager {
     Tile[][] tiles;
     int marsx, marsy; // TODO: don't use this system, it sucks
     ArrayList<MapLocation> placesWeveSentTo;
+    
+    int[] researchLevels;
 
 	public InfoManager(GameController g, MagicNumbers mn) {
 		gc = g;
@@ -102,6 +104,8 @@ public class InfoManager {
         marsy = 0;
         builtRocket = true;
         placesWeveSentTo = new ArrayList<MapLocation>();
+        
+        researchLevels = new int[]{0,0,0,0,0,0}; //knight, mage, ranger, healer, worker, rocket
 	}
 
 	public void update(Strategy strat) {
