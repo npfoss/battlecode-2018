@@ -11,55 +11,15 @@ public class ResearchManagerMars extends ResearchManager{
 		if(gc.round() >= 750) {
 			if(gc.researchInfo().hasNextInQueue())
 				return;
-			int numExpectedRanger = 0;
-			int numExpectedMage = 0;
-			int numExpectedKnight = 0;
-			int numExpectedWorker = 0;
-			int numExpectedRocket = 0;
-			int numExpectedHealer = 0;
+			int[] numExpected = new int[]{0,0,0,0,0,0};
 			
 			for(UnitType ut: strat.researchOrder){
-				if(ut == UnitType.Ranger){
-					numExpectedRanger++;
-					if(numExpectedRanger>gc.researchInfo().getLevel(UnitType.Ranger)){
-						gc.queueResearch(UnitType.Ranger);
-						break;
-					}
-				}
-				if(ut == UnitType.Mage){
-					numExpectedMage++;
-					if(numExpectedMage>gc.researchInfo().getLevel(UnitType.Mage)){
-						gc.queueResearch(UnitType.Mage);
-						break;
-					}
-				}
-				if(ut == UnitType.Knight){
-					numExpectedKnight++;
-					if(numExpectedKnight>gc.researchInfo().getLevel(UnitType.Knight)){
-						gc.queueResearch(UnitType.Knight);
-						break;
-					}
-				}
-				if(ut == UnitType.Worker){
-					numExpectedWorker++;
-					if(numExpectedWorker>gc.researchInfo().getLevel(UnitType.Worker)){
-						gc.queueResearch(UnitType.Worker);
-						break;
-					}
-				}
-				if(ut == UnitType.Healer){
-					numExpectedHealer++;
-					if(numExpectedHealer>gc.researchInfo().getLevel(UnitType.Healer)){
-						gc.queueResearch(UnitType.Healer);
-						break;
-					}
-				}
-				if(ut == UnitType.Rocket){
-					numExpectedRocket++;
-					if(numExpectedRocket>gc.researchInfo().getLevel(UnitType.Rocket)){
-						gc.queueResearch(UnitType.Rocket);
-						break;
-					}
+				int i = Utils.typeToInd(ut);
+				numExpected[i]++;
+				if(numExpected[i] > infoMan.researchLevels[i]){
+					gc.queueResearch(ut);
+					infoMan.researchLevels[i]++;
+					break;
 				}
 			}
 		}
