@@ -5,7 +5,7 @@ import java.util.TreeSet;
 
 import bc.*;
 
-public class Utils{	
+public class Utils{
     public static Direction[] orderedDirections =
         {Direction.East, Direction.Southeast, Direction.South, Direction.Southwest,
          Direction.West, Direction.Northwest, Direction.North, Direction.Northeast};

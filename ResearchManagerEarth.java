@@ -8,7 +8,7 @@ public class ResearchManagerEarth extends ResearchManager{
 	public ResearchManagerEarth(GameController g, InfoManager im){
 		super(g,im);
 	}
-	
+
 	public void update(Strategy strat){
 		if(gc.researchInfo().hasNextInQueue())
 			return;
