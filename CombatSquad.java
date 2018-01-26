@@ -8,8 +8,9 @@ import java.util.HashSet;
 import java.util.TreeSet;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.function.BiFunction;
 
-// oops missed a description... help
+// REFACTOR: oops missed a description... help
 
 public class CombatSquad extends Squad{
 
@@ -24,7 +25,9 @@ public class CombatSquad extends Squad{
 
 /************ ALL THE THINGS TO TWEAK ****************/
 
-
+	public double testScore(Tile tile, CombatUnit cu){
+		return 10.0;
+	}
 
 
 
@@ -636,6 +639,7 @@ public class CombatSquad extends Squad{
 			Tile t = infoMan.tiles[nx][ny];
 			if(!infoMan.isLocationClear(t.myLoc))
 				continue;
+			score = scoreWithFunct(t, cu, this::testScore);
 			score = t.distFromNearestHostile * MagicNumbers.HOSTILE_FACTOR_RANGER_MOVE
 					- (t.distFromNearestHostile - goalRangerDistance > 0 ? t.distFromNearestHostile - goalRangerDistance : 0) * MagicNumbers.DISTANCE_FACTOR_RANGER_MOVE
 					- t.possibleDamage * MagicNumbers.DAMAGE_FACTOR_RANGER_MOVE
@@ -747,5 +751,9 @@ public class CombatSquad extends Squad{
 		// TODO: make this better
 		// put in strategy too
 		return numEnemyUnits > combatUnits.size() * MagicNumbers.AGGRESION_FACTOR;
+	}
+
+	public double scoreWithFunct(Tile t, CombatUnit cu, BiFunction<Tile, CombatUnit, Double> scoreFunct){
+		return scoreFunct.apply(t, cu);
 	}
 }
