@@ -15,12 +15,12 @@ public class WorkerSquad extends Squad {
 	Strategy strat;
 	private boolean blueprinted;
 	HashMap<Integer, MapLocation> targetKarbLocs;
-	HashSet<Integer> workersToRep;
-
+	
 	public WorkerSquad(InfoManager im, Strategy s) {
 		super(im);
 		strat = s;
 		blueprinted = false;
+		targetKarbLocs = new HashMap<Integer,MapLocation>();
 	}
 	
 	public void update() {
@@ -37,13 +37,13 @@ public class WorkerSquad extends Squad {
 				infoMan.moveAndUpdate(id, movedir, UnitType.Worker);
 				worker = gc.unit(id);
 			}
-			else if(worker.location().mapLocation()  == targetLoc) {//We are on top of the targetLoc, move away
+			else if(worker.location().mapLocation() == targetLoc) {//We are on top of the targetLoc, move away
 				for(Direction dirToMove : Utils.orderedDirections) {
 					if (gc.canMove(id, dirToMove)) {
 						infoMan.moveAndUpdate(id, dirToMove, UnitType.Worker);
 						worker = gc.unit(id);
+						break;
 					}
-					break;
 				}
 			}
 			//Last resort we're stuck and need to build
@@ -116,12 +116,18 @@ public class WorkerSquad extends Squad {
 			MapLocation targetKarbLoc = targetKarbLocs.get(id);
 			if(infoMan.tiles[targetKarbLoc.getX()][targetKarbLoc.getY()].karbonite == 0)
 				karbLoc = infoMan.getClosestKarbonite(myLoc);
+			else
+				karbLoc = targetKarbLoc;
 		}
 		else{
 			karbLoc = infoMan.getClosestKarbonite(myLoc);
 		}
+		//Utils.log("trying to move toward karbonite at location " + karbLoc);
+		if(karbLoc == null)
+			return;
 		targetKarbLocs.put(id, karbLoc);
 		Direction d = nav.dirToMoveSafely(myLoc, karbLoc);
+		
 		infoMan.moveAndUpdate(id, d, UnitType.Worker);
 	}
 	
@@ -171,6 +177,7 @@ public class WorkerSquad extends Squad {
 				if (gc.canReplicate(id, dirToReplicate)) {
 					gc.replicate(id, dirToReplicate);
 					infoMan.workerCount++;
+					infoMan.workersToRep.remove(id);
 					break;
 				}
 			}
@@ -180,6 +187,7 @@ public class WorkerSquad extends Squad {
 				if (gc.canReplicate(id, dirToReplicate)) {
 					gc.replicate(id, dirToReplicate);
 					infoMan.workerCount++;
+					infoMan.workersToRep.remove(id);
 					break;
 				}
 			}
@@ -194,7 +202,7 @@ public class WorkerSquad extends Squad {
 			if(worker.location().isInSpace() || worker.location().isInGarrison())
 				continue;
 			//TODO: replicate based on manager's choice
-			if(worker.abilityHeat() < 10 && workersToRep.contains(id)){
+			if(worker.abilityHeat() < 10 && infoMan.workersToRep.contains(id)){
 				replicateWorker(id);
 			}
 			switch (objective) {

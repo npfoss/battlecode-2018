@@ -47,6 +47,7 @@ public class MagicNumbers{
     static int FACTORY_COST = 200;
 	static int MAX_WORKERS_PER_BUILDING = 6;
 	static double MINIMUM_SCORE_TO_STEAL = 0;
-	static int MAX_DIST_TO_STEAL = 50;
+	static int MAX_DIST_TO_STEAL = 20;
 	static long KARB_SEPARATION_DISTANCE = 10;
+	static Double MIN_SCORE_TO_REPLICATE = 50.0;
 }

@@ -54,6 +54,7 @@ public class InfoManager {
 	ArrayList<WorkerSquad> workerSquads;
 	ArrayList<RocketSquad> rocketSquads;
 	ArrayList<CombatSquad> combatSquads;
+	HashSet<Integer> workersToRep;
 
 	// here lies map info (mostly for nav)
     ArrayList<Region> regions;
@@ -61,6 +62,7 @@ public class InfoManager {
     Tile[][] tiles;
     int marsx, marsy; // TODO: don't use this system, it sucks
     ArrayList<MapLocation> placesWeveSentTo;
+    
 
 	public InfoManager(GameController g, MagicNumbers mn) {
 		gc = g;
@@ -94,16 +96,27 @@ public class InfoManager {
 
         tiles = new Tile[width][height];
         regions = new ArrayList<Region>();
+        workersToRep = new HashSet<Integer>();
+        karbAreas = new ArrayList<KarboniteArea>();
         initMap();
-
+        
+        
         marsx = 0;
         marsy = 0;
         placesWeveSentTo = new ArrayList<MapLocation>();
         factoriesToBeBuilt = 0;
         rocketsToBeBuilt = 0;
+        
+        rockets = new ArrayList<Unit>();
+        workers = new ArrayList<Unit>();
+        fighters = new ArrayList<Unit>();
+        factories = new ArrayList<Unit>();
+        unassignedUnits = new HashSet<Integer>();
 	}
 
 	public void update(Strategy strat) {
+		//TODO: if you're mars add karbonite to tiles according to weather.
+		
 		lastCheckpoint = System.nanoTime();
 		
 		// called at the beginning of each turn
@@ -400,8 +413,10 @@ public class InfoManager {
         if(karbs > 0)
         	karbArea = getKarbArea(loc, region);
         tiles[loc.getX()][loc.getY()] = new Tile(true, karbs, region, loc, magicNums, this, karbArea);
-        if(karbArea != null)
+        if(karbArea != null) {
         	karbArea.addTile(tiles[loc.getX()][loc.getY()]);
+        	//Utils.log("adding " + loc + " to an area.");
+        }
         region.tiles.add(tiles[loc.getX()][loc.getY()]);
         region.karbonite += karbs;
 
@@ -418,7 +433,7 @@ public class InfoManager {
 
     public KarboniteArea getKarbArea(MapLocation loc, Region r) {
 		for(KarboniteArea kA: karbAreas){
-			if(r != kA.tiles.get(0).region)
+			if(kA.tiles.size() == 0 || r != kA.tiles.get(0).region)
 				continue;
 			if(kA.hasTileWithinDistance(loc, MagicNumbers.KARB_SEPARATION_DISTANCE)){
 				return kA;
@@ -512,14 +527,6 @@ public class InfoManager {
     	tiles[end.getX()][end.getY()].myType = type;
     }
     
-/*******  FOR LOGGING AND DEBUGGING *********/
-    
-    public void logTimeCheckpoint(String identifier){
-    	long duration = System.nanoTime() - lastCheckpoint;
-    	lastCheckpoint = System.nanoTime();
-    	//Utils.log(identifier + ": " + duration + " ns since last checkpoint.");
-    }
-
     public Double distToClosestKarbonite(MapLocation loc) {
     	long minDist = 1000000;
     	KarboniteArea closest = null;
@@ -538,14 +545,23 @@ public class InfoManager {
     	long minDist = 1000000;
     	KarboniteArea closest = null;
     	for(KarboniteArea kA: karbAreas){
-    		if(kA.center.distanceSquaredTo(loc) < minDist){
+    		if(kA.tiles.size() > 0 && kA.center.distanceSquaredTo(loc) < minDist){
     			minDist = kA.center.distanceSquaredTo(loc);
     			closest = kA;
     		}
     	}
     	if(closest == null)
     		return null;
+    	//Utils.log("closest karb is in area with center " + closest.center);
     	return closest.getClosestTile(loc).myLoc;
+    }
+    
+/*******  FOR LOGGING AND DEBUGGING *********/
+    
+    public void logTimeCheckpoint(String identifier){
+    	long duration = System.nanoTime() - lastCheckpoint;
+    	lastCheckpoint = System.nanoTime();
+    	//Utils.log(identifier + ": " + duration + " ns since last checkpoint.");
     }
 
 }

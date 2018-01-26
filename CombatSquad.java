@@ -276,7 +276,7 @@ public class CombatSquad extends Squad{
 		Direction dirToMove = Utils.orderedDirections[(int) (8*Math.random())];
 		for(int uid: units){
 			if(gc.canMove(uid, dirToMove) && gc.unit(uid).movementHeat() < 10)
-				gc.moveRobot(uid, dirToMove);
+				infoMan.moveAndUpdate(uid, dirToMove,gc.unit(uid).unitType());
 		}
 	}
 
@@ -630,7 +630,7 @@ public class CombatSquad extends Squad{
 			if(nx<0||nx>=infoMan.width||ny<0||ny>=infoMan.height)
 				continue;
 			Tile t = infoMan.tiles[nx][ny];
-			if(!t.isWalkable || t.containsUnit)
+			if(!t.isWalkable || t.unitID > -1)
 				continue;
 			score = t.distFromNearestHostile * magicNums.HOSTILE_FACTOR_HEALER_MOVE
 					- (t.distFromNearestHostile - (goalRangerDistance+magicNums.HEALER_RANGE) > 0 ? t.distFromNearestHostile - (goalRangerDistance+magicNums.HEALER_RANGE) : 0) 
@@ -660,7 +660,7 @@ public class CombatSquad extends Squad{
 			if(nx<0||nx>=infoMan.width||ny<0||ny>=infoMan.height)
 				continue;
 			Tile t = infoMan.tiles[nx][ny];
-			if(!t.isWalkable || t.containsUnit)
+			if(!t.isWalkable || t.unitID > -1)
 				continue;
 			score = t.distFromNearestHostile * magicNums.HOSTILE_FACTOR_RANGER_MOVE
 					- (t.distFromNearestHostile - goalRangerDistance > 0 ? t.distFromNearestHostile - goalRangerDistance : 0) * magicNums.DISTANCE_FACTOR_RANGER_MOVE
@@ -695,7 +695,7 @@ public class CombatSquad extends Squad{
 			if(nx<0||nx>=infoMan.width||ny<0||ny>=infoMan.height)
 				continue;
 			Tile t = infoMan.tiles[nx][ny];
-			if(!t.isWalkable || t.containsUnit)
+			if(!t.isWalkable || t.unitID > -1)
 				continue;
 			score = t.distFromNearestHostile * magicNums.HOSTILE_FACTOR_HEALER_MOVE
 					- (t.distFromNearestHostile - goalRangerDistance > 0 ? t.distFromNearestHostile - goalRangerDistance : 0) * magicNums.DISTANCE_FACTOR_RANGER_MOVE
@@ -750,7 +750,7 @@ public class CombatSquad extends Squad{
 			if(nx<0||nx>=infoMan.width||ny<0||ny>=infoMan.height)
 				continue;
 			Tile t = infoMan.tiles[nx][ny];
-			if(!t.isWalkable || t.containsUnit)
+			if(!t.isWalkable || t.unitID > -1)
 				continue;
 			score = t.distFromNearestHostile*magicNums.HOSTILE_FACTOR_RUN_AWAY 
 					- t.myLoc.distanceSquaredTo(swarmLoc)*magicNums.SWARM_FACTOR_RUN_AWAY
@@ -791,16 +791,10 @@ public class CombatSquad extends Squad{
 	private CombatUnit moveAndUpdate(CombatUnit cu, Direction d){
 		if(d==Direction.Center)
 			return cu;
-		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].containsUnit = false;
-		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].unitID = -1;
-		System.out.flush();
 		cu.canMove = false;
-		cu.myLoc = cu.myLoc.add(d);
-		//Utils.log(cu.ID + " moving to " + cu.myLoc.getX() + " " + cu.myLoc.getY());
-		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].containsUnit = true;
-		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].unitID = cu.ID;
 		cu.distFromNearestHostile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].distFromNearestHostile;
-		gc.moveRobot(cu.ID, d);
+		infoMan.moveAndUpdate(cu.ID, d, cu.type);
+		cu.myLoc = cu.myLoc.add(d);
 		return cu;
 	}
 	

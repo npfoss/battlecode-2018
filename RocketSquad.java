@@ -92,7 +92,7 @@ public class RocketSquad extends Squad {
 				 * 		rocket are marked as dangerous (without a fix) */
 				Direction movedir = nav.dirToMoveSafely(astronaut.location().mapLocation(),targetLoc);
 				if (movedir != Direction.Center) {
-					gc.moveRobot(id, movedir);
+					infoMan.moveAndUpdate(id, movedir, astronaut.unitType());
 				}
 			}
 		}

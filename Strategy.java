@@ -67,11 +67,14 @@ public class Strategy{
 
 	public int calcWorkerUrgency(int size, Objective objective, UnitType toBuild) {
 		//TODO: make this better
-		return 8 - size;
+		if(objective == Objective.MINE)
+			return 0;
+		return MagicNumbers.MAX_WORKERS_PER_BUILDING - size;
 	}
 
 	public boolean shouldGoToBuildLoc() {
 		//TODO: make this better
-		return gc.karbonite() >= MagicNumbers.FACTORY_COST - infoMan.workerCount * 10;
+		return true;
+		//return gc.karbonite() >= MagicNumbers.FACTORY_COST - infoMan.workerCount * 10;
 	}
 }

@@ -14,8 +14,7 @@ public class Player {
         while (true) {
             try{
                 overseer.takeTurn();
-                if(gc.round() % 50 == 0)
-                	System.gc();
+                System.gc();
             } catch(Exception e) {
                 System.out.println("***ERROR AHHHHHHHHHHHHHHHHHHHHHHHHH***");
                 e.printStackTrace(System.out);
