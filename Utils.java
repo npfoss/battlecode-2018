@@ -13,6 +13,8 @@ public class Utils{
     public static Direction[] orderedDirections =
         {Direction.East, Direction.Southeast, Direction.South, Direction.Southwest,
          Direction.West, Direction.Northwest, Direction.North, Direction.Northeast};
+    static final int[] dx = {1, 1, 0,-1,-1,-1,0,1,0};
+    static final int[] dy = {0,-1,-1,-1, 0, 1,1,1,0};
     public static Direction[] orderedDiagonals =
         {Direction.Southeast, Direction.Southwest,
          Direction.Northwest, Direction.Northeast};
@@ -31,6 +33,20 @@ public class Utils{
         }
     }
 
+    public static Direction indexToDirection(int i){
+        switch(i){
+            case 0: return Direction.East;
+            case 1: return Direction.Southeast;
+            case 2: return Direction.South;
+            case 3: return Direction.Southwest;
+            case 4: return Direction.West;
+            case 5: return Direction.Northwest;
+            case 6: return Direction.North;
+            case 7: return Direction.Northeast;
+            default: return Direction.Center;
+        }
+    }
+
     public static Direction[] directionsTowardButNotIncluding(Direction dir) {
     	 Direction left = dir;
          Direction right = dir;
@@ -43,23 +59,9 @@ public class Utils{
              ret[counter++] = left;
              ret[counter++] = right;
          }
-         ret[6] = oppositeDir(dir);
+         ret[6] = oppositeDirection(dir);
          return ret;
     }
-    
-    public static Direction oppositeDir(Direction dir){
-        switch(dir){
-            case North: return Direction.South;
-            case Northwest: return Direction.Southeast;
-            case West: return Direction.East;
-            case Southwest: return Direction.Northeast;
-            case South: return Direction.North;
-            case Southeast: return Direction.Northwest;
-            case East: return Direction.West;
-            case Northeast: return Direction.Southwest;
-        }
-        return Direction.Center;
-    } 
     
     public static Direction rotateLeft(Direction dir){
         switch(dir){

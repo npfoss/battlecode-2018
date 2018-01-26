@@ -36,16 +36,16 @@ public class CombatUnit {
 		
 	}
 	
-	public CombatUnit(int i, int d, long h, boolean ca, boolean cm, MapLocation ml, UnitType ut, int sft){
-		ID = i;
-		damage = d;
-		health = h;
-		canAttack = ca;
-		canMove = cm;
+	public CombatUnit(Unit u, MapLocation ml, int sft){
+		ID = u.id();
+		type = u.unitType();
+		damage = u.damage();
+		health = u.health();
+		canAttack = u.attackHeat() < 10;
+		canMove = u.movementHeat() < 10;
+		myLoc = ml;
 		canSnipe = false;
 		dependencyID = -1;
-		myLoc = ml;
-		type = ut;
 		stepsFromTarget = sft;
 		switch(type){
 			case Ranger: maxHealth = 200; break; // should be magic numbers in case they change the specs
