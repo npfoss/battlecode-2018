@@ -40,7 +40,6 @@ public class RocketManager{
 
         // find new (unassigned) rockets and make squads
         for (Unit rocket : infoMan.newRockets){
-        	infoMan.builtRocket = true;
         	RocketSquad rs = new RocketSquad(infoMan, rocket.location().mapLocation());
         	rs.units.add(rocket.id());
             infoMan.rocketSquads.add(rs);

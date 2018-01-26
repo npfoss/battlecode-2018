@@ -18,7 +18,8 @@ public class Strategy{
                             // knight, mage, ranger, healer, worker
 	MapLocation[] rocketLaunchLocations;
     int rocketLaunchFrequency; // (# rounds between each)
-	int maxWorkers;
+	int minWorkers;
+    int maxWorkers;
 	int maxFactories;
 	int minFactories;
 
@@ -36,6 +37,8 @@ public class Strategy{
         rocketsToBuild = 0;
         maxFactories = 1;
         minFactories = 0;
+        minWorkers = 5;
+        maxWorkers = 20;
 	}
 
 	public void update(){
@@ -43,7 +46,7 @@ public class Strategy{
 		if(infoMan.myPlanet == Planet.Mars)
 			return;
 		//increment rocketsToBuild appropriately
-		//TODO: replace with variable from research refactor
+		//TODO: replace with variable from research refactor plus make better
 		if(gc.round() % 50 == 0 && gc.researchInfo().getLevel(UnitType.Rocket) > 0)
 			rocketsToBuild++;
 		/*
@@ -61,4 +64,14 @@ public class Strategy{
 				maxWorkers += 1;
 		}*/
     }
+
+	public int calcWorkerUrgency(int size, Objective objective, UnitType toBuild) {
+		//TODO: make this better
+		return 8 - size;
+	}
+
+	public boolean shouldGoToBuildLoc() {
+		//TODO: make this better
+		return gc.karbonite() >= MagicNumbers.FACTORY_COST - infoMan.workerCount * 10;
+	}
 }

@@ -11,27 +11,25 @@ sets objective to NONE when done (to be reassigned by manager)
  * less gc calls, cooperate with infoMan, tile, etc.
  */
 
-//TODO: when you lay down a blueprint, decrement factoriesToBeBuilt
+//TODO: persist karbonite targets by worker between rounds
 
 public class WorkerSquad extends Squad {
 
 	UnitType toBuild;
 	MapLocation targetKarboniteLoc = null;
+	Strategy strat;
+	private boolean blueprinted;
 
-	public WorkerSquad(GameController g, InfoManager im) {
+	public WorkerSquad(InfoManager im, Strategy s) {
 		super(im);
-		//REFACTOR: remove the auto toBuild?
-		toBuild = UnitType.Factory;
+		strat = s;
+		blueprinted = false;
 	}
-
-	final int[] dx = {-1,-1,-1,0,0,0,1,1,1};
-	final int[] dy = {-1,0,1,-1,0,1,-1,0,1};
-
+	
 	public void update() {
-		//TODO: think more about this
 		if(requestedUnits.isEmpty())
 			requestedUnits.add(UnitType.Worker);
-		urgency = 8-units.size();
+		urgency = strat.calcWorkerUrgency(units.size(),objective,toBuild);
 	}
 	
 	public void moveTowardsBuildLoc(int id, Unit worker, Nav nav) {
@@ -39,13 +37,13 @@ public class WorkerSquad extends Squad {
 			//Move towards the target location
 			Direction movedir = nav.dirToMoveSafely(worker.location().mapLocation(),targetLoc);
 			if (movedir != Direction.Center) {
-				gc.moveRobot(id, movedir);
+				infoMan.moveAndUpdate(id, movedir, UnitType.Worker);
 				worker = gc.unit(id);
 			}
 			else if(worker.location().mapLocation()  == targetLoc) {//We are on top of the targetLoc, move away
 				for(Direction dirToMove : Utils.orderedDirections) {
 					if (gc.canMove(id, dirToMove)) {
-						gc.moveRobot(id, dirToMove);
+						infoMan.moveAndUpdate(id, dirToMove, UnitType.Worker);
 						worker = gc.unit(id);
 					}
 					break;
@@ -58,36 +56,41 @@ public class WorkerSquad extends Squad {
 		}
 		
 	}
+	
 	public void tryToBuild (int id, Unit worker) {
-		//REFACTOR: remove all/most of the gc calls
-		if(gc.hasUnitAtLocation(targetLoc) && gc.senseUnitAtLocation(targetLoc).unitType() == toBuild && gc.senseUnitAtLocation(targetLoc).structureIsBuilt() != 0) {
+		int x = targetLoc.getX();
+		int y = targetLoc.getY();
+		Tile t = infoMan.tiles[x][y];
+		if(t.unitID != -1 && t.myType == toBuild && gc.unit(t.unitID).structureIsBuilt() != 0) {
 			objective = Objective.NONE;
 			return; 
 		}
 		//We're here! Lets make a blueprint/work on building it up.
 		if(worker.location().mapLocation().isAdjacentTo(targetLoc)) {
-			if(gc.hasUnitAtLocation(targetLoc) && gc.senseUnitAtLocation(targetLoc).unitType() == toBuild) {
-				Unit blueprint = gc.senseUnitAtLocation(targetLoc);
-				if (gc.canBuild(id, blueprint.id())) {
-					gc.build(id, blueprint.id());
+			if(t.unitID != -1 && t.myType == toBuild) {
+				if (gc.canBuild(id, t.unitID)) {
+					gc.build(id, t.unitID);
 				}
 			}
 		}
-		if(gc.hasUnitAtLocation(targetLoc) && gc.senseUnitAtLocation(targetLoc).unitType() == toBuild && gc.senseUnitAtLocation(targetLoc).structureIsBuilt() != 0) {
+		if(t.unitID != -1 && t.myType == toBuild &&  gc.unit(t.unitID).structureIsBuilt() != 0) {
 			objective = Objective.NONE;
 			return; 
 		}
-		if(!(gc.hasUnitAtLocation(targetLoc))) {
+		if(t.unitID == -1) {
 			Direction dirToBuild = worker.location().mapLocation().directionTo(targetLoc);
 			if (gc.karbonite() > bc.bcUnitTypeBlueprintCost(toBuild)
 					&& gc.canBlueprint(id, toBuild, dirToBuild)) {
 				gc.blueprint(worker.id(), toBuild, dirToBuild);
+			    Unit blueprint = gc.senseUnitAtLocation(targetLoc);
+			    t.unitID = blueprint.id();
+			    t.myType = toBuild;
+			    blueprinted = true;
+			    switch(toBuild){
+			    case Factory: infoMan.factoriesToBeBuilt--;
+			    case Rocket: infoMan.rocketsToBeBuilt--;
+			    }
 			}
-		}
-		
-		//System.out.println(gc.senseUnitAtLocation(targetLoc).unitType());
-		if(gc.hasUnitAtLocation(targetLoc) && gc.senseUnitAtLocation(targetLoc).unitType() == toBuild && gc.senseUnitAtLocation(targetLoc).structureIsBuilt() != 0) {
-			objective = Objective.NONE;
 		}
 	}
 
@@ -106,65 +109,17 @@ public class WorkerSquad extends Squad {
 			return infoMan.height-1;
 		return y;
 	}
-	public boolean karboniteNearLoc(MapLocation loc) {
-		for(int i = 0; i < 9; i++) {
-			if(infoMan.tiles[safeX(loc.getX()+dx[i])][safeY(loc.getY()+dy[i])].karbonite > 0) {
-				return true;
-			}
-		}
-		return false;
-	}
+	
 	public void moveTowardsKarbonite(int id, Nav nav) {
-		//System.out.println("trying really hard to move towards karbonite");
 		if(!gc.isMoveReady(id))
 			return;
-		//long start = System.nanoTime();
-		for(Direction d : Utils.orderedDirections) {
-			if(gc.canMove(id, d)) {
-				if(karboniteNearLoc(gc.unit(id).location().mapLocation().add(d))) {
-					gc.moveRobot(id, d);
-					return;
-				}
-			}
-		}
 		MapLocation myLoc = gc.unit(id).location().mapLocation();
-		int maxDist = 2;
-		
-		//REFACTOR: have infoMan keep track of karbonite regions and have a method to get the nearest one. just call that and go there.
-		
-		if(targetKarboniteLoc != null && infoMan.tiles[targetKarboniteLoc.getX()][targetKarboniteLoc.getY()].karbonite == 0)
-			targetKarboniteLoc = null;
-		while(targetKarboniteLoc == null && maxDist < 257) {
-			VecMapLocation m = gc.allLocationsWithin(myLoc, maxDist);
-			maxDist = maxDist*2;
-			for(int i = 0; i < m.size(); i++) {
-				int x = m.get(i).getX();
-				int y= m.get(i).getY();
-				if(infoMan.tiles[x][y].karbonite > 0 && infoMan.isReachable(myLoc, m.get(i)) && infoMan.distToHostile(m.get(i)) > 200) {
-					targetKarboniteLoc = m.get(i);
-					break;
-				}
-			}
-		}
-		if(targetKarboniteLoc != null) {
-			//System.out.println("trying sososoosososososososo hard to move towards karbonite");
-			Direction toMove = nav.dirToMoveSafely(myLoc, targetKarboniteLoc);
-			if(gc.canMove(id, toMove)) {
-				//System.out.println("IM MOVING ROAR");
-				gc.moveRobot(id, toMove);
-			}
-		}else {
-			//For now probably nothing better todo :(
-			//gc.disintegrateUnit(id);
-			Direction dirToMove = Utils.orderedDirections[(int) (8*Math.random())];
-			if(gc.canMove(id, dirToMove))
-				gc.moveRobot(id, dirToMove);
-		}
-		//long end = System.nanoTime();
-		//Utils.log("aaron just wasted " + (end-start) + " ns.");
+		MapLocation karbLoc = infoMan.getClosestKarbonite(myLoc);
+		Direction d = nav.dirToMoveSafely(myLoc, karbLoc);
+		infoMan.moveAndUpdate(id, d, UnitType.Worker);
 	}
+	
 	public boolean tryToMine(int id) {
-		//REFACTOR: Use tile checks instead of gc.canHarvest
 		if(gc.canHarvest(id,Direction.Center)) {
 			gc.harvest(id, Direction.Center);
 			return true;
@@ -232,50 +187,57 @@ public class WorkerSquad extends Squad {
 			Unit worker = gc.unit(id);
 			if(worker.location().isInSpace() || worker.location().isInGarrison())
 				continue;
-			//REFACTOR: only replicate if you are told to by your manager
-			if((infoMan.workerCount < strat.maxWorkers && infoMan.myPlanet == Planet.Earth) || (infoMan.myPlanet == Planet.Mars && (gc.round() > 700 || gc.karbonite() > 200))) {
+			//TODO: replicate based on manager's choice
+			if(worker.abilityHeat() < 10 && infoMan.workerCount < strat.minWorkers){
 				replicateWorker(id);
 			}
 			switch (objective) {
 			case BUILD:
-				if(targetLoc != null) {
-					moveTowardsBuildLoc(id, worker, nav);
-					//System.out.println("Trying to build something useful at: " + targetLoc.getX() + ", " + targetLoc.getY());
-					
-					if(worker.location().mapLocation().isAdjacentTo(targetLoc)) {
-						tryToBuild(id, worker);
-						
+				if(blueprinted || strat.shouldGoToBuildLoc()){
+					if(targetLoc != null) {
+						moveTowardsBuildLoc(id, worker, nav);					
+						if(worker.location().mapLocation().isAdjacentTo(targetLoc)) {
+							tryToBuild(id, worker);
+						}
 					}
-				}
-				else {
-					//we are told to build without a location??? angrily build in a random direction directions.
-					VecUnit vu = gc.senseNearbyUnits(worker.location().mapLocation(), 2);
-					for (int i = 0; i < vu.size(); i++) {
-						if(vu.get(i).unitType() == toBuild) {
-							if (gc.canBuild(id, vu.get(i).id())) {
-								gc.build(id, vu.get(i).id());
+					else {
+						//we are told to build without a location??? angrily build in a random direction directions.
+						VecUnit vu = gc.senseNearbyUnits(worker.location().mapLocation(), 2);
+						for (int i = 0; i < vu.size(); i++) {
+							if(vu.get(i).unitType() == toBuild) {
+								if (gc.canBuild(id, vu.get(i).id())) {
+									gc.build(id, vu.get(i).id());
+								}
+								if(vu.get(i).structureIsBuilt()!=0) {
+									objective = Objective.NONE;
+								}
 							}
-							if(vu.get(i).structureIsBuilt()!=0) {
-								objective = Objective.NONE;
+						}
+						for(Direction dirToBuild : Utils.orderedDirections) {
+							if (gc.karbonite() > bc.bcUnitTypeBlueprintCost(toBuild)
+									&& gc.canBlueprint(id, toBuild, dirToBuild)) {
+								gc.blueprint(worker.id(), toBuild, dirToBuild);
+								MapLocation bloc = worker.location().mapLocation().add(dirToBuild);
+								Unit blueprint = gc.senseUnitAtLocation(bloc);
+							    infoMan.tiles[bloc.getX()][bloc.getY()].unitID = blueprint.id();
+							    infoMan.tiles[bloc.getX()][bloc.getY()].myType = toBuild;
+							    blueprinted = true;
+							    switch(toBuild){
+							    case Factory: infoMan.factoriesToBeBuilt--;
+							    case Rocket: infoMan.rocketsToBeBuilt--;
+							    }
 							}
 						}
 					}
-					for(Direction dirToBuild : Utils.orderedDirections) {
-						if (gc.karbonite() > bc.bcUnitTypeBlueprintCost(toBuild)
-								&& gc.canBlueprint(id, toBuild, dirToBuild)) {
-							gc.blueprint(worker.id(), toBuild, dirToBuild);
-							break;
-						}
-					}
 				}
+				else if(!tryToMine(id))
+					moveTowardsKarbonite(id,nav);
 				tryToMine(id);
 				break;
 			case MINE:
 				if(!tryToMine(id))
 					moveTowardsKarbonite(id,nav);
 				tryToMine(id);
-				break;
-			case BOARD_ROCKET:
 				break;
 			default:
 				break;

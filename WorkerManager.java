@@ -23,12 +23,14 @@ import java.util.TreeSet;
 public class WorkerManager{
 	InfoManager infoMan;
 	GameController gc;
+	Strategy strat;
 
 
-	public WorkerManager(InfoManager im, GameController g){
+	public WorkerManager(InfoManager im, GameController g, Strategy s){
 		infoMan = im;
 		gc = g;
-		WorkerSquad ws = new WorkerSquad(gc,infoMan);
+		strat = s;
+		WorkerSquad ws = new WorkerSquad(infoMan,s);
 		ws.objective = Objective.MINE;
 		ws.update();
 		infoMan.workerSquads.add(ws);
@@ -81,7 +83,7 @@ public class WorkerManager{
 		return bn && bs && be && bw;
 	}
 
-	public void update(Strategy strat,Nav nav){
+	public void update(Nav nav){
 		if(infoMan.myPlanet== Planet.Earth) {
 			ArrayList<WorkerSquad> toRemove = new ArrayList<WorkerSquad>();
 			for(WorkerSquad ws: infoMan.workerSquads){
@@ -97,26 +99,6 @@ public class WorkerManager{
 				infoMan.workerSquads.remove(ws);
 			
 			assignUnassignedUnits();
-
-			/*
-			if(gc.round() == 1) {
-				//Pick a place to build the first factory
-				if(true) {
-					int maxDist = 2;
-					while(startingFactory1 == null && maxDist < 33) {
-						VecMapLocation v =  gc.allLocationsWithin(gc.unit(infoMan.workerSquads.get(0).units.get(0)).location().mapLocation(), maxDist);
-						maxDist = maxDist*2;
-						for(int i= 0; i < v.size(); i++) {
-							if(okayToBuild(v.get(i))) {
-								startingFactory1 = v.get(i);
-								infoMan.workerSquads.get(0).targetLoc = startingFactory1;
-								break;
-							}
-						}
-
-					}
-				}
-			 */
 
 			while(strat.rocketsToBuild > 0){
 				// rocket!
@@ -136,34 +118,6 @@ public class WorkerManager{
 				createBuildSquad(UnitType.Factory, mustSteal);
 			}
 
-			//			if(infoMan.factories.size() < strat.maxFactories && gc.karbonite() >= MagicNumbers.FACTORY_COST) {
-			//				for(WorkerSquad ws : infoMan.workerSquads) {
-			//					if((ws.objective == Objective.NONE  || ws.objective == Objective.MINE) && ws.units.size() > 0) {
-			//						// System.out.println("Trying to build a third factory");
-			//						int maxDist = 36;
-			//						VecMapLocation v =  gc.allLocationsWithin(gc.unit(ws.units.get(0)).location().mapLocation(), maxDist);
-			//						int maxHostileDist = 0;
-			//						boolean foundSomewhere = false;
-			//						for(int i= 0; i < v.size(); i++) {
-			//							if(okayToBuild(v.get(i))) {
-			//								int dist = infoMan.distToHostile(v.get(i));
-			//								if(dist>maxHostileDist){
-			//									maxHostileDist = dist;
-			//									ws.targetLoc = v.get(i);
-			//									foundSomewhere = true;
-			//								}
-			//								if(maxHostileDist == 250)
-			//									break;
-			//							}
-			//						}
-			//						if(foundSomewhere){
-			//							ws.objective = Objective.BUILD;
-			//							ws.toBuild = UnitType.Factory;
-			//						}
-			//							
-			//					}
-			//				}
-			//			}
 		}
 		else{
 			assignUnassignedUnits();
@@ -198,7 +152,7 @@ public class WorkerManager{
 					if(!a.location().isOnMap())
 						continue;
 					if(a.unitType() == UnitType.Worker) {
-						WorkerSquad wsn = new WorkerSquad(gc,infoMan);
+						WorkerSquad wsn = new WorkerSquad(infoMan,strat);
 						wsn.objective = Objective.MINE;
 						wsn.units.add(i);
 						infoMan.unassignedUnits.remove(i);
@@ -238,7 +192,7 @@ public class WorkerManager{
 				case Factory: infoMan.factoriesToBeBuilt++;
 				default: infoMan.rocketsToBeBuilt++;
 			}
-			WorkerSquad newSquad = new WorkerSquad(gc,infoMan);
+			WorkerSquad newSquad = new WorkerSquad(infoMan,strat);
 			newSquad.objective = Objective.BUILD;
 			newSquad.toBuild = type; 
 			HashSet<Integer> toSteal = new HashSet<Integer>();
@@ -256,7 +210,7 @@ public class WorkerManager{
 			for(int d: distances.descendingSet()) {
 				if(d > MagicNumbers.MAX_DIST_TO_STEAL)
 				toSteal.add(distToID.get(d));
-				if(toSteal.size() == 8)
+				if(toSteal.size() == MagicNumbers.MAX_WORKERS_PER_BUILDING)
 					break;
 			}
 			for(int id: toSteal) {
@@ -313,14 +267,16 @@ public class WorkerManager{
 	public double lameScore(int id) {
 		//if it can mine return a lower number
 		//else return a larger number (meaning its lame)
-		return 0;
+		Double ans = infoMan.distToClosestKarbonite(gc.unit(id).location().mapLocation());
+		return (ans == null ? 10000 : ans);
 	}
 	
+	/* unused
 	public void produceRocket(){
 		// choose a squad or create a new one
 		WorkerSquad ws = null;
 		for (WorkerSquad w : infoMan.workerSquads){
-			if (w.objective == Objective.MINE/* || infoMan.factories.size() > 1 && w.objective == Objective.BUILD && w.toBuild == UnitType.Factory*/){
+			if (w.objective == Objective.MINE || infoMan.factories.size() > 1 && w.objective == Objective.BUILD && w.toBuild == UnitType.Factory){
 				w.objective = Objective.BUILD;
 				w.toBuild = UnitType.Rocket;
 				w.targetLoc = null;
@@ -331,13 +287,13 @@ public class WorkerManager{
 			}
 		}
 		if (ws == null){
-			ws = new WorkerSquad(gc,infoMan);
+			ws = new WorkerSquad(gc,infoMan,strat);
 			ws.objective = Objective.BUILD;
 			ws.toBuild = UnitType.Rocket;
 			ws.targetLoc = null;
 			ws.update();
 		}
 		infoMan.workerSquads.add(ws);
-	}
+	}*/
 }
 

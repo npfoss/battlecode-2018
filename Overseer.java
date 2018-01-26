@@ -28,7 +28,7 @@ public class Overseer{
         
         infoMan = new InfoManager(gc,magicNums);
         strat = new Strategy(infoMan,gc);
-        workerMan = new WorkerManager(infoMan,gc);
+        workerMan = new WorkerManager(infoMan,gc,strat);
         combatMan = new CombatManager(infoMan,gc,magicNums,strat);
         nav = new Nav(infoMan);
         
@@ -52,7 +52,7 @@ public class Overseer{
         strat.update();
         researchMan.update(strat);
         rocketMan.update(strat);
-        workerMan.update(strat,nav);
+        workerMan.update(nav);
         combatMan.update(strat);
         prodMan.update(strat);
 

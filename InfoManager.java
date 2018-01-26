@@ -57,6 +57,7 @@ public class InfoManager {
 
 	// here lies map info (mostly for nav)
     ArrayList<Region> regions;
+    ArrayList<KarboniteArea> karbAreas;
     Tile[][] tiles;
     int marsx, marsy; // TODO: don't use this system, it sucks
     ArrayList<MapLocation> placesWeveSentTo;
@@ -181,7 +182,7 @@ public class InfoManager {
 					break;
 				}
 			} else {
-				//addEnemyUnit(unit.id(),unit.unitType()); (we never used this, comment it out for now)
+				addEnemyUnit(unit.id(),unit.unitType());
 				enemyLastSeen.put(unit.id(),(int) gc.round());
 				if(!unit.location().isOnMap())
 					continue;
@@ -383,7 +384,7 @@ public class InfoManager {
                         regions.add(newRegion);
                     } else {
                         // impassible terrain
-                        tiles[x][y] = new Tile(false, startingMap.initialKarboniteAt(loc), null, loc, magicNums, this);
+                        tiles[x][y] = new Tile(false, startingMap.initialKarboniteAt(loc), null, loc, magicNums, this, null);
                     }
                 }
             }
@@ -394,7 +395,13 @@ public class InfoManager {
     //      from it to the given region
     public void floodfill(Region region, MapLocation loc){
         long karbs = startingMap.initialKarboniteAt(loc);
-        tiles[loc.getX()][loc.getY()] = new Tile(true, karbs, region, loc, magicNums, this);
+        
+        KarboniteArea karbArea = null;
+        if(karbs > 0)
+        	karbArea = getKarbArea(loc, region);
+        tiles[loc.getX()][loc.getY()] = new Tile(true, karbs, region, loc, magicNums, this, karbArea);
+        if(karbArea != null)
+        	karbArea.addTile(tiles[loc.getX()][loc.getY()]);
         region.tiles.add(tiles[loc.getX()][loc.getY()]);
         region.karbonite += karbs;
 
@@ -409,7 +416,20 @@ public class InfoManager {
         }
     }
 
-    public boolean isOnMap(int x, int y){
+    public KarboniteArea getKarbArea(MapLocation loc, Region r) {
+		for(KarboniteArea kA: karbAreas){
+			if(r != kA.tiles.get(0).region)
+				continue;
+			if(kA.hasTileWithinDistance(loc, MagicNumbers.KARB_SEPARATION_DISTANCE)){
+				return kA;
+			}
+		}
+		KarboniteArea kA = new KarboniteArea(this);
+		karbAreas.add(kA);
+		return kA;
+	}
+
+	public boolean isOnMap(int x, int y){
         return 0 <= x && 0 <= y && x < tiles.length && y < tiles[0].length;
     }
 
@@ -477,39 +497,13 @@ public class InfoManager {
         		}
         	}
         }
-        //Utils.log("bestloc = " + bestloc);
         placesWeveSentTo.add(bestloc);
         return bestloc;
-        
-// so we don't land in the same place twice (unless we run out)
-        
-        /*try{
-            marsx = bestloc.getX();
-            marsy = bestloc.getY() + 1;
-            if (marsy == startingMap.getHeight()){
-                marsy = 0;
-                marsx++;
-            }
-            if (marsx == startingMap.getWidth()){
-                marsx = 0;
-            }
-            marsy++;
-            if (marsy == startingMap.getHeight()){
-                marsy = 0;
-                marsx++;
-            }
-            if (marsx == startingMap.getWidth()){
-                marsx = 0;
-            }
-        } catch (Exception e) {
-            // cry, mars is impassible
-        }
-        
-        Utils.log("marsx = " + marsx + " marsy = " + marsy);
-         */
     }
 
     public void moveAndUpdate(int id, Direction d, UnitType type) {
+    	if(d == Direction.Center)
+    		return;
     	MapLocation start = gc.unit(id).location().mapLocation();
     	gc.moveRobot(id, d);
     	tiles[start.getX()][start.getY()].unitID = -1;
@@ -525,4 +519,33 @@ public class InfoManager {
     	lastCheckpoint = System.nanoTime();
     	//Utils.log(identifier + ": " + duration + " ns since last checkpoint.");
     }
+
+    public Double distToClosestKarbonite(MapLocation loc) {
+    	long minDist = 1000000;
+    	KarboniteArea closest = null;
+    	for(KarboniteArea kA: karbAreas){
+    		if(kA.center.distanceSquaredTo(loc) < minDist){
+    			minDist = kA.center.distanceSquaredTo(loc);
+    			closest = kA;
+    		}
+    	}
+    	if(closest == null)
+    		return null;
+    	return (double) closest.getClosestTile(loc).myLoc.distanceSquaredTo(loc);
+    }
+    
+    public MapLocation getClosestKarbonite(MapLocation loc){
+    	long minDist = 1000000;
+    	KarboniteArea closest = null;
+    	for(KarboniteArea kA: karbAreas){
+    		if(kA.center.distanceSquaredTo(loc) < minDist){
+    			minDist = kA.center.distanceSquaredTo(loc);
+    			closest = kA;
+    		}
+    	}
+    	if(closest == null)
+    		return null;
+    	return closest.getClosestTile(loc).myLoc;
+    }
+
 }

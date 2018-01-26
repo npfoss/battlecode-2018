@@ -13,7 +13,7 @@ public class MagicNumbers{
     int MAX_DIST_THEY_COULD_HIT_NEXT_TURN = 72;
     int MAX_DIST_THEY_COULD_HIT = 50;
     int ENEMY_UNIT_DIST_THRESHOLD = 200;
-    int MAX_FIGHTER_COUNT = 100;
+    int MAX_FIGHTER_COUNT = 1000;
     int RANGER_RUN_AWAY_HEALTH_THRESH = 0;
     double AGGRESION_FACTOR = 1.0; //bigger = more aggressive
     //the bigger, the more we care:
@@ -35,8 +35,6 @@ public class MagicNumbers{
     double DAMAGE_FACTOR_RANGER_MOVE_ATTACK = 100.0;
     double DISTANCE_FACTOR_RANGER_MOVE_ATTACK = 10.0;
     double SWARM_FACTOR_RANGER_MOVE_ATTACK = 1.5; 
-    static double MINIMUM_SCORE_TO_STEAL = 0;
-	static int MAX_DIST_TO_STEAL = 50;
 	double g;
 
     int EARTH_FLOOD_ROUND = 750;
@@ -46,5 +44,9 @@ public class MagicNumbers{
     int ROCKET_COUNTDOWN = 5;
     
     //for workers
-    static int FACTORY_COST = 100;
+    static int FACTORY_COST = 200;
+	static int MAX_WORKERS_PER_BUILDING = 6;
+	static double MINIMUM_SCORE_TO_STEAL = 0;
+	static int MAX_DIST_TO_STEAL = 50;
+	static long KARB_SEPARATION_DISTANCE = 10;
 }
