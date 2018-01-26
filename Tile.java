@@ -17,7 +17,7 @@ public class Tile{
     MagicNumbers magicNums;
     InfoManager infoMan;
     boolean containsUnit;
-    int myUnit; //id of combat unit on tile
+    UnitType myType;
 
     int roundLastUpdated;
     TreeSet<TargetUnit> enemiesWhichCouldHitUs;
@@ -57,7 +57,6 @@ public class Tile{
         containsUnit = false;
         unitID = -1;
         distFromNearestHostile = 100;
-        myUnit = -1;
     }
 
     public void updateKarbonite(long newKarb){
@@ -92,12 +91,14 @@ public class Tile{
     	}
     }
     
+    /*
     public void updateContains(GameController gc){
     	if(containsUpdated)
     		return;
     	containsUpdated = true;
     	containsUnit = gc.hasUnitAtLocation(myLoc);
     }
+    */
     
     public void updateEnemies(GameController gc){
     	if(enemiesUpdated)

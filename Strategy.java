@@ -12,7 +12,7 @@ public class Strategy{
 	GameController gc;
 	UnitType[] researchOrder;
 	int[] combatComposition;
-	int nextRocketBuild;
+	int rocketsToBuild;
 	int[] rocketComposition;
     static int[] defaultRocketComposition = {0, 0, 4, 2, 2};
                             // knight, mage, ranger, healer, worker
@@ -33,7 +33,7 @@ public class Strategy{
 		researchOrder = new UnitType[]{UnitType.Ranger,UnitType.Worker,UnitType.Rocket,UnitType.Healer,UnitType.Healer,UnitType.Healer,UnitType.Ranger,UnitType.Ranger};
 		combatComposition = new int[]{0, 0, 3, 2}; //knight,mage,ranger,healer
         rocketComposition = defaultRocketComposition;
-        nextRocketBuild = 101;
+        rocketsToBuild = 0;
         maxFactories = 1;
         minFactories = 0;
 	}
@@ -42,6 +42,11 @@ public class Strategy{
         //TODO: make it adjust stuff if necessary
 		if(infoMan.myPlanet == Planet.Mars)
 			return;
+		//increment rocketsToBuild appropriately
+		//TODO: replace with variable from research refactor
+		if(gc.round() % 50 == 0 && gc.researchInfo().getLevel(UnitType.Rocket) > 0)
+			rocketsToBuild++;
+		/*
 		if(gc.round() > nextRocketBuild){
             if (gc.round() > infoMan.magicNums.EARTH_FLOOD_ROUND - 10){
                 // give up, not enough time
@@ -54,6 +59,6 @@ public class Strategy{
 			nextRocketBuild += 55 - (int)(((650.0 - roundsLeft) / 650)*30) - (int)((infoMan.fighters.size() / 150.0)*30);
 			if(gc.round()<350)
 				maxWorkers += 1;
-		}
+		}*/
     }
 }

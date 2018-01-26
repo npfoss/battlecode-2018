@@ -20,7 +20,7 @@ public class InfoManager {
 	MagicNumbers magicNums;
 	int height, width;
 	long lastCheckpoint;
-	boolean builtRocket;
+	int rocketsToBeBuilt;
 	int factoriesToBeBuilt;
 	PlanetMap startingMap;
 	//int totalUnitCount;
@@ -97,16 +97,13 @@ public class InfoManager {
 
         marsx = 0;
         marsy = 0;
-        builtRocket = true;
         placesWeveSentTo = new ArrayList<MapLocation>();
         factoriesToBeBuilt = 0;
+        rocketsToBeBuilt = 0;
 	}
 
 	public void update(Strategy strat) {
 		lastCheckpoint = System.nanoTime();
-		
-		if(gc.round() == strat.nextRocketBuild)
-			builtRocket = false;
 		
 		// called at the beginning of each turn
 		comms.update();
@@ -151,6 +148,7 @@ public class InfoManager {
             	int x = unit.location().mapLocation().getX();
             	int y = unit.location().mapLocation().getY();
             	tiles[x][y].unitID = unit.id();
+            	tiles[x][y].myType = unit.unitType();
             	if(unit.unitType() == UnitType.Factory || unit.unitType() == UnitType.Rocket)
             		tiles[x][y].isWalkable = false;
             }
@@ -183,7 +181,7 @@ public class InfoManager {
 					break;
 				}
 			} else {
-				addEnemyUnit(unit.id(),unit.unitType());
+				//addEnemyUnit(unit.id(),unit.unitType()); (we never used this, comment it out for now)
 				enemyLastSeen.put(unit.id(),(int) gc.round());
 				if(!unit.location().isOnMap())
 					continue;
@@ -423,7 +421,7 @@ public class InfoManager {
     // returns false if we can't see that loc
     public boolean isLocationClear(MapLocation loc){
         try{
-            return isLocationWalkable(loc) && gc.isOccupiable(loc) > 0;
+            return isLocationWalkable(loc) && tiles[loc.getX()][loc.getY()].unitID == -1;
         } catch (Exception e) {
             System.out.println("isLocationClear threw Exception. help");
             e.printStackTrace(System.out);
@@ -511,12 +509,13 @@ public class InfoManager {
          */
     }
 
-    public void moveAndUpdate(int id, Direction d) {
+    public void moveAndUpdate(int id, Direction d, UnitType type) {
     	MapLocation start = gc.unit(id).location().mapLocation();
     	gc.moveRobot(id, d);
     	tiles[start.getX()][start.getY()].unitID = -1;
     	MapLocation end = start.add(d);
     	tiles[end.getX()][end.getY()].unitID = id;
+    	tiles[end.getX()][end.getY()].myType = type;
     }
     
 /*******  FOR LOGGING AND DEBUGGING *********/

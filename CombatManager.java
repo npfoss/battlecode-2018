@@ -25,7 +25,6 @@ public class CombatManager{
 		if(infoMan.myPlanet == Planet.Mars)
 			return;
 		VecUnit vu = gc.startingMap(infoMan.myPlanet).getInitial_units();
-		ArrayList<MapLocation> enemyStartingLocs = new ArrayList<MapLocation>();
 		for(int i=0; i<vu.size(); i++){
 			Unit u = vu.get(i);
 			if(u.team() == gc.team())
