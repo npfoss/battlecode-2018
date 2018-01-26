@@ -20,6 +20,18 @@ public class Utils{
     public static UnitType[] robotTypes =
         {UnitType.Knight, UnitType.Mage, UnitType.Ranger, UnitType.Healer, UnitType.Worker};
 
+    public static int typeToInd(UnitType ut){
+        switch(ut){
+            case Knight: return 0;
+            case Mage  : return 1;
+            case Ranger: return 2;
+            case Healer: return 3;
+            case Worker: return 4;
+            case Rocket: return 5;
+            default: return 6;
+        }
+    }
+
     public static Direction[] directionsTowardButNotIncluding(Direction dir) {
     	 Direction left = dir;
          Direction right = dir;

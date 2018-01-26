@@ -58,14 +58,15 @@ public class Overseer{
 
         prodMan.move();
 
-        for(RocketSquad rs : infoMan.rocketSquads){
-        	rs.move(nav);
-        }
+        
         for(WorkerSquad ws : infoMan.workerSquads){
             ws.move(nav,strat);
         }
         for(CombatSquad cs : infoMan.combatSquads){
             cs.move(nav);
+        }
+        for(RocketSquad rs : infoMan.rocketSquads){
+        	rs.move(nav);
         }
 
         gc.nextTurn();
