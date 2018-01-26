@@ -99,7 +99,7 @@ public class InfoManager {
         builtRocket = true;
         placesWeveSentTo = new ArrayList<MapLocation>();
         
-        researchLevels = new int[]{0,0,0,0,0,0}; //worker,rocket,knight,mage,ranger,healer
+        researchLevels = new int[]{0,0,0,0,0,0}; //knight, mage, ranger, healer, worker, rocket
 	}
 
 	public void update(Strategy strat) {

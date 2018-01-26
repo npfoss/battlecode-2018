@@ -5,18 +5,7 @@ import java.util.TreeSet;
 
 import bc.*;
 
-public class Utils{
-	public static int typeToInd(UnitType ut){
-		switch(ut){
-			case Worker: return 0;
-			case Rocket: return 1;
-			case Knight: return 2;
-			case Mage  : return 3;
-			case Ranger: return 4;
-			default    : return 5;
-		}
-	}
-	
+public class Utils{	
     public static Direction[] orderedDirections =
         {Direction.East, Direction.Southeast, Direction.South, Direction.Southwest,
          Direction.West, Direction.Northwest, Direction.North, Direction.Northeast};
@@ -25,6 +14,18 @@ public class Utils{
          Direction.Northwest, Direction.Northeast};
     public static UnitType[] robotTypes =
         {UnitType.Knight, UnitType.Mage, UnitType.Ranger, UnitType.Healer, UnitType.Worker};
+
+    public static int typeToInd(UnitType ut){
+        switch(ut){
+            case Knight: return 0;
+            case Mage  : return 1;
+            case Ranger: return 2;
+            case Healer: return 3;
+            case Worker: return 4;
+            case Rocket: return 5;
+            default: return 6;
+        }
+    }
 
     public static Direction[] directionsTowardButNotIncluding(Direction dir) {
     	 Direction left = dir;

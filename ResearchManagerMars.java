@@ -19,6 +19,7 @@ public class ResearchManagerMars extends ResearchManager{
 				if(numExpected[i] > infoMan.researchLevels[i]){
 					gc.queueResearch(ut);
 					infoMan.researchLevels[i]++;
+					break;
 				}
 			}
 		}

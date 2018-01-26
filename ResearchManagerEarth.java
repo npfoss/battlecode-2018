@@ -20,6 +20,7 @@ public class ResearchManagerEarth extends ResearchManager{
 			if(numExpected[i] > infoMan.researchLevels[i]){
 				gc.queueResearch(ut);
 				infoMan.researchLevels[i]++;
+				break;
 			}
 		}
 	}
