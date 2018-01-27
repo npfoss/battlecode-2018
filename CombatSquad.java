@@ -284,9 +284,9 @@ public class CombatSquad extends Squad{
 		int x, y, nx, ny;
 		goalRangerDistance = 9999;
 		for(CombatUnit cu: combatUnits.values()){
-			cu.update(gc, nav.optimalStepsTo(cu.myLoc, targetLoc));
-			if(cu.notOnMap)
+			if(cu.notOnMap && !gc.unit(cu.ID).location().isOnMap())
 				continue;
+			cu.update(gc, nav.optimalStepsTo(cu.myLoc, targetLoc));
 			x = cu.myLoc.getX();
 			y = cu.myLoc.getY();
 			infoMan.tiles[x][y].updateEnemies(gc);

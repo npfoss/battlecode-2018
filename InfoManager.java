@@ -181,7 +181,7 @@ public class InfoManager {
 				case Worker:
 					workers.add(unit);
 					workerCount++;
-					if (!isInSquads(unit) && unit.location().isOnMap()){
+					if (!isInSquads(unit)){
 						unassignedUnits.add(unit.id());
 					}
 					break;
@@ -195,7 +195,7 @@ public class InfoManager {
 					break;
 				default:
 					fighters.add(unit);
-					if (!isInSquads(unit) && unit.location().isOnMap()){
+					if (!isInSquads(unit)){
 						unassignedUnits.add(unit.id());
 					}
 					break;

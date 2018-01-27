@@ -43,10 +43,6 @@ public class Nav{
         }
         catch(Exception e){
         	Utils.log("RIP USSSSSS");
-        	if(target == null)
-        		Utils.log("bruhhhhhhh tf u doin");
-        	else if(start == null)
-        		Utils.log("excuse me/");
         	return 0;
         }
     }
