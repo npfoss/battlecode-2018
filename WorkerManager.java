@@ -193,7 +193,7 @@ public class WorkerManager{
 					if(ws.units.size() > 0)
 						wsunit = gc.unit(ws.units.get(0));
 					if(ws.units.size() == 0 || !wsunit.location().isOnMap() || infoMan.isReachable(wsunit.location().mapLocation(),a.location().mapLocation())){
-						ws.units.add(a.id());
+						ws.units.add(i);
 						infoMan.unassignedUnits.remove(i);
 						ws.update();
 						didSomething = true;
