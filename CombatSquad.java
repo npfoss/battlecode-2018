@@ -188,8 +188,6 @@ public class CombatSquad extends Squad{
 		if(units.size() == 0)
 			return;
 
-		numEnemyUnits = infoMan.getTargetUnits(swarmLoc, MagicNumbers.ENEMY_UNIT_DIST_THRESHOLD, true).size();
-
 		if(objective == Objective.EXPLORE){
 			infoMan.logTimeCheckpoint("start of explore move");
 			// Utils.log("swarm size = " + units.size() + " obj = " + objective + " urgency = " + urgency);
@@ -199,6 +197,9 @@ public class CombatSquad extends Squad{
 			infoMan.logTimeCheckpoint("done with CombatSquad move");
 			return;
 		}
+		
+		numEnemyUnits = infoMan.getTargetUnits(swarmLoc, MagicNumbers.ENEMY_UNIT_DIST_THRESHOLD, true).size();
+
 		//reassign separated units to swarm if appropriate
 		/* REFACTOR: use or remove
 		if(combatUnits.size()==0){
@@ -365,7 +366,7 @@ public class CombatSquad extends Squad{
 			Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
 			//if we're not near any enemies nav, otherwise move and maybe attack
 			if(myTile.distFromNearestHostile > MagicNumbers.MAX_DIST_THEY_COULD_HIT_NEXT_TURN){
-				Utils.log("navving " + cu.myLoc.getX() + " " + cu.myLoc.getY());
+				//Utils.log("navving " + cu.myLoc.getX() + " " + cu.myLoc.getY());
 				Direction d = nav.dirToMove(cu.myLoc, targetLoc);
 				moveAndUpdate(cu, d);
 			} else if (cu.health <= MagicNumbers.RANGER_RUN_AWAY_HEALTH_THRESH){
