@@ -486,7 +486,7 @@ public class CombatSquad extends Squad{
 			}
 		}
 		if(tH != null){
-			Utils.log("healing unit " + tH.ID + " at " + tH.myLoc.getX() + " " + tH.myLoc.getY());
+			Utils.log("I'm at loc " + tH.myLoc + " healing unit of type " + tH.type + " at " + tH.myLoc.getX() + " " + tH.myLoc.getY());
 			gc.heal(cu.ID, tH.ID);
 			cu.canAttack = false;
 			switch((int)(gc.researchInfo().getLevel(UnitType.Healer))){ // REFACTOR: probably a better way to do this
