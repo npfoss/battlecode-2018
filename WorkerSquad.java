@@ -204,6 +204,10 @@ public class WorkerSquad extends Squad {
 			for(Direction dirToReplicate : Utils.directionsTowardButNotIncluding(gc.unit(id).location().mapLocation().directionTo(targetLoc))) {
 				if (gc.canReplicate(id, dirToReplicate)) {
 					gc.replicate(id, dirToReplicate);
+					MapLocation rloc = gc.unit(id).location().mapLocation().add(dirToReplicate);
+					Unit repped = gc.senseUnitAtLocation(rloc);
+				    infoMan.tiles[rloc.getX()][rloc.getY()].unitID = repped.id();
+				    infoMan.tiles[rloc.getX()][rloc.getY()].myType = toBuild;
 					infoMan.workerCount++;
 					infoMan.workersToRep.remove(id);
 					break;
@@ -214,6 +218,10 @@ public class WorkerSquad extends Squad {
 			for(Direction dirToReplicate : Utils.orderedDirections) {
 				if (gc.canReplicate(id, dirToReplicate)) {
 					gc.replicate(id, dirToReplicate);
+					MapLocation rloc = gc.unit(id).location().mapLocation().add(dirToReplicate);
+					Unit repped = gc.senseUnitAtLocation(rloc);
+				    infoMan.tiles[rloc.getX()][rloc.getY()].unitID = repped.id();
+				    infoMan.tiles[rloc.getX()][rloc.getY()].myType = toBuild;
 					infoMan.workerCount++;
 					infoMan.workersToRep.remove(id);
 					break;
