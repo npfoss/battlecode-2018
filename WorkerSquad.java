@@ -123,12 +123,36 @@ public class WorkerSquad extends Squad {
 			karbLoc = infoMan.getClosestKarbonite(myLoc);
 		}
 		//Utils.log("trying to move toward karbonite at location " + karbLoc);
-		if(karbLoc == null)
+		if(karbLoc == null){
+			runAway(id,myLoc);
 			return;
+		}
+		
 		targetKarbLocs.put(id, karbLoc);
 		Direction d = nav.dirToMoveSafely(myLoc, karbLoc);
 		
 		infoMan.moveAndUpdate(id, d, UnitType.Worker);
+	
+	}
+	
+	public void runAway(int id, MapLocation loc){
+		double bestScore = -10000000;
+		int bestInd = 0;
+		int x = loc.getX();
+		int y = loc.getY();
+		int nx,ny;
+		for(int i=0; i<9; i++){
+			nx = x + Utils.dx[i];
+			ny = y + Utils.dy[i];
+			Tile t = infoMan.tiles[nx][ny];
+			t.updateEnemies(gc);
+			double score = -100.0 * t.possibleDamage + t.distFromNearestHostile;
+			if(score>bestScore){
+				bestScore = score;
+				bestInd = i;
+			}
+		}
+		infoMan.moveAndUpdate(id, Utils.indexToDirection(bestInd), UnitType.Worker);
 	}
 	
 	public boolean tryToMine(int id) {

@@ -49,24 +49,9 @@ public class Strategy{
         //TODO: make it adjust stuff if necessary
 		if(infoMan.myPlanet == Planet.Mars)
 			return;
-		//increment rocketsToBuild appropriately
 		//TODO: replace with variable from research refactor plus make better
 		if(gc.round() % 50 == 0 && gc.researchInfo().getLevel(UnitType.Rocket) > 0)
 			rocketsToBuild++;
-		/*
-		if(gc.round() > nextRocketBuild){
-            if (gc.round() > infoMan.magicNums.EARTH_FLOOD_ROUND - 10){
-                // give up, not enough time
-                nextRocketBuild = 999;
-            }
-            int roundsLeft = infoMan.magicNums.EARTH_FLOOD_ROUND - (int)(gc.round());
-            if(roundsLeft < 300){
-                rocketComposition = new int[]{0, 0, 5, 3, 0};
-            }
-			nextRocketBuild += 55 - (int)(((650.0 - roundsLeft) / 650)*30) - (int)((infoMan.fighters.size() / 150.0)*30);
-			if(gc.round()<350)
-				maxWorkers += 1;
-		}*/
     }
 
 	public int calcWorkerUrgency(int size, Objective objective, UnitType toBuild) {
