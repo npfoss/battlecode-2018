@@ -33,7 +33,7 @@ public class Overseer{
         nav = new Nav(infoMan);
         
         if(gc.planet() == Planet.Earth){
-            prodMan = new ProductionManager(infoMan, gc, magicNums);
+            prodMan = new ProductionManager(infoMan, gc);
             researchMan = new ResearchManagerEarth(gc, infoMan);
             rocketMan = new RocketManager(gc, infoMan);
         } else {

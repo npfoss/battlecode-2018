@@ -13,7 +13,8 @@ public class MagicNumbers{
     int MAX_DIST_THEY_COULD_HIT_NEXT_TURN = 72;
     int MAX_DIST_THEY_COULD_HIT = 50;
     int ENEMY_UNIT_DIST_THRESHOLD = 200;
-    int MAX_FIGHTER_COUNT = 1000;
+    static int MAX_FIGHTER_COUNT = 1000;
+	static long ROUND_TO_STOP_PRODUCTION = 650;
     int RANGER_RUN_AWAY_HEALTH_THRESH = 0;
     double AGGRESION_FACTOR = 1.0; //bigger = more aggressive
     //the bigger, the more we care:
