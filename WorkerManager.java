@@ -90,7 +90,7 @@ public class WorkerManager{
 			for(WorkerSquad ws: infoMan.workerSquads){
 				if(ws.objective == Objective.NONE){
 					for(int uid: ws.units){
-						Utils.log("uu adding " + uid);
+						// Utils.log("uu adding " + uid);
 						infoMan.unassignedUnits.add(uid);
 					}
 					toRemove.add(ws);
@@ -131,7 +131,7 @@ public class WorkerManager{
 		//give each miner a score indicating whether we should steal them
 		//if we must steal or if the score is higher than a certain threshold, steal that miner and up to 7 miners within a magic num of it.
 		int mustRepNum = (strat.minWorkers > infoMan.workerCount ? strat.minWorkers - infoMan.workerCount : 0);
-		Utils.log("Number to Rep: "+mustRepNum);
+		// Utils.log("Number to Rep: "+mustRepNum);
 		int maxToRep = strat.maxWorkers - infoMan.workerCount;
 		if(gc.karbonite() < 200 && (infoMan.factoriesToBeBuilt > 0 || infoMan.rocketsToBeBuilt > 0))
 			maxToRep = mustRepNum;

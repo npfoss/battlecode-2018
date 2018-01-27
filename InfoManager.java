@@ -67,8 +67,10 @@ public class InfoManager {
     ArrayList<Region> regions;
     ArrayList<KarboniteArea> karbAreas;
     Tile[][] tiles;
-    int marsx, marsy; // TODO: don't use this system, it sucks
     ArrayList<MapLocation> placesWeveSentTo;
+    // short[][][][][] destToDir; // startx, starty, targetx, targety, [Direction, stepsToDest]
+
+    // research
     int[] researchLevels;
 
 	public InfoManager(GameController g, MagicNumbers mn) {
@@ -103,14 +105,12 @@ public class InfoManager {
         width = (int) startingMap.getWidth();
 
         tiles = new Tile[width][height];
+        // destToDir = new short[width][height][width][height][2];
         regions = new ArrayList<Region>();
         workersToRep = new HashSet<Integer>();
         karbAreas = new ArrayList<KarboniteArea>();
         initMap();
         
-        
-        marsx = 0;
-        marsy = 0;
         placesWeveSentTo = new ArrayList<MapLocation>();
         factoriesToBeBuilt = 0;
         rocketsToBeBuilt = 0;
@@ -151,8 +151,6 @@ public class InfoManager {
 					tiles[x][y].enemiesUpdated = false;
 					tiles[x][y].unitID = -1;
 					tiles[x][y].isWalkable = startingMap.isPassableTerrainAt(loc) > 0;
-					// TODO: check if there's now a factory there
-					//      (to update walkability)
 				}
 			}
 		}

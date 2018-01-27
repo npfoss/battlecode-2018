@@ -130,6 +130,7 @@ public class Tile{
     	for(Unit u: infoMan.rockets) {
     		if(!u.location().isOnMap())
     			continue;
+            // TODO: make this only happen during the rocket countdown
     		if(u.location().mapLocation().distanceSquaredTo(myLoc) <= 2)
     			possibleDamage += 100;
     	}
