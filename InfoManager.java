@@ -419,6 +419,7 @@ public class InfoManager {
 	            if (isOnMap(neighbor)
 	                    && tiles[neighbor.getX()][neighbor.getY()] == null
 	                    && startingMap.isPassableTerrainAt(neighbor) > 0){
+	            	Utils.log("adding " + neighbor.getX() + " " + neighbor.getY());
 	                q.add(neighbor);
 	            }
 	        }
