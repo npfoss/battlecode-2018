@@ -32,10 +32,6 @@ public class CombatUnit {
 	MapLocation myLoc;
 	boolean notOnMap;
 	
-	public CombatUnit(){ // does this need to be here?
-		
-	}
-	
 	public CombatUnit(Unit u, MapLocation ml, int sft){
 		ID = u.id();
 		type = u.unitType();
@@ -80,18 +76,4 @@ public class CombatUnit {
 			return false;
 		return ID == ((CombatUnit)o).ID;
 	}
-	
-	/* // use or remove
-	public void addOption(int opt, Tile tile) {
-		if(attackOptions.containsKey(opt)){
-			ArrayList<Tile> alt = attackOptions.get(opt);
-			alt.add(tile);
-			attackOptions.put(opt, alt);
-		}
-		else{
-			ArrayList<Tile> alt = new ArrayList<Tile>();
-			alt.add(tile);
-			attackOptions.put(opt, alt);
-		}
-	}*/
 }
