@@ -580,8 +580,7 @@ public class InfoManager {
     	if(closest == null)
     		return null;
     	//Utils.log("closest karb is in area with center " + closest.center);
-    	//return closest.getClosestTile(loc).myLoc;
-    	return closest.center;
+    	return closest.getClosestTile(loc).myLoc;
     }
     
 /*******  FOR LOGGING AND DEBUGGING *********/

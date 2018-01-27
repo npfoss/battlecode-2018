@@ -39,8 +39,6 @@ public class KarboniteArea{
     		ysum += t.y;
     	}
     	center = new MapLocation(infoMan.myPlanet,(int)(xsum/tiles.size()),(int)(ysum/tiles.size()));
-    	if(infoMan.tiles[center.getX()][center.getY()] != null)
-    		infoMan.tiles[center.getX()][center.getY()].karbArea = this;
     }
     
     public boolean hasTileWithinDistance(MapLocation loc, long dist){
