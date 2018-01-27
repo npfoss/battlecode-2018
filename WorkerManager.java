@@ -195,7 +195,7 @@ public class WorkerManager{
 						wsunit = gc.unit(ws.units.get(0));
 					if(ws.units.size() == 0 || !wsunit.location().isOnMap() || infoMan.isReachable(wsunit.location().mapLocation(),a.location().mapLocation())){
 						ws.units.add(i);
-						Utils.log("adding " + i);
+						Utils.log("1 adding " + i);
 						infoMan.unassignedUnits.remove(i);
 						ws.update();
 						didSomething = true;
@@ -214,7 +214,7 @@ public class WorkerManager{
 						WorkerSquad wsn = new WorkerSquad(infoMan,strat);
 						wsn.objective = Objective.MINE;
 						wsn.units.add(i);
-						Utils.log("adding " + i);
+						Utils.log("2 adding " + i);
 						infoMan.unassignedUnits.remove(i);
 						wsn.update();
 						infoMan.workerSquads.add(wsn);
@@ -295,7 +295,7 @@ public class WorkerManager{
 			for(int id: toSteal) {
 				lameSquad.removeUnit(id);
 				newSquad.units.add(id);
-				Utils.log("adding " + id);
+				Utils.log("3 adding " + id);
 			}
 			newSquad.targetLoc = findBuildLoc(newSquad);
 			infoMan.workerSquads.add(newSquad);
