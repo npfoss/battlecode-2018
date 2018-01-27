@@ -8,6 +8,7 @@ import java.util.Collection; //unused
 import java.util.Collections; //unused
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.TreeSet;
 
 /*
 manages overall decisions of combat units
@@ -61,16 +62,18 @@ public class CombatManager{
 		//defend factories and rockets
 		for(Unit u: infoMan.factories){
 			MapLocation ml = u.location().mapLocation();
-			if(infoMan.getTargetUnits(ml, 100, true).size() > 0){ // REFACTOR: 100 should be magic number
-				addCombatSquad(ml, Objective.DEFEND_LOC, strat);
+			TreeSet<TargetUnit> tus = infoMan.getTargetUnits(ml, 100, true);
+			if(tus.size() > 0){ // REFACTOR: 100 should be magic number
+				addCombatSquad(tus.first().myLoc, Objective.DEFEND_LOC, strat);
 			}
 		}
 		
 		if(infoMan.myPlanet == Planet.Earth){
 			for(Unit u: infoMan.rockets){
 				MapLocation ml = u.location().mapLocation();
-				if(infoMan.getTargetUnits(ml, 100, true).size() > 0){ // REFACTOR: 100 should be magic number
-					addCombatSquad(ml, Objective.DEFEND_LOC, strat);
+				TreeSet<TargetUnit> tus = infoMan.getTargetUnits(ml, 100, true);
+				if(tus.size() > 0){ // REFACTOR: 100 should be magic number
+					addCombatSquad(tus.first().myLoc, Objective.DEFEND_LOC, strat);
 				}
 			}
 		}
