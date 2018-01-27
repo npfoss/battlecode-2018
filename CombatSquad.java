@@ -286,8 +286,9 @@ public class CombatSquad extends Squad{
 		for(CombatUnit cu: combatUnits.values()){
 			if(cu.notOnMap && !gc.unit(cu.ID).location().isOnMap())
 				continue;
-			if(cu.myLoc != gc.unit(cu.ID).location().mapLocation()){
-				Utils.log("HOUSTON WE HAVE A PROBLEM cl = " + cu.myLoc + " actual = " + gc.unit(cu.ID).location().mapLocation());
+			MapLocation actualLoc = gc.unit(cu.ID).location().mapLocation();
+			if(cu.myLoc.getX() != actualLoc.getX() || cu.myLoc.getY() != actualLoc.getY()){
+				Utils.log("HOUSTON WE HAVE A PROBLEM cl = " + cu.myLoc + " actual = " + actualLoc);
 			}
 			cu.update(gc, nav.optimalStepsTo(cu.myLoc, targetLoc));
 			x = cu.myLoc.getX();
