@@ -393,7 +393,7 @@ public class InfoManager {
                     if (startingMap.isPassableTerrainAt(loc) > 0){
                         // new region! floodfill it
                         Region newRegion = new Region();
-                        floodfill(newRegion, loc);
+                        floodfill(startingMap,newRegion, loc);
                         regions.add(newRegion);
                     } else {
                         // impassible terrain
@@ -431,6 +431,24 @@ public class InfoManager {
 	            }
 	        }
     	}
+    }
+    
+    public void floodfill(PlanetMap startingMap, Region region, MapLocation loc){
+    	Utils.log("x = " + loc.getX() + " y = " + loc.getY());
+        long karbs = startingMap.initialKarboniteAt(loc);
+        tiles[loc.getX()][loc.getY()] = new Tile(true, karbs, region, loc, magicNums, this, null);
+        region.tiles.add(tiles[loc.getX()][loc.getY()]);
+        region.karbonite += karbs;
+
+        // now floodfill
+        for (Direction dir : Utils.orderedDirections){
+            MapLocation neighbor = loc.add(dir);
+            if (isOnMap(neighbor)
+                    && tiles[neighbor.getX()][neighbor.getY()] == null
+                    && startingMap.isPassableTerrainAt(neighbor) > 0){
+                floodfill(startingMap, region, neighbor);
+            }
+        }
     }
 
     public KarboniteArea getKarbArea(MapLocation loc, Region r) {
