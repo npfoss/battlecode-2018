@@ -196,9 +196,12 @@ public class WorkerManager{
 					if(ws.units.size() == 0 || !wsunit.location().isOnMap() || infoMan.isReachable(wsunit.location().mapLocation(),a.location().mapLocation())){
 						ws.units.add(i);
 						Utils.log("1 adding " + i);
-						infoMan.unassignedUnits.remove(i);
 						ws.update();
 						didSomething = true;
+						break;
+					}
+					if(didSomething){
+						infoMan.unassignedUnits.remove(i);
 						break;
 					}
 				}
@@ -206,6 +209,7 @@ public class WorkerManager{
 					break;
 			}
 			if(!didSomething) {
+				HashSet<Integer> toRemove = new HashSet<Integer>();
 				for(int i : infoMan.unassignedUnits) {
 					Unit a = gc.unit(i);
 					if(!a.location().isOnMap())
@@ -215,12 +219,15 @@ public class WorkerManager{
 						wsn.objective = Objective.MINE;
 						wsn.units.add(i);
 						Utils.log("2 adding " + i);
-						infoMan.unassignedUnits.remove(i);
+						toRemove.add(i);
 						wsn.update();
 						infoMan.workerSquads.add(wsn);
 						didSomething = true;
 						break;
 					}
+				}
+				for(int id: toRemove){
+					infoMan.unassignedUnits.remove(id);
 				}
 			}
 

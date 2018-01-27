@@ -178,7 +178,7 @@ public class InfoManager {
 				case Worker:
 					workers.add(unit);
 					if (!isInSquads(unit) && unit.location().isOnMap()){
-						//Utils.log("here");
+						//Utils.log("here " + unit.id());
 						unassignedUnits.add(unit.id());
 					}
 					break;
