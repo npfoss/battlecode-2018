@@ -157,7 +157,7 @@ public class CombatSquad extends Squad{
 		else
 			ml = gc.unit(u.location().structure()).location().mapLocation();
 		CombatUnit cu = new CombatUnit(u, ml, 1000); // REFACTOR: why not actually calc steps to target?
-		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].myUnit = cu.ID;
+		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].unitID = cu.ID;
 		combatUnits.put(cu.ID, cu);
 		update();
 	}
@@ -174,7 +174,7 @@ public class CombatSquad extends Squad{
 		if(!combatUnits.containsKey(id))
 			return;
 		CombatUnit cu = combatUnits.get(id);
-		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].myUnit = -1;
+		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].unitID = -1;
 		combatUnits.remove(id);
 		switch(cu.type){
 		case Knight:unitCounts[0]--; break;
@@ -208,7 +208,7 @@ public class CombatSquad extends Squad{
 					continue;
 				CombatUnit cu = new CombatUnit(id,u.damage(),u.health(),u.movementHeat()<10,u.attackHeat()<10,
 						u.location().mapLocation(),u.unitType(),nav.optimalStepsTo(u.location().mapLocation(), targetLoc));
-				infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].myUnit = cu.ID;
+				infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].unitID = cu.ID;
 				//System.out.println("adding " + cu.ID + " 1");
 				//System.out.flush();
 				combatUnits.put(cu.ID,cu);
@@ -227,7 +227,7 @@ public class CombatSquad extends Squad{
 				separatedUnits.remove(i);
 				CombatUnit cu = new CombatUnit(u.id(),u.damage(),u.health(),u.movementHeat()<10,u.attackHeat()<10,
 						ml,u.unitType(),nav.optimalStepsTo(ml, targetLoc));
-				infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].myUnit = cu.ID;
+				infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].unitID = cu.ID;
 				//System.out.println("adding " + cu.ID + " 2");
 				//System.out.flush();
 				combatUnits.put(cu.ID,cu);
@@ -252,7 +252,7 @@ public class CombatSquad extends Squad{
 	private void moveToSwarm(Nav nav){
 		//TODO: micro more if you see enemies on the way
 		for(int uid: separatedUnits){
-			if(!gc.isMoveReady(uid))
+			if(!gc.isMoveReaUtils.dy(uid))
 				continue;
 			Unit u = gc.unit(uid);
 			if(!u.location().isOnMap())
@@ -280,27 +280,15 @@ public class CombatSquad extends Squad{
 		TreeSet<CombatUnit> mages = new TreeSet<CombatUnit>(new AscendingStepsComp());
 
 		//update combat units and tiles near them
-		/*long last = System.nanoTime(); // REFACTOR: use or remove
-		long enemiesAccum = 0;
-		long updateAccum = 0;
-		long otherAccum = 0;*/
 		int x, y, nx, ny;
 		goalRangerDistance = 9999;
 		for(CombatUnit cu: combatUnits.values()){
 			cu.update(gc, nav.optimalStepsTo(cu.myLoc, targetLoc));
 			if(cu.notOnMap)
 				continue;
-			//updateAccum += System.nanoTime() - last; // use or remove
-			//last = System.nanoTime();
 			x = cu.myLoc.getX();
 			y = cu.myLoc.getY();
-			infoMan.tiles[x][y].containsUnit = true;
-			infoMan.tiles[x][y].containsUpdated = true;
-			//otherAccum += System.nanoTime() - last;// use or remove
-			//last = System.nanoTime();
 			infoMan.tiles[x][y].updateEnemies(gc);
-			//enemiesAccum += System.nanoTime() - last;// use or remove
-			//last = System.nanoTime();
 			if(cu.type == UnitType.Ranger && infoMan.tiles[x][y].distFromNearestHostile < goalRangerDistance){
 				goalRangerDistance = infoMan.tiles[x][y].distFromNearestHostile;
 			}
@@ -312,12 +300,7 @@ public class CombatSquad extends Squad{
 					ny = y + Utils.dy[i];
 					if(!infoMan.isOnMap(nx, ny) || !infoMan.tiles[nx][ny].isWalkable)
 						continue;
-					infoMan.tiles[nx][ny].updateContains(gc);
-					//otherAccum += System.nanoTime() - last;// use or remove
-					//last = System.nanoTime();
 					infoMan.tiles[nx][ny].updateEnemies(gc);
-					//enemiesAccum += System.nanoTime() - last;// use or remove
-					//last = System.nanoTime();
 				}
 			}
 			switch(cu.type){
@@ -329,11 +312,6 @@ public class CombatSquad extends Squad{
 		}
 		
 		infoMan.logTimeCheckpoint("units and tiles updated");
-		/*// use or remove
-		Utils.log("updateAccum = " + updateAccum);
-		Utils.log("otherAccum = " + otherAccum);
-		Utils.log("enemiesAccum = " + enemiesAccum);
-		*/
 		
 		goalRangerDistance = (goalRangerDistance < MagicNumbers.MIN_RANGER_GOAL_DIST ? MagicNumbers.MIN_RANGER_GOAL_DIST : goalRangerDistance); // magic number?
 
@@ -356,7 +334,7 @@ public class CombatSquad extends Squad{
 
 //--------------------- RANGER MICRO --------------------
 	private void doRangerMicro(TreeSet<CombatUnit> rangers, boolean retreat, Nav nav) {
-		//first go through rangers which can attack already
+		//first go through rangers which can attack alreaUtils.dy
 		for(CombatUnit cu: rangers.descendingSet()){
 			if(!cu.canAttack)
 				continue;
@@ -551,7 +529,6 @@ public class CombatSquad extends Squad{
 				ny = y + Utils.dy[i];
 				if(!infoMan.isOnMap(nx, ny) || !infoMan.tiles[nx][ny].isWalkable)
 					continue;
-				infoMan.tiles[nx][ny].updateContains(gc);
 				infoMan.tiles[nx][ny].updateEnemies(gc);
 			}
 			switch(tO.type){
@@ -619,11 +596,9 @@ public class CombatSquad extends Squad{
 		for(int i = 0; i < 8 + (includeCenter?1:0); i++){
 			nx = x + Utils.dx[i];
 			ny = y + Utils.dy[i];
-			if(!infoMan.isOnMap(nx, ny))
+			if(!infoMan.isOnMap(nx, ny) || (mustBeClear && !infoMan.isLocationClear(nx, ny)))
 				continue;
 			Tile t = infoMan.tiles[nx][ny];
-			if(mustBeClear && !infoMan.isLocationClear(t.myLoc))
-				continue;
 			score = scoreFunct.apply(t, cu);
 			if (score > bestScore){
 				bestScore = score;
@@ -636,14 +611,9 @@ public class CombatSquad extends Squad{
 	private void moveAndUpdate(CombatUnit cu, Direction d){
 		if(d == null || d == Direction.Center)
 			return;
-		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].containsUnit = false;
-		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].myUnit = -1;
-		gc.moveRobot(cu.ID, d);
 		cu.canMove = false;
+		infoMan.moveAndUpdate(cu.ID, d, cu.type);
 		cu.myLoc = cu.myLoc.add(d);
-		//Utils.log(cu.ID + " moving to " + cu.myLoc.getX() + " " + cu.myLoc.getY());
-		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].containsUnit = true;
-		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].myUnit = cu.ID;
 		cu.distFromNearestHostile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].distFromNearestHostile;
 	}
 	

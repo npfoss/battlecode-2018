@@ -28,12 +28,12 @@ public class Overseer{
         
         infoMan = new InfoManager(gc, magicNums);
         strat = new Strategy(infoMan, gc);
-        workerMan = new WorkerManager(infoMan, gc);
+        workerMan = new WorkerManager(infoMan, gc, strat);
         combatMan = new CombatManager(infoMan, gc, strat);
         nav = new Nav(infoMan);
         
         if(gc.planet() == Planet.Earth){
-            prodMan = new ProductionManager(infoMan, gc, magicNums);
+            prodMan = new ProductionManager(infoMan, gc);
             researchMan = new ResearchManagerEarth(gc, infoMan);
             rocketMan = new RocketManager(gc, infoMan);
         } else {
@@ -52,20 +52,21 @@ public class Overseer{
         strat.update();
         researchMan.update(strat);
         rocketMan.update(strat);
-        workerMan.update(strat,nav);
+        workerMan.update(nav);
         combatMan.update(strat);
         prodMan.update(strat);
 
         prodMan.move();
 
-        for(RocketSquad rs : infoMan.rocketSquads){
-        	rs.move(nav);
-        }
+        
         for(WorkerSquad ws : infoMan.workerSquads){
             ws.move(nav,strat);
         }
         for(CombatSquad cs : infoMan.combatSquads){
             cs.move(nav);
+        }
+        for(RocketSquad rs : infoMan.rocketSquads){
+        	rs.move(nav);
         }
 
         gc.nextTurn();

@@ -1,7 +1,3 @@
-/****************/
-/* REFACTOR ME! */
-/****************/
-
 import bc.*;
 
 /*
@@ -13,7 +9,7 @@ public class MagicNumbers{
 
     // general purpose
     static int EARTH_FLOOD_ROUND = 750;
-    static int RANGER_MIN_RANGE = 11; // is this right??
+    static int RANGER_MIN_RANGE = 11;
     static int RANGER_RANGE = 50;
     static int KNIGHT_RANGE = 2; // what about javelin?
     static int MAGE_RANGE = 30;
@@ -22,7 +18,7 @@ public class MagicNumbers{
     static int MAX_DIST_THEY_COULD_HIT = 50; // UNUSED, delete pls
 
     // for tweaking CombatManager
-    static int SQUAD_SEPARATION_THRESHOLD = 50; // this seems a little high to me
+    static int SQUAD_SEPARATION_THRESHOLD = 50;
 
     // for tweaking CombatSquad
     static int ENEMY_UNIT_DIST_THRESHOLD = 200;
@@ -54,6 +50,15 @@ public class MagicNumbers{
 
     // ProductionManager
     static int MAX_FIGHTER_COUNT = 100;
+    static long ROUND_TO_STOP_PRODUCTION = 650;
+
+    //for workers
+    static int FACTORY_COST = 200;
+    static int MAX_WORKERS_PER_BUILDING = 6;
+    static double MINIMUM_SCORE_TO_STEAL = 0;
+    static int MAX_DIST_TO_STEAL = 20;
+    static long KARB_SEPARATION_DISTANCE = 10;
+    static Double MIN_SCORE_TO_REPLICATE = 50.0;
 
     // rockets
     static int ROCKET_COUNTDOWN = 5; // how many turns to wait before launching

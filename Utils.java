@@ -10,11 +10,11 @@ import java.util.TreeSet;
 import bc.*;
 
 public class Utils{
-    public static Direction[] orderedDirections =
+	public static Direction[] orderedDirections =
         {Direction.East, Direction.Southeast, Direction.South, Direction.Southwest,
          Direction.West, Direction.Northwest, Direction.North, Direction.Northeast};
-    static final int[] dx = {1, 1, 0,-1,-1,-1,0,1,0};
-    static final int[] dy = {0,-1,-1,-1, 0, 1,1,1,0};
+    public static final int[] dx = {1, 1, 0,-1,-1,-1,0,1,0};
+    public static final int[] dy = {0,-1,-1,-1, 0, 1,1,1,0};
     public static Direction[] orderedDiagonals =
         {Direction.Southeast, Direction.Southwest,
          Direction.Northwest, Direction.Northeast};
