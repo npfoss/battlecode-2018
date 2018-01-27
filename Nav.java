@@ -229,7 +229,7 @@ public class Nav{
             nextLocs = new ArrayList<MapLocation>();
         }
         
-        Utils.log("done generating map");
+        //Utils.log("done generating map");
     }
 
     public MapLocation getNextMarsDest(){
