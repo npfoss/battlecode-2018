@@ -64,7 +64,7 @@ public class CombatManager{
 			MapLocation ml = u.location().mapLocation();
 			TreeSet<TargetUnit> tus = infoMan.getTargetUnits(ml, 100, true);
 			if(tus.size() > 0){ // REFACTOR: 100 should be magic number
-				addCombatSquad(tus.first().myLoc, Objective.DEFEND_LOC, strat);
+				addCombatSquad(ml, Objective.DEFEND_LOC, strat);
 			}
 		}
 		
@@ -73,7 +73,7 @@ public class CombatManager{
 				MapLocation ml = u.location().mapLocation();
 				TreeSet<TargetUnit> tus = infoMan.getTargetUnits(ml, 100, true);
 				if(tus.size() > 0){ // REFACTOR: 100 should be magic number
-					addCombatSquad(tus.first().myLoc, Objective.DEFEND_LOC, strat);
+					addCombatSquad(ml, Objective.DEFEND_LOC, strat);
 				}
 			}
 		}

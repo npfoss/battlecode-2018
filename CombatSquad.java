@@ -477,7 +477,7 @@ public class CombatSquad extends Squad{
 		CombatUnit tH = null;
 		double bestScore = -10000;
 		for(CombatUnit h: healees){
-			if(h.health + 10 >= h.maxHealth)
+			if(h.ID == cu.ID || h.health + 10 >= h.maxHealth)
 				continue;
 			double score = -h.distFromNearestHostile - h.health * MagicNumbers.HEALER_HEALTH_FACTOR;
 			if(score > bestScore){
