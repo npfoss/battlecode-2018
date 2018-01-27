@@ -284,11 +284,11 @@ public class CombatSquad extends Squad{
 		int x, y, nx, ny;
 		goalRangerDistance = 9999;
 		for(CombatUnit cu: combatUnits.values()){
-			if(cu.notOnMap && !gc.unit(cu.ID).location().isOnMap())
+			if(cu.notOnMap && !cu.updateOnMap(gc))
 				continue;
 			MapLocation actualLoc = gc.unit(cu.ID).location().mapLocation();
 			if(cu.myLoc.getX() != actualLoc.getX() || cu.myLoc.getY() != actualLoc.getY()){
-				Utils.log("HOUSTON WE HAVE A PROBLEM cl = " + cu.myLoc + " actual = " + actualLoc);
+				Utils.log("HOUSTON WE HAVE A PROBLEM  with unit " + cu.ID + " cl = " + cu.myLoc + " actual = " + actualLoc);
 			}
 			cu.update(gc, nav.optimalStepsTo(cu.myLoc, targetLoc));
 			x = cu.myLoc.getX();
@@ -345,7 +345,7 @@ public class CombatSquad extends Squad{
 				continue;
 			Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
 			if(myTile.enemiesWithinRangerRange.size() > 0){
-				Utils.log("I'm trying to attack " + myTile.enemiesWithinRangerRange.first().myLoc + " from " + cu.myLoc);
+				Utils.log(cu.ID + " trying to attack " + myTile.enemiesWithinRangerRange.first().myLoc + " from " + cu.myLoc);
 				gc.attack(cu.ID, myTile.enemiesWithinRangerRange.first().ID);
 				updateDamage(cu, myTile.enemiesWithinRangerRange.first());
 				cu.canAttack = false;
@@ -490,7 +490,7 @@ public class CombatSquad extends Squad{
 			}
 		}
 		if(tH != null){
-			Utils.log("I'm at loc " + cu.myLoc + " healing unit of type " + tH.type + " at " + tH.myLoc.getX() + " " + tH.myLoc.getY());
+			Utils.log(cu.ID + " at loc " + cu.myLoc + " healing " + tH.ID + " at " + tH.myLoc.getX() + " " + tH.myLoc.getY());
 			gc.heal(cu.ID, tH.ID);
 			cu.canAttack = false;
 			switch((int)(gc.researchInfo().getLevel(UnitType.Healer))){ // REFACTOR: probably a better way to do this
@@ -526,7 +526,7 @@ public class CombatSquad extends Squad{
 			}
 		}
 		if(tO != null){
-			Utils.log("I'm at loc " + cu.myLoc + " overcharging unit " + tO.ID + " at " + tO.myLoc.getX() + " " + tO.myLoc.getY());
+			Utils.log(cu.ID + " at loc " + cu.myLoc + " overcharging unit " + tO.ID + " at " + tO.myLoc.getX() + " " + tO.myLoc.getY());
 			gc.overcharge(cu.ID, tO.ID);
 			cu.canOvercharge = false;
 			tO.update(gc, nav.optimalStepsTo(tO.myLoc, targetLoc));

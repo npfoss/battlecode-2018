@@ -51,13 +51,6 @@ public class CombatUnit {
 	
 	public void update(GameController gc, int sft){
 		Unit u = gc.unit(ID);
-		if(notOnMap && u.location().isOnMap()){
-			myLoc = u.location().mapLocation();
-			notOnMap = false;
-		} else if (!notOnMap && !u.location().isOnMap()){
-			notOnMap = true;
-			// didn't see this anywhere so I added it. probably didn't cause problems before but can't hurt
-		}
 		stepsFromTarget = sft;
 		health = u.health();
 		canAttack = u.attackHeat() < 10 && !(type == UnitType.Ranger && u.rangerIsSniping() != 0);
@@ -72,5 +65,12 @@ public class CombatUnit {
 		if(!(o instanceof CombatUnit))
 			return false;
 		return ID == ((CombatUnit)o).ID;
+	}
+
+	public boolean updateOnMap(GameController gc) {
+		notOnMap = !gc.unit(ID).location().isOnMap();
+		if(!notOnMap)
+			myLoc = gc.unit(ID).location().mapLocation();
+		return !notOnMap;
 	}
 }
