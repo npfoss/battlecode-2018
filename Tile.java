@@ -24,7 +24,7 @@ public class Tile{
     int roundLastUpdated;
     TreeSet<TargetUnit> enemiesWhichCouldHitUs;
     int possibleDamage;
-    HashMap<String, Signpost> destToDir;
+    HashMap<Integer, Signpost> destToDir;
     int distFromNearestHostile;
     
     //for combat
@@ -48,7 +48,7 @@ public class Tile{
         karbArea = kA;
         roundLastUpdated = 0;
         possibleDamage = 0;
-        destToDir = new HashMap<String, Signpost>();
+        destToDir = new HashMap<Integer, Signpost>();
         enemiesWhichCouldHitUs = new TreeSet<TargetUnit>(new descendingPriorityComp());
         enemiesWithinRangerRange = new TreeSet<TargetUnit>(new descendingPriorityComp());
         enemiesWithinKnightRange = new TreeSet<TargetUnit>(new descendingPriorityComp());
