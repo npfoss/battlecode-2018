@@ -628,6 +628,7 @@ public class CombatSquad extends Squad{
 		cu.canMove = false;
 		infoMan.moveAndUpdate(cu.ID, d, cu.type);
 		cu.myLoc = cu.myLoc.add(d);
+		Utils.log("updating " + cu.ID + " to " + cu.myLoc);
 		cu.distFromNearestHostile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].distFromNearestHostile;
 	}
 	
