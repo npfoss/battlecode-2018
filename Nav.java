@@ -233,7 +233,7 @@ public class Nav{
         }
     }
 
-    //REFACTOR: why is this a thing?
+    //REFACTOR: why is this a thing? because the rocket's move had nav and not infoMan when I wrote it :P
     public MapLocation getNextMarsDest(){
         return infoMan.getNextMarsDest();
     }
