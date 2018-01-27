@@ -83,7 +83,7 @@ public class Strategy{
 	
 	public boolean shouldLaunch(Unit rocket, int numUnitsInside) {
 		//TODO: make this better
-		return gc.round() + 1 == infoMan.magicNums.EARTH_FLOOD_ROUND
+		return gc.round() + 1 == MagicNumbers.EARTH_FLOOD_ROUND
 		|| rocket.health() * 2 < rocket.maxHealth();
 	}
 	

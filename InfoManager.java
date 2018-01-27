@@ -543,7 +543,8 @@ public class InfoManager {
     }
 
     public void moveAndUpdate(int id, Direction d, UnitType type) {
-    	if(d == Direction.Center)
+    	//TODO: be able to remove gc.canMove(id,d) and not throw errors
+    	if(d == Direction.Center || !gc.canMove(id, d))
     		return;
     	MapLocation start = gc.unit(id).location().mapLocation();
     	gc.moveRobot(id, d);

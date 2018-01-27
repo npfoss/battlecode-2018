@@ -61,7 +61,6 @@ public class MagicNumbers{
     static Double MIN_SCORE_TO_REPLICATE = 50.0;
 
     // rockets
-    static int ROCKET_COUNTDOWN = 5; // how many turns to wait before launching
     static long SEND_EVERYTHING = 600;
 
     // unsorted
