@@ -130,7 +130,6 @@ public class WorkerSquad extends Squad {
 		
 		targetKarbLocs.put(id, karbLoc);
 		Direction d = nav.dirToMoveSafely(myLoc, karbLoc);
-		
 		infoMan.moveAndUpdate(id, d, UnitType.Worker);
 	
 	}
