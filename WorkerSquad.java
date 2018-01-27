@@ -144,7 +144,11 @@ public class WorkerSquad extends Squad {
 		for(int i=0; i<9; i++){
 			nx = x + Utils.dx[i];
 			ny = y + Utils.dy[i];
+			if(!infoMan.isOnMap(nx,ny))
+				continue;
 			Tile t = infoMan.tiles[nx][ny];
+			if(!t.isWalkable || t.unitID > -1)
+				continue;
 			t.updateEnemies(gc);
 			double score = -100.0 * t.possibleDamage + t.distFromNearestHostile;
 			if(score>bestScore){
