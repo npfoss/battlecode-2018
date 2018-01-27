@@ -40,8 +40,7 @@ public class MagicNumbers{
     int EARTH_FLOOD_ROUND = 750;
 
     // for rockets
-    // how many turns to wait before launch
-    int ROCKET_COUNTDOWN = 5;
+    static long SEND_EVERYTHING = 600;
     
     //for workers
     static int FACTORY_COST = 200;

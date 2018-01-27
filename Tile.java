@@ -137,6 +137,12 @@ public class Tile{
         	accessible = false;
         }
         */
+    	for(Unit u: infoMan.rockets) {
+    		if(!u.location().isOnMap())
+    			continue;
+    		if(u.location().mapLocation().distanceSquaredTo(myLoc) <= 2)
+    			possibleDamage += 100;
+    	}
     	TreeSet<TargetUnit> enemies = infoMan.getTargetUnits(myLoc, magicNums.MAX_DIST_TO_CHECK, false);
     	distFromNearestHostile = magicNums.MAX_DIST_TO_CHECK;
     	boolean didSomething;

@@ -153,6 +153,7 @@ public class InfoManager {
 		//keeping track of our/enemy units, squad management
 		//REFACTOR: while going through units, add to tiles whether or not there is a unit there so we don't have to call gc.hasUnitAtLocation;
 		VecUnit units = gc.units();
+		workerCount = 0;
 		HashSet<Integer> ids = new HashSet<Integer>();
 		for (int i = 0; i < units.size(); i++) {
 			Unit unit = units.get(i);
@@ -172,6 +173,8 @@ public class InfoManager {
 				switch (unit.unitType()) {
 				case Worker:
 					workers.add(unit);
+					if(!(unit.location().isInGarrison()))
+							workerCount++;
 					if (!isInSquads1(unit, workerSquads) && !isInSquads2(unit, rocketSquads))
 						unassignedUnits.add(unit.id());
 					break;
@@ -180,17 +183,13 @@ public class InfoManager {
 					break;
 				case Rocket:
 					rockets.add(unit);
-                    Utils.log("THERE IS A ROCKET!");
+                    //Utils.log("THERE IS A ROCKET!");
 					if (!isInSquads2(unit, rocketSquads))
 						newRockets.add(unit);
 					break;
 				default:
-					//if(myPlanet == Planet.Mars)
-					//	Utils.log("wow");
 					fighters.add(unit);
 					if (!isInSquads3(unit, combatSquads) && !isInSquads2(unit,rocketSquads)){
-						//if(myPlanet == Planet.Mars)
-						//	Utils.log("no way");
 						unassignedUnits.add(unit.id());
 					}
 					break;
@@ -247,8 +246,6 @@ public class InfoManager {
 			s.update();
 		}
 		
-		workerCount = workers.size();
-
 		logTimeCheckpoint("infoMan update done");
 	}
 
