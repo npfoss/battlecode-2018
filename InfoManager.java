@@ -405,8 +405,8 @@ public class InfoManager {
     // takes a passable maplocation, adds it and everything reachable
     //      from it to the given region
     public void floodfill(Region region, MapLocation loc){
+    	Utils.log("x = " + loc.getX() + " y = " + loc.getY());
         long karbs = startingMap.initialKarboniteAt(loc);
-        
         KarboniteArea karbArea = null;
         if(karbs > 0)
         	karbArea = getKarbArea(loc, region);

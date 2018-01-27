@@ -54,8 +54,8 @@ public class Strategy{
 			takeAnyUnit = true;
 			rocketsToBuild = 100;
 		}
-		if(gc.karbonite() >= 200 ) {
-			maxFactories = infoMan.factories.size() +1 > 6 ? 6 : infoMan.factories.size() +1;
+		if(gc.karbonite() >= MagicNumbers.FACTORY_COST ) {
+			maxFactories = infoMan.factories.size() + 1 > 6 ? 6 : infoMan.factories.size() +1;
 		}
 		//increment rocketsToBuild appropriately
 		//if you've totally dominated them, send a bunch at the same time.
