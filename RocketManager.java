@@ -76,13 +76,13 @@ public class RocketManager{
     public void stealClosestApplicableUnitsOfType(RocketSquad rs, UnitType type, int num, boolean takeAnyUnit){
 
         if (num == 0) return;
-    	Utils.log("Num = " + num);
+    	// Utils.log("Num = " + num);
         // get closest legal units
         Unit[] toSteal = new Unit[num];
         int maxInd = 0;
         long maxDist = 999999;
         ArrayList<Unit> list = type == UnitType.Worker ? infoMan.workers : infoMan.fighters;
-        Utils.log("List length = " + list.size());
+        // Utils.log("List length = " + list.size());
         for (Unit unit : list){
         	if(!takeAnyUnit && unit.unitType() != type)
         		continue;
@@ -90,7 +90,7 @@ public class RocketManager{
         		continue;
             if ((toSteal[maxInd] == null || rs.targetLoc.distanceSquaredTo(unit.location().mapLocation()) < maxDist)
                     && canStealUnit(rs, unit)){
-            	Utils.log("Tryna steal a unit");
+            	// Utils.log("Tryna steal a unit");
                 toSteal[maxInd] = unit;
                 maxInd = Utils.maxDistIndex(toSteal, rs.targetLoc);
                 maxDist = toSteal[maxInd] == null ? 999999 : rs.targetLoc.distanceSquaredTo(unit.location().mapLocation());

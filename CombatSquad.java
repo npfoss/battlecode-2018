@@ -341,7 +341,7 @@ public class CombatSquad extends Squad{
 				continue;
 			Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
 			if(myTile.enemiesWithinRangerRange.size() > 0){
-				Utils.log("trying to attack from " + cu.myLoc);
+				// Utils.log("trying to attack from " + cu.myLoc);
 				gc.attack(cu.ID, myTile.enemiesWithinRangerRange.first().ID);
 				updateDamage(cu, myTile.enemiesWithinRangerRange.first());
 				cu.canAttack = false;

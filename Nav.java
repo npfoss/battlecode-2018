@@ -35,16 +35,10 @@ public class Nav{
         	//can't get there but just return distance
     		return (int)(start.distanceSquaredTo(target));
         }
-        if (!infoMan.tiles[start.getX()][start.getY()].destToDir.containsKey(target.toString())){
+        if (!infoMan.tiles[start.getX()][start.getY()].destToDir.containsKey(mapLocToString(target))){
             generateBFSMap(target);
         }
-        try{
-        	return infoMan.tiles[start.getX()][start.getY()].destToDir.get(target.toString()).stepsToDest;
-        }
-        catch(Exception e){
-        	Utils.log("RIP USSSSSS");
-        	return 0;
-        }
+        return infoMan.tiles[start.getX()][start.getY()].destToDir.get(mapLocToString(target)).stepsToDest;
     }
 
     /*
@@ -52,10 +46,10 @@ public class Nav{
     ignoring other units
     */
     public Direction directionTowards(MapLocation start, MapLocation target){
-        if (!infoMan.tiles[start.getX()][start.getY()].destToDir.containsKey(target.toString())){
+        if (!infoMan.tiles[start.getX()][start.getY()].destToDir.containsKey(mapLocToString(target))){
             generateBFSMap(target);
         }
-        return infoMan.tiles[start.getX()][start.getY()].destToDir.get(target.toString()).direction;
+        return infoMan.tiles[start.getX()][start.getY()].destToDir.get(mapLocToString(target)).direction;
     }
 
     /*
@@ -195,11 +189,11 @@ public class Nav{
     }
 
     public void generateBFSMap(MapLocation target){
-        Utils.log("Generating map to " + target.toString());
+        Utils.log("Generating map to " + mapLocToString(target));
         int dist = 0;
         ArrayList<MapLocation> currentLocs = new ArrayList<MapLocation>();
         ArrayList<MapLocation> nextLocs = new ArrayList<MapLocation>();
-        infoMan.tiles[target.getX()][target.getY()].destToDir.put(target.toString(), new Signpost(Direction.Center, 0));
+        infoMan.tiles[target.getX()][target.getY()].destToDir.put(mapLocToString(target), new Signpost(Direction.Center, 0));
 
         currentLocs.add(target);
         dist++;
@@ -208,9 +202,12 @@ public class Nav{
             for (MapLocation loc : currentLocs){
                 for (Direction dir : Utils.orderedDirections){
                     MapLocation neighbor = loc.add(dir);
-                    if (infoMan.isOnMap(neighbor) && infoMan.isLocationWalkable(neighbor)){
-                        if (infoMan.tiles[neighbor.getX()][neighbor.getY()].destToDir.containsKey(target.toString())){
-                            sign = infoMan.tiles[neighbor.getX()][neighbor.getY()].destToDir.get(target.toString());
+                    if (infoMan.isOnMap(neighbor)
+                            && (infoMan.isLocationWalkable(neighbor)
+                                    || infoMan.tiles[neighbor.getX()][neighbor.getY()].myType == UnitType.Rocket
+                                    || infoMan.tiles[neighbor.getX()][neighbor.getY()].myType == UnitType.Factory)){
+                        if (infoMan.tiles[neighbor.getX()][neighbor.getY()].destToDir.containsKey(mapLocToString(target))){
+                            sign = infoMan.tiles[neighbor.getX()][neighbor.getY()].destToDir.get(mapLocToString(target));
                             if (sign.stepsToDest == dist
                                     && !Utils.isDiagonalDirection(dir)
                                     && Utils.isDiagonalDirection(sign.direction)){
@@ -221,11 +218,17 @@ public class Nav{
                             } else if (sign.stepsToDest > dist){
                                 sign.stepsToDest = dist;
                                 sign.direction = Utils.oppositeDirection(dir);
-                                nextLocs.add(neighbor);
+                                if(!(infoMan.tiles[neighbor.getX()][neighbor.getY()].myType == UnitType.Rocket
+                                        || infoMan.tiles[neighbor.getX()][neighbor.getY()].myType == UnitType.Factory)){
+                                    nextLocs.add(neighbor);
+                                }
                             }
                         } else {
-                            infoMan.tiles[neighbor.getX()][neighbor.getY()].destToDir.put(target.toString(), new Signpost(Utils.oppositeDirection(dir), dist));
-                            nextLocs.add(neighbor);
+                            infoMan.tiles[neighbor.getX()][neighbor.getY()].destToDir.put(mapLocToString(target), new Signpost(Utils.oppositeDirection(dir), dist));
+                            if(!(infoMan.tiles[neighbor.getX()][neighbor.getY()].myType == UnitType.Rocket
+                                    || infoMan.tiles[neighbor.getX()][neighbor.getY()].myType == UnitType.Factory)){
+                                nextLocs.add(neighbor);
+                            }
                         }
                     }
                 }
@@ -234,8 +237,15 @@ public class Nav{
             currentLocs = nextLocs;
             nextLocs = new ArrayList<MapLocation>();
         }
-        
         //Utils.log("done generating map");
+    }
+
+    public String mapLocToString(MapLocation loc){
+        return coordToString(loc.getX(), loc.getY());
+    }
+
+    public String coordToString(int x, int y){
+        return "" + x + "," + y;
     }
 
     public MapLocation getNextMarsDest(){
