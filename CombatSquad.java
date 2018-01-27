@@ -626,9 +626,9 @@ public class CombatSquad extends Squad{
 		if(d == null || d == Direction.Center)
 			return;
 		cu.canMove = false;
-		infoMan.moveAndUpdate(cu.ID, d, cu.type);
 		cu.myLoc = cu.myLoc.add(d);
 		Utils.log("updating " + cu.ID + " to " + cu.myLoc);
+		infoMan.moveAndUpdate(cu.ID, d, cu.type);
 		cu.distFromNearestHostile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].distFromNearestHostile;
 	}
 	
