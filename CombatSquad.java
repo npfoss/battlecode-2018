@@ -519,7 +519,11 @@ public class CombatSquad extends Squad{
 		}
 		if(tO != null){
 			//Utils.log("overcharging unit " + tO.ID + " at " + tO.myLoc.getX() + " " + tO.myLoc.getY());
-			gc.overcharge(cu.ID, tO.ID);
+			//TODO: don't throw errors even when we remove the check (it's trying to overcharge things too far away)
+			if(gc.canOvercharge(cu.ID, tO.ID))
+				gc.overcharge(cu.ID, tO.ID);
+			else
+				return;
 			cu.canOvercharge = false;
 			tO.update(gc, nav.optimalStepsTo(tO.myLoc, targetLoc));
 			TreeSet<CombatUnit> temp = new TreeSet<CombatUnit>(new AscendingStepsComp());
