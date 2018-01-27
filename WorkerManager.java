@@ -111,7 +111,7 @@ public class WorkerManager{
 				}
 			}
 
-			if(infoMan.factories.size() < strat.maxFactories) {
+			if(infoMan.factories.size() < strat.maxFactories && infoMan.factoriesToBeBuilt == 0) {
 				boolean mustSteal = (strat.minFactories > infoMan.factories.size());
 				createBuildSquad(UnitType.Factory, mustSteal);
 			}
