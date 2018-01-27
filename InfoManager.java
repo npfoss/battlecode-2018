@@ -6,6 +6,8 @@ import bc.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.TreeSet;
 
 /*
@@ -158,6 +160,7 @@ public class InfoManager {
 		//keeping track of our/enemy units, squad management
 		//REFACTOR: while going through units, add to tiles whether or not there is a unit there so we don't have to call gc.hasUnitAtLocation;
 		VecUnit units = gc.units();
+		workerCount = 0;
 		HashSet<Integer> ids = new HashSet<Integer>();
 		for (int i = 0; i < units.size(); i++) {
 			Unit unit = units.get(i);
@@ -178,7 +181,6 @@ public class InfoManager {
 				case Worker:
 					workers.add(unit);
 					if (!isInSquads(unit) && unit.location().isOnMap()){
-						//Utils.log("here " + unit.id());
 						unassignedUnits.add(unit.id());
 					}
 					break;
@@ -238,8 +240,6 @@ public class InfoManager {
 			s.update();
 		}
 		
-		workerCount = workers.size();
-
 		logTimeCheckpoint("infoMan update done");
 	}
 
@@ -398,9 +398,37 @@ public class InfoManager {
 
     // takes a passable maplocation, adds it and everything reachable
     //      from it to the given region
-    public void floodfill(Region region, MapLocation loc){
+    public void floodfill(Region region, MapLocation l){
+    	Queue<MapLocation> q = new LinkedList<MapLocation>();
+    	q.add(l);
+    	while(!q.isEmpty()){
+    		MapLocation loc = q.poll();
+	        long karbs = startingMap.initialKarboniteAt(loc);
+	        KarboniteArea karbArea = null;
+	        if(karbs > 0)
+	        	karbArea = getKarbArea(loc, region);
+	        tiles[loc.getX()][loc.getY()] = new Tile(true, karbs, region, loc, this, karbArea);
+	        if(karbArea != null) {
+	        	karbArea.addTile(tiles[loc.getX()][loc.getY()]);
+	        	//Utils.log("adding " + loc + " to an area.");
+	        }
+	        region.tiles.add(tiles[loc.getX()][loc.getY()]);
+	        region.karbonite += karbs;
+	        for (Direction dir : Utils.orderedDirections){
+	            MapLocation neighbor = loc.add(dir);
+	            if (isOnMap(neighbor)
+	                    && tiles[neighbor.getX()][neighbor.getY()] == null
+	                    && startingMap.isPassableTerrainAt(neighbor) > 0){
+	                q.add(neighbor);
+	            }
+	        }
+    	}
+    }
+    
+    /* old one that maybe works better? for debugging
+    public void floodfill(PlanetMap startingMap, Region region, MapLocation loc){
+    	Utils.log("x = " + loc.getX() + " y = " + loc.getY());
         long karbs = startingMap.initialKarboniteAt(loc);
-        
         KarboniteArea karbArea = null;
         if(karbs > 0)
         	karbArea = getKarbArea(loc, region);
@@ -418,10 +446,10 @@ public class InfoManager {
             if (isOnMap(neighbor)
                     && tiles[neighbor.getX()][neighbor.getY()] == null
                     && startingMap.isPassableTerrainAt(neighbor) > 0){
-                floodfill(region, neighbor);
+                floodfill(startingMap, region, neighbor);
             }
         }
-    }
+    }*/
 
     public KarboniteArea getKarbArea(MapLocation loc, Region r) {
 		for(KarboniteArea kA: karbAreas){

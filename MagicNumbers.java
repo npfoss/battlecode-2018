@@ -62,6 +62,7 @@ public class MagicNumbers{
 
     // rockets
     static int ROCKET_COUNTDOWN = 5; // how many turns to wait before launching
+    static long SEND_EVERYTHING = 600;
 
     // unsorted
 }
