@@ -65,7 +65,7 @@ public class Strategy{
 		//if you've totally dominated them, send a bunch at the same time.
 		//otherwise if it's getting close to the end of the game send a bunch at the same time
 		//otherwise even if you're not dominating, if you're not really engaging with the enemy/running out of space to build then steadily send.
-		else if(infoMan.researchLevels[5] > 0 && infoMan.fighters.size() > (25 + rocketsBuilt*5)) {
+		else if(infoMan.researchLevels[5] > 0 && infoMan.fighters.size() > (50 + rocketsBuilt*8)) {
 			rocketsToBuild++;
 			rocketsBuilt++;
 		}
@@ -82,8 +82,9 @@ public class Strategy{
 	}
 	
 	public boolean shouldLaunch(Unit rocket, int numUnitsInside) {
-			return gc.round() + 1 == infoMan.magicNums.EARTH_FLOOD_ROUND
-			|| rocket.health() * 2 < rocket.maxHealth();
+		//TODO: make this better
+		return gc.round() + 1 == infoMan.magicNums.EARTH_FLOOD_ROUND
+		|| rocket.health() * 2 < rocket.maxHealth();
 	}
 	
 	public boolean shouldGoToBuildLoc() {
