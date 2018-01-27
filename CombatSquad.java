@@ -69,7 +69,7 @@ public class CombatSquad extends Squad{
 
 	public double scoreOverchargee(CombatUnit o){
 		switch(o.type){
-		case Healer: continue;
+		case Healer: return 0;
 		case Ranger: return (gc.researchInfo().getLevel(UnitType.Ranger) == 3 ? gc.unit(o.ID).abilityHeat() * MagicNumbers.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.distFromNearestHostile;
 		case Knight: return (gc.researchInfo().getLevel(UnitType.Knight) == 3 ? gc.unit(o.ID).abilityHeat() * MagicNumbers.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.distFromNearestHostile;
 		case Mage: return (gc.researchInfo().getLevel(UnitType.Mage) == 4 ? gc.unit(o.ID).abilityHeat() * MagicNumbers.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.distFromNearestHostile;
@@ -79,12 +79,6 @@ public class CombatSquad extends Squad{
 	private boolean shouldWeRetreat(){
 		// TODO: make this better
 		// put in strategy too?
-		return numEnemyUnits > combatUnits.size() * MagicNumbers.AGGRESION_FACTOR;
-	}
-
-	private boolean shouldWeRetreat(){
-		// TODO: make this better
-		// put in strategy too
 		return numEnemyUnits > combatUnits.size() * MagicNumbers.AGGRESION_FACTOR;
 	}
 
