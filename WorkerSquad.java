@@ -137,17 +137,17 @@ public class WorkerSquad extends Squad {
 	
 	public void runAway(int id, MapLocation loc){
 		double bestScore = -10000000;
-		int bestInd = 0;
+		int bestInd = 8;
 		int x = loc.getX();
 		int y = loc.getY();
 		int nx,ny;
-		for(int i=0; i<9; i++){
+		for(int i=0; i < 8; i++){
 			nx = x + Utils.dx[i];
 			ny = y + Utils.dy[i];
 			if(!infoMan.isOnMap(nx,ny))
 				continue;
 			Tile t = infoMan.tiles[nx][ny];
-			if(!t.isWalkable || t.unitID > -1)
+			if(!t.isWalkable || !infoMan.isLocationClear(nx, ny))
 				continue;
 			t.updateEnemies(gc);
 			double score = -100.0 * t.possibleDamage + t.distFromNearestHostile;
