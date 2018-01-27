@@ -184,6 +184,7 @@ public class WorkerManager{
 		boolean didSomething = false;
 		while(infoMan.unassignedUnits.size() > 0) {
 			didSomething = false;
+			int toR = 0;
 			infoMan.workerSquads.sort(Squad.byUrgency());
 			for(WorkerSquad ws : infoMan.workerSquads) {
 				for(int i : infoMan.unassignedUnits) {
@@ -195,18 +196,17 @@ public class WorkerManager{
 						wsunit = gc.unit(ws.units.get(0));
 					if(ws.units.size() == 0 || !wsunit.location().isOnMap() || infoMan.isReachable(wsunit.location().mapLocation(),a.location().mapLocation())){
 						ws.units.add(i);
+						toR = i;
 						Utils.log("1 adding " + i);
 						ws.update();
 						didSomething = true;
 						break;
 					}
-					if(didSomething){
-						infoMan.unassignedUnits.remove(i);
-						break;
-					}
 				}
-				if(didSomething)
+				if(didSomething){
+					infoMan.unassignedUnits.remove(toR);
 					break;
+				}
 			}
 			if(!didSomething) {
 				HashSet<Integer> toRemove = new HashSet<Integer>();
