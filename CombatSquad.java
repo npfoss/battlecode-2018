@@ -367,9 +367,9 @@ public class CombatSquad extends Squad{
 			//if we're not near any enemies nav, otherwise move and maybe attack
 			if(myTile.distFromNearestHostile > MagicNumbers.MAX_DIST_THEY_COULD_HIT_NEXT_TURN){
 				//Utils.log("navving " + cu.myLoc.getX() + " " + cu.myLoc.getY());
-				Utils.log("trying to generate");
+				//Utils.log("trying to generate");
 				Direction d = nav.dirToMove(cu.myLoc, targetLoc);
-				Utils.log("generated");
+				//Utils.log("generated");
 				moveAndUpdate(cu, d);
 			} else if (cu.health <= MagicNumbers.RANGER_RUN_AWAY_HEALTH_THRESH){
 				runAway(cu);
