@@ -578,8 +578,9 @@ public class CombatSquad extends Squad{
 		// TODO: should this use Nav's explore?
 		Direction dirToMove = Utils.orderedDirections[(int) (8*Math.random())];
 		for(int uid: units){
-			if(gc.canMove(uid, dirToMove) && gc.unit(uid).movementHeat() < 10)
-				gc.moveRobot(uid, dirToMove);
+			if(gc.canMove(uid, dirToMove) && gc.unit(uid).movementHeat() < 10){
+				infoMan.moveAndUpdate(uid, dirToMove, gc.unit(uid).unitType());
+			}
 		}
 	}
 
