@@ -91,9 +91,12 @@ public class RocketSquad extends Squad {
 				//Move towards the target location
 				/* TODO: this is not going to work if the tiles around the
 				 * 		rocket are marked as dangerous (without a fix) */
+				if(targetLoc == null) {
+					Utils.log("This is the saddest time because we are about to throw an exception");
+				}
 				Direction movedir = nav.dirToMoveSafely(astronaut.location().mapLocation(),targetLoc);
 				if (movedir != Direction.Center) {
-					gc.moveRobot(id, movedir);
+					infoMan.moveAndUpdate(id, movedir, astronaut.unitType());
 				}
 			}
 		}

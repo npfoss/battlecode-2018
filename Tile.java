@@ -17,7 +17,8 @@ public class Tile{
     MagicNumbers magicNums;
     InfoManager infoMan;
     boolean containsUnit;
-    int myUnit; //id of combat unit on tile
+    UnitType myType;
+    KarboniteArea karbArea;
 
     int roundLastUpdated;
     TreeSet<TargetUnit> enemiesWhichCouldHitUs;
@@ -32,10 +33,10 @@ public class Tile{
     TreeSet<TargetUnit> enemiesWithinMageRange;
     //boolean claimed;
     boolean enemiesUpdated;
-    boolean containsUpdated;
+    int unitID;
     //boolean accessible; //contains no unit or our unit that is move ready
     
-    public Tile(boolean walkable, long karb, Region reg, MapLocation ml, MagicNumbers mn, InfoManager im){
+    public Tile(boolean walkable, long karb, Region reg, MapLocation ml, MagicNumbers mn, InfoManager im, KarboniteArea kA){
         x = ml.getX();
         y = ml.getY();
         isWalkable = walkable;
@@ -44,6 +45,7 @@ public class Tile{
         myLoc = ml;
         magicNums = mn;
         infoMan = im;
+        karbArea = kA;
         roundLastUpdated = 0;
         possibleDamage = 0;
         destToDir = new HashMap<String, Signpost>();
@@ -55,15 +57,23 @@ public class Tile{
         //claimed = false;
         enemiesUpdated = false;
         containsUnit = false;
-        containsUpdated = false;
+        unitID = -1;
         distFromNearestHostile = 100;
-        myUnit = -1;
     }
 
     public void updateKarbonite(long newKarb){
         if (newKarb != karbonite){
             if(region != null){
                 region.karbonite += newKarb - karbonite;
+            }
+            if(karbonite == 0){
+            	karbArea = infoMan.getKarbArea(myLoc,region);
+            }
+            else{
+            	karbArea.karbonite += newKarb - karbonite;
+            }
+            if(newKarb == 0){
+            	karbArea.removeTile(this);
             }
             karbonite = newKarb;
         }
@@ -92,12 +102,14 @@ public class Tile{
     	}
     }
     
+    /*
     public void updateContains(GameController gc){
     	if(containsUpdated)
     		return;
     	containsUpdated = true;
     	containsUnit = gc.hasUnitAtLocation(myLoc);
     }
+    */
     
     public void updateEnemies(GameController gc){
     	if(enemiesUpdated)
