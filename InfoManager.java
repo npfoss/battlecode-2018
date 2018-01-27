@@ -180,6 +180,7 @@ public class InfoManager {
 				switch (unit.unitType()) {
 				case Worker:
 					workers.add(unit);
+					workerCount++;
 					if (!isInSquads(unit) && unit.location().isOnMap()){
 						unassignedUnits.add(unit.id());
 					}
