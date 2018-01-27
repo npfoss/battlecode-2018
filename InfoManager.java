@@ -136,21 +136,21 @@ public class InfoManager {
 		targetUnits.clear();
 
 		//updating map info
-				for(int x = 0; x < tiles.length; x++){
-					for(int y = 0; y < tiles[0].length; y++){
-						MapLocation loc = tiles[x][y].myLoc;
-						if(gc.canSenseLocation(loc)){
-							tiles[x][y].roundLastUpdated = (int) gc.round();
-		                    tiles[x][y].updateKarbonite(gc.karboniteAt(loc));
-		                    tiles[x][y].enemiesUpdated = false;
-		                    tiles[x][y].unitID = -1;
-		                    if(startingMap.isPassableTerrainAt(loc) > 0)
-		                    	tiles[x][y].isWalkable = true;
-		                    // TODO: check if there's now a factory there
-		                    //      (to update walkability)
-		                }
-					}
+		for(int x = 0; x < tiles.length; x++){
+			for(int y = 0; y < tiles[0].length; y++){
+				MapLocation loc = tiles[x][y].myLoc;
+				if(gc.canSenseLocation(loc)){
+					tiles[x][y].roundLastUpdated = (int) gc.round();
+					tiles[x][y].updateKarbonite(gc.karboniteAt(loc));
+					tiles[x][y].enemiesUpdated = false;
+					tiles[x][y].unitID = -1;
+					if(startingMap.isPassableTerrainAt(loc) > 0)
+						tiles[x][y].isWalkable = true;
+					// TODO: check if there's now a factory there
+					//      (to update walkability)
 				}
+			}
+		}
 		
 		//keeping track of our/enemy units, squad management
 		//REFACTOR: while going through units, add to tiles whether or not there is a unit there so we don't have to call gc.hasUnitAtLocation;
