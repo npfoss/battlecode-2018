@@ -284,7 +284,7 @@ public class CombatSquad extends Squad{
 		int x, y, nx, ny;
 		goalRangerDistance = 9999;
 		for(CombatUnit cu: combatUnits.values()){
-			if(cu.notOnMap && !gc.unit(cu.ID).location().isOnMap())
+			if(cu.notOnMap && !cu.updateOnMap(gc))
 				continue;
 			MapLocation actualLoc = gc.unit(cu.ID).location().mapLocation();
 			if(cu.myLoc.getX() != actualLoc.getX() || cu.myLoc.getY() != actualLoc.getY()){
