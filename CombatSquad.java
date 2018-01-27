@@ -341,7 +341,7 @@ public class CombatSquad extends Squad{
 				continue;
 			Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
 			if(myTile.enemiesWithinRangerRange.size() > 0){
-				Utils.log("trying to attack from " + cu.myLoc);
+				Utils.log("I'm trying to attack " + myTile.enemiesWithinRangerRange.first().myLoc + " from " + cu.myLoc);
 				gc.attack(cu.ID, myTile.enemiesWithinRangerRange.first().ID);
 				updateDamage(cu, myTile.enemiesWithinRangerRange.first());
 				cu.canAttack = false;
@@ -522,7 +522,7 @@ public class CombatSquad extends Squad{
 			}
 		}
 		if(tO != null){
-			Utils.log("overcharging unit " + tO.ID + " at " + tO.myLoc.getX() + " " + tO.myLoc.getY());
+			Utils.log("I'm at loc " + cu.myLoc + " overcharging unit " + tO.ID + " at " + tO.myLoc.getX() + " " + tO.myLoc.getY());
 			//TODO: don't throw errors even when we remove the check (it's trying to overcharge things too far away)
 			gc.overcharge(cu.ID, tO.ID);
 			cu.canOvercharge = false;
