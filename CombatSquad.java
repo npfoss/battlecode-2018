@@ -504,6 +504,8 @@ public class CombatSquad extends Squad{
 	private TreeSet<CombatUnit> getUnitsToHeal(MapLocation ml){
     	TreeSet<CombatUnit> ret = new TreeSet<CombatUnit>(new AscendingStepsComp());
     	for(CombatUnit cu: combatUnits.values()){
+    		if(cu.notOnMap)
+    			continue;
     		int dist = (int) ml.distanceSquaredTo(cu.myLoc);
     		if(dist <= MagicNumbers.HEALER_RANGE)
     			ret.add(cu);
