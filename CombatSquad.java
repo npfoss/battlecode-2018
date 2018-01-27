@@ -509,6 +509,8 @@ public class CombatSquad extends Squad{
 		double bestScore = -10000;
 		double score = 0;
 		for(CombatUnit o: overchargees){
+			if(o.type == UnitType.Healer)
+				continue;
 			score = scoreOverchargee(o);
 			if(score > bestScore){
 				tO = o;
