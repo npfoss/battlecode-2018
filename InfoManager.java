@@ -375,6 +375,7 @@ public class InfoManager {
     // takes a passable maplocation, adds it and everything reachable
     //      from it to the given region
     public void floodfill(PlanetMap startingMap, Region region, MapLocation loc){
+    	Utils.log("x = " + loc.getX() + " y = " + loc.getY());
         long karbs = startingMap.initialKarboniteAt(loc);
         tiles[loc.getX()][loc.getY()] = new Tile(true, karbs, region, loc, magicNums, this);
         region.tiles.add(tiles[loc.getX()][loc.getY()]);
