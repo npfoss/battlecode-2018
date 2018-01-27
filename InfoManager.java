@@ -403,6 +403,8 @@ public class InfoManager {
     	q.add(l);
     	while(!q.isEmpty()){
     		MapLocation loc = q.poll();
+    		if(tiles[loc.getX()][loc.getY()] != null)
+    			continue;
 	        long karbs = startingMap.initialKarboniteAt(loc);
 	        KarboniteArea karbArea = null;
 	        if(karbs > 0)
@@ -419,7 +421,7 @@ public class InfoManager {
 	            if (isOnMap(neighbor)
 	                    && tiles[neighbor.getX()][neighbor.getY()] == null
 	                    && startingMap.isPassableTerrainAt(neighbor) > 0){
-	            	Utils.log("adding " + neighbor.getX() + " " + neighbor.getY());
+	            	//Utils.log("adding " + neighbor.getX() + " " + neighbor.getY());
 	                q.add(neighbor);
 	            }
 	        }
