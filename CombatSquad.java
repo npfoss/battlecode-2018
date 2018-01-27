@@ -174,7 +174,6 @@ public class CombatSquad extends Squad{
 		if(!combatUnits.containsKey(id))
 			return;
 		CombatUnit cu = combatUnits.get(id);
-		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].unitID = -1;
 		combatUnits.remove(id);
 		switch(cu.type){
 		case Knight:unitCounts[0]--; break;

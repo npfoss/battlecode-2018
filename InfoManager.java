@@ -547,6 +547,7 @@ public class InfoManager {
     	MapLocation start = gc.unit(id).location().mapLocation();
     	gc.moveRobot(id, d);
     	tiles[start.getX()][start.getY()].unitID = -1;
+    	Utils.log("unsetting " + start.getX() + " " + start.getY());
     	MapLocation end = start.add(d);
     	tiles[end.getX()][end.getY()].unitID = id;
     	tiles[end.getX()][end.getY()].myType = type;
