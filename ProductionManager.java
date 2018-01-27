@@ -19,9 +19,6 @@ public class ProductionManager{
     }
 
     public void update(Strategy strat){
-    	//REFACTOR: actually do the calcs here and find the n highest urgency squads for n factories, assign units to factories
-        // find squads with highest urgency and find factories to build them. etc junk
-    	// TODO: stuff
     }
 
     public void move(){
@@ -44,23 +41,18 @@ public class ProductionManager{
     			continue;
     		infoMan.combatSquads.sort(Squad.byUrgency());
     		infoMan.rocketSquads.sort(Squad.byUrgency());
-    		infoMan.workerSquads.sort(Squad.byUrgency());
     		Squad toFill = null;
     		if(infoMan.combatSquads.size() > 0 && infoMan.fighters.size() < MagicNumbers.MAX_FIGHTER_COUNT)
     			toFill = infoMan.combatSquads.get(0);
     		if(infoMan.rocketSquads.size() > 0 && (toFill == null || infoMan.rocketSquads.get(0).urgency > toFill.urgency))
     			toFill = infoMan.rocketSquads.get(0);
-    		//if(infoMan.workerSquads.size()>0 && (toFill == null || infoMan.workerSquads.get(0).urgency > toFill.urgency))
-    			//toFill = infoMan.workerSquads.get(0);
     		UnitType toMake = null;
     		if(toFill != null && toFill.requestedUnits.size() > 0){
     			toMake = toFill.requestedUnits.get(0);
-    			//REFACTOR: make 3 a magic number
-    			if(infoMan.workers.size() < 3)
+    			if(infoMan.workers.size() < 1)
     				toMake = UnitType.Worker;
     		}
-    		//REFACTOR: make 650 a magic number
-    		if(toMake != null && gc.canProduceRobot(id,toMake) && gc.round() < 650) {
+    		if(toMake != null && gc.canProduceRobot(id,toMake) && gc.round() < MagicNumbers.ROUND_TO_STOP_PRODUCTION) {
     			gc.produceRobot(id, toMake);
     		}
     	}
