@@ -105,6 +105,10 @@ public class Utils{
         return Direction.Center;
     }
 
+    public static Direction oppositeDirection(int ind){
+        return oppositeDirection(indexToDirection(ind));
+    }
+
     public static boolean isDiagonalDirection(Direction dir){
         switch(dir){
             case Northeast:
@@ -113,6 +117,10 @@ public class Utils{
             case Southwest: return true;
         }
         return false;
+    }
+
+    public static boolean isDiagonalDirection(int ind){
+        return ind % 2 == 1;
     }
 
     public static MapLocation averageMapLocation(GameController gc, ArrayList<Integer> units) {
