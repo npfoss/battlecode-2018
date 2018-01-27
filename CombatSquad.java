@@ -486,7 +486,7 @@ public class CombatSquad extends Squad{
 			}
 		}
 		if(tH != null){
-			Utils.log("I'm at loc " + tH.myLoc + " healing unit of type " + tH.type + " at " + tH.myLoc.getX() + " " + tH.myLoc.getY());
+			Utils.log("I'm at loc " + cu.myLoc + " healing unit of type " + tH.type + " at " + tH.myLoc.getX() + " " + tH.myLoc.getY());
 			gc.heal(cu.ID, tH.ID);
 			cu.canAttack = false;
 			switch((int)(gc.researchInfo().getLevel(UnitType.Healer))){ // REFACTOR: probably a better way to do this
@@ -523,7 +523,6 @@ public class CombatSquad extends Squad{
 		}
 		if(tO != null){
 			Utils.log("I'm at loc " + cu.myLoc + " overcharging unit " + tO.ID + " at " + tO.myLoc.getX() + " " + tO.myLoc.getY());
-			//TODO: don't throw errors even when we remove the check (it's trying to overcharge things too far away)
 			gc.overcharge(cu.ID, tO.ID);
 			cu.canOvercharge = false;
 			tO.update(gc, nav.optimalStepsTo(tO.myLoc, targetLoc));
