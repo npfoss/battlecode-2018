@@ -41,7 +41,7 @@ public class Strategy{
         rocketsToBuild = 0;
         maxFactories = 1;
         minFactories = 0;
-        minWorkers = 5;
+        minWorkers = 3;
         maxWorkers = 20;
 	}
 

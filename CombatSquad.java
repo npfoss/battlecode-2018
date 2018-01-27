@@ -188,7 +188,7 @@ public class CombatSquad extends Squad{
 		if(units.size() == 0)
 			return;
 
-		numEnemyUnits = infoMan.getTargetUnits(swarmLoc, MagicNumbers.ENEMY_UNIT_DIST_THRESHOLD, false).size();
+		numEnemyUnits = infoMan.getTargetUnits(swarmLoc, MagicNumbers.ENEMY_UNIT_DIST_THRESHOLD, true).size();
 
 		if(objective == Objective.EXPLORE){
 			infoMan.logTimeCheckpoint("start of explore move");
