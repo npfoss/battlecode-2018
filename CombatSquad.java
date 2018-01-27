@@ -334,7 +334,7 @@ public class CombatSquad extends Squad{
 
 //--------------------- RANGER MICRO --------------------
 	private void doRangerMicro(TreeSet<CombatUnit> rangers, boolean retreat, Nav nav) {
-		//first go through rangers which can attack alreaUtils.dy
+		//first go through rangers which can attack already
 		for(CombatUnit cu: rangers.descendingSet()){
 			if(!cu.canAttack)
 				continue;

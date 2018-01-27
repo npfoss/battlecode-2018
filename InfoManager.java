@@ -148,8 +148,7 @@ public class InfoManager {
 		                    tiles[x][y].updateKarbonite(gc.karboniteAt(loc));
 		                    tiles[x][y].enemiesUpdated = false;
 		                    tiles[x][y].unitID = -1;
-		                    if(startingMap.isPassableTerrainAt(loc) > 0)
-		                    	tiles[x][y].isWalkable = true;
+		                    tiles[x][y].isWalkable = startingMap.isPassableTerrainAt(loc) > 0;
 		                    // TODO: check if there's now a factory there
 		                    //      (to update walkability)
 		                }
@@ -173,7 +172,7 @@ public class InfoManager {
             	if(unit.unitType() == UnitType.Factory || unit.unitType() == UnitType.Rocket)
             		tiles[x][y].isWalkable = false;
             }
-			if(unit.team() == gc.team()){
+			if(unit.team() == myTeam){
 				ids.add(unit.id());
 				switch (unit.unitType()) {
 				case Worker:
@@ -388,7 +387,7 @@ public class InfoManager {
                         regions.add(newRegion);
                     } else {
                         // impassible terrain
-                        tiles[x][y] = new Tile(false, startingMap.initialKarboniteAt(loc), null, loc, magicNums, this, null);
+                        tiles[x][y] = new Tile(false, startingMap.initialKarboniteAt(loc), null, loc, this, null);
                     }
                 }
             }
@@ -403,7 +402,7 @@ public class InfoManager {
         KarboniteArea karbArea = null;
         if(karbs > 0)
         	karbArea = getKarbArea(loc, region);
-        tiles[loc.getX()][loc.getY()] = new Tile(true, karbs, region, loc, magicNums, this, karbArea);
+        tiles[loc.getX()][loc.getY()] = new Tile(true, karbs, region, loc, this, karbArea);
         if(karbArea != null) {
         	karbArea.addTile(tiles[loc.getX()][loc.getY()]);
         	//Utils.log("adding " + loc + " to an area.");
