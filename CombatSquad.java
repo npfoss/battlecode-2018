@@ -357,7 +357,7 @@ public class CombatSquad extends Squad{
 		}
 
 		//otherwise, do moves and attacks heuristically
-		for(CombatUnit cu: rangers){ // REFACTOR: should this be rangers.descendingSet() or some ordering?
+		for(CombatUnit cu: rangers){ 
 			if(!cu.canMove){
 				continue;
 			}
@@ -365,7 +365,7 @@ public class CombatSquad extends Squad{
 			Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
 			//if we're not near any enemies nav, otherwise move and maybe attack
 			if(myTile.distFromNearestHostile > MagicNumbers.MAX_DIST_THEY_COULD_HIT_NEXT_TURN){
-				//Utils.log("navving " + cu.myLoc.getX() + " " + cu.myLoc.getY());
+				Utils.log("navving " + cu.myLoc.getX() + " " + cu.myLoc.getY());
 				Direction d = nav.dirToMove(cu.myLoc, targetLoc);
 				moveAndUpdate(cu, d);
 			} else if (cu.health <= MagicNumbers.RANGER_RUN_AWAY_HEALTH_THRESH){
