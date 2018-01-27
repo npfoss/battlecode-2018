@@ -2,6 +2,8 @@ import bc.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.TreeSet;
 
 /*
@@ -404,29 +406,31 @@ public class InfoManager {
 
     // takes a passable maplocation, adds it and everything reachable
     //      from it to the given region
-    public void floodfill(Region region, MapLocation loc){
-    	Utils.log("x = " + loc.getX() + " y = " + loc.getY());
-        long karbs = startingMap.initialKarboniteAt(loc);
-        KarboniteArea karbArea = null;
-        if(karbs > 0)
-        	karbArea = getKarbArea(loc, region);
-        tiles[loc.getX()][loc.getY()] = new Tile(true, karbs, region, loc, magicNums, this, karbArea);
-        if(karbArea != null) {
-        	karbArea.addTile(tiles[loc.getX()][loc.getY()]);
-        	//Utils.log("adding " + loc + " to an area.");
-        }
-        region.tiles.add(tiles[loc.getX()][loc.getY()]);
-        region.karbonite += karbs;
-
-        // now floodfill
-        for (Direction dir : Utils.orderedDirections){
-            MapLocation neighbor = loc.add(dir);
-            if (isOnMap(neighbor)
-                    && tiles[neighbor.getX()][neighbor.getY()] == null
-                    && startingMap.isPassableTerrainAt(neighbor) > 0){
-                floodfill(region, neighbor);
-            }
-        }
+    public void floodfill(Region region, MapLocation l){
+    	Queue<MapLocation> q = new LinkedList<MapLocation>();
+    	q.add(l);
+    	while(!q.isEmpty()){
+    		MapLocation loc = q.poll();
+	        long karbs = startingMap.initialKarboniteAt(loc);
+	        KarboniteArea karbArea = null;
+	        if(karbs > 0)
+	        	karbArea = getKarbArea(loc, region);
+	        tiles[loc.getX()][loc.getY()] = new Tile(true, karbs, region, loc, magicNums, this, karbArea);
+	        if(karbArea != null) {
+	        	karbArea.addTile(tiles[loc.getX()][loc.getY()]);
+	        	//Utils.log("adding " + loc + " to an area.");
+	        }
+	        region.tiles.add(tiles[loc.getX()][loc.getY()]);
+	        region.karbonite += karbs;
+	        for (Direction dir : Utils.orderedDirections){
+	            MapLocation neighbor = loc.add(dir);
+	            if (isOnMap(neighbor)
+	                    && tiles[neighbor.getX()][neighbor.getY()] == null
+	                    && startingMap.isPassableTerrainAt(neighbor) > 0){
+	                q.add(neighbor);
+	            }
+	        }
+    	}
     }
 
     public KarboniteArea getKarbArea(MapLocation loc, Region r) {
