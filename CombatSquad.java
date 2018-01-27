@@ -10,13 +10,17 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.function.BiFunction;
 
-// REFACTOR: oops missed a description... help
-
+/*
+membership controlled by CombatManager
+basically just carry out assigned objective (attack/defend)
+sets objective to NONE when done (to be reassigned by manager)
+combat micro lives here
+*/
 public class CombatSquad extends Squad{
 
 	//keep track of units into two groups: those with the main swarm and those separated from it
 	HashMap<Integer,CombatUnit> combatUnits; //ID to CombatUnit
-	//ArrayList<Integer> separatedUnits;// add back in
+	//ArrayList<Integer> separatedUnits;// add back in?
 	MapLocation swarmLoc;
 	int numEnemyUnits;
 	int goalRangerDistance;
@@ -63,14 +67,82 @@ public class CombatSquad extends Squad{
 			- t.myLoc.distanceSquaredTo(swarmLoc) * MagicNumbers.SWARM_FACTOR_HEALER_MOVE;
 	}
 
-/******************** END TWEAKING *******************/
+	public double scoreOverchargee(CombatUnit o){
+		switch(o.type){
+		case Healer: continue;
+		case Ranger: return (gc.researchInfo().getLevel(UnitType.Ranger) == 3 ? gc.unit(o.ID).abilityHeat() * MagicNumbers.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.distFromNearestHostile;
+		case Knight: return (gc.researchInfo().getLevel(UnitType.Knight) == 3 ? gc.unit(o.ID).abilityHeat() * MagicNumbers.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.distFromNearestHostile;
+		case Mage: return (gc.researchInfo().getLevel(UnitType.Mage) == 4 ? gc.unit(o.ID).abilityHeat() * MagicNumbers.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.distFromNearestHostile;
+		}
+	}
 
+	private boolean shouldWeRetreat(){
+		// TODO: make this better
+		// put in strategy too?
+		return numEnemyUnits > combatUnits.size() * MagicNumbers.AGGRESION_FACTOR;
+	}
+
+	private boolean shouldWeRetreat(){
+		// TODO: make this better
+		// put in strategy too
+		return numEnemyUnits > combatUnits.size() * MagicNumbers.AGGRESION_FACTOR;
+	}
+
+	private boolean areWeDone(){
+		switch(objective){
+		case ATTACK_LOC: return gc.senseNearbyUnitsByTeam(targetLoc, 5, gc.team()).size() > 0 // REFACTOR: get rid of gc call // make 5 magicnum
+							&& infoMan.getTargetUnits(targetLoc, MagicNumbers.SQUAD_SEPARATION_THRESHOLD, false).size() == 0;
+		case DEFEND_LOC: return infoMan.getTargetUnits(targetLoc, 100, false).size() == 0; // REFACTOR: 100 magic num (also somewhere else)
+		default: return false;
+		}
+	}
+
+	public void updateUrgency(){
+		if(units.size() == 0)
+			urgency = 100;
+		else
+			urgency = (numEnemyUnits * 2 - units.size() + 15) * 10; // TODO: tweak this formula, possibly put it in strategy
+		if(urgency < 0)
+			urgency = 0;
+		else if(urgency > 100)
+			urgency = 100;
+	}
+
+/******************** END TWEAKING *******************/
+/******************** NORMAL SQUAD STUFF *************************/
 	public CombatSquad(GameController g, InfoManager im, int[] ucg) {
 		super(im);
 		combatUnits = new HashMap<Integer,CombatUnit>();
 		//separatedUnits = new ArrayList<Integer>();// use or remove
 		unitCounts = new int[]{0,0,0,0}; //knight,mage,ranger,healer
 		unitCompGoal = ucg;
+	}
+
+	public void update(){
+		if(objective == Objective.EXPLORE){
+			requestedUnits.clear();
+			requestedUnits.add(UnitType.Ranger);
+			requestedUnits.add(UnitType.Healer);
+			requestedUnits.add(UnitType.Mage);
+			requestedUnits.add(UnitType.Knight);// REFACTOR: is all this really necessary?
+			urgency = 0;
+			return;
+		}
+
+		swarmLoc = targetLoc;
+		if(combatUnits.size() > 0)
+			swarmLoc = Utils.averageMapLocation(gc, combatUnits.values());
+		if(infoMan.myPlanet == Planet.Mars){
+			requestedUnits.clear();
+			requestedUnits.add(UnitType.Ranger);
+			requestedUnits.add(UnitType.Healer);
+			requestedUnits.add(UnitType.Mage);
+			requestedUnits.add(UnitType.Knight);// REFACTOR: is all this really necessary?
+		}
+		else if(requestedUnits.isEmpty())
+			requestedUnits.add(getRequestedUnit());
+
+		updateUrgency();
 	}
 	
 	public void addUnit(Unit u){
@@ -118,55 +190,6 @@ public class CombatSquad extends Squad{
 		}
 	}
 
-	public void update(){
-		if(objective == Objective.EXPLORE){
-			requestedUnits.clear();
-			requestedUnits.add(UnitType.Ranger);
-			requestedUnits.add(UnitType.Healer);
-			requestedUnits.add(UnitType.Mage);
-			requestedUnits.add(UnitType.Knight);
-			urgency = 0;
-			return;
-		}
-
-		swarmLoc = targetLoc;
-		if(combatUnits.size() > 0)
-			swarmLoc = Utils.averageMapLocation(gc, combatUnits.values());
-		if(infoMan.myPlanet == Planet.Mars){
-			requestedUnits.clear();
-			requestedUnits.add(UnitType.Ranger);
-			requestedUnits.add(UnitType.Healer);
-			requestedUnits.add(UnitType.Mage);
-			requestedUnits.add(UnitType.Knight);
-		}
-		else if(requestedUnits.isEmpty())
-			requestedUnits.add(getRequestedUnit());
-
-		if(units.size() == 0)
-			urgency = 100;
-		else
-			urgency = (numEnemyUnits * 2 - units.size() + 15) * 10; // TODO: tweak this formula, probably put it in strategy
-		if(urgency < 0)
-			urgency = 0;
-		if(urgency > 100)
-			urgency = 100;
-	}
-
-	private UnitType getRequestedUnit() {
-		int bestIndex = 0;
-		int bestScore = 10000;
-		for(int i = 0; i < 4; i++){
-			if(unitCompGoal[i] == 0)
-				continue;
-			int score = unitCounts[i] / unitCompGoal[i];
-			if(score < bestScore){
-				bestScore = score;
-				bestIndex = i;
-			}
-		}
-		return Utils.robotTypes[bestIndex];
-	}
-
 	public void move(Nav nav){
 		if(units.size() == 0)
 			return;
@@ -183,7 +206,7 @@ public class CombatSquad extends Squad{
 			return;
 		}
 		//reassign separated units to swarm if appropriate
-		/* use or remove
+		/* REFACTOR: use or remove
 		if(combatUnits.size()==0){
 			for(int id: separatedUnits){
 				Unit u = gc.unit(id);
@@ -223,24 +246,15 @@ public class CombatSquad extends Squad{
 		boolean retreat = shouldWeRetreat();
 		infoMan.logTimeCheckpoint("starting micro");
 		doSquadMicro(retreat, nav);
-		//check if we're done with our objective
+		// check if we're done with our objective
 		if(areWeDone()){
 			Utils.log("setting obj to none");
 			objective = Objective.NONE;
 		}
 		infoMan.logTimeCheckpoint("done with CombatSquad move");
 	}
-
-	private boolean areWeDone(){
-		switch(objective){
-		case ATTACK_LOC: return gc.senseNearbyUnitsByTeam(targetLoc, 5, gc.team()).size() > 0 // get rid of gc call // make 5 magicnum
-							&& infoMan.getTargetUnits(targetLoc, MagicNumbers.SQUAD_SEPARATION_THRESHOLD, false).size() == 0;
-		case DEFEND_LOC: return infoMan.getTargetUnits(targetLoc, 100, false).size() == 0; // 100 magic num (also somewhere else)
-		default: return false;
-		}
-	}
 	
-	/* use or remove
+	/* REFACTOR: use or remove
 	private void moveToSwarm(Nav nav){
 		//TODO: micro more if you see enemies on the way
 		for(int uid: separatedUnits){
@@ -255,15 +269,7 @@ public class CombatSquad extends Squad{
 		}
 	}*/
 
-	private void explore(Nav nav){
-		Direction dirToMove = Utils.orderedDirections[(int) (8*Math.random())];
-		for(int uid: units){
-			if(gc.canMove(uid, dirToMove) && gc.unit(uid).movementHeat() < 10)
-				gc.moveRobot(uid, dirToMove);
-		}
-	}
-
-/***************************** SHARED MICRO STUFF ************************************/
+/***************************** COMBAT MICRO ************************************/
 
 	private void doSquadMicro(boolean retreat, Nav nav){
 		/*
@@ -280,7 +286,7 @@ public class CombatSquad extends Squad{
 		TreeSet<CombatUnit> mages = new TreeSet<CombatUnit>(new AscendingStepsComp());
 
 		//update combat units and tiles near them
-		/*long last = System.nanoTime(); // use or remove
+		/*long last = System.nanoTime(); // REFACTOR: use or remove
 		long enemiesAccum = 0;
 		long updateAccum = 0;
 		long otherAccum = 0;*/
@@ -354,14 +360,7 @@ public class CombatSquad extends Squad{
 		infoMan.logTimeCheckpoint("snipes done");	
 	}
 
-	private void runAway(CombatUnit cu) {
-		Direction toMove = highestScoringDir(cu, true, true, this::runAwayScore);
-		if (toMove != null)
-			moveAndUpdate(cu, toMove);
-	}
-
-/*************************** UNIT-SPECIFIC MICRO STUFF *****************************/
-
+//--------------------- RANGER MICRO --------------------
 	private void doRangerMicro(TreeSet<CombatUnit> rangers, boolean retreat, Nav nav) {
 		//first go through rangers which can attack already
 		for(CombatUnit cu: rangers.descendingSet()){
@@ -386,58 +385,28 @@ public class CombatSquad extends Squad{
 		}
 
 		//otherwise, do moves and attacks heuristically
-		for(CombatUnit cu: rangers){
+		for(CombatUnit cu: rangers){ // REFACTOR: should this be rangers.descendingSet() or some ordering?
 			if(!cu.canMove){
 				continue;
 			}
-			if(cu.canAttack){
-				rangerMoveAndAttack(cu,nav);
+			// first check if we should nav
+			Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
+			//if we're not near any enemies nav, otherwise move and maybe attack
+			if(myTile.distFromNearestHostile > MagicNumbers.MAX_DIST_THEY_COULD_HIT_NEXT_TURN){
+				//Utils.log("navving " + cu.myLoc.getX() + " " + cu.myLoc.getY());
+				Direction d = nav.dirToMove(cu.myLoc, targetLoc);
+				moveAndUpdate(cu, d);
+			} else if (cu.health <= MagicNumbers.RANGER_RUN_AWAY_HEALTH_THRESH){
+				runAway(cu);
 			} else {
-				rangerMove(cu,nav);
-			}
-		}
-	}
-	
-	private void doHealerMicro(TreeSet<CombatUnit> healers, boolean retreat, Nav nav) {
-		//go through healers which can heal and heal units which are low on health and close to combat
-		for(CombatUnit cu: healers.descendingSet()){
-			if(cu.canAttack){
-				healSomeone(cu);
-			}
-		}
-		
-		//overcharge then retreat if retreating, otherwise move up then overcharge
-		if(retreat){
-			for(CombatUnit cu: healers.descendingSet()){
-				if(cu.canOvercharge){
-					performOvercharge(cu, retreat, nav);
-				}
-				if(cu.canMove){
-					runAway(cu);
-				}
-			}
-			return;
-		}
-		
-		for(CombatUnit cu: healers){
-			if(cu.canMove){
-				healerMove(cu,nav);
+				// ok, we're not using nav
 				if(cu.canAttack){
-					healSomeone(cu);
+					rangerMoveAndAttack(cu);
+				} else {
+					rangerMove(cu);
 				}
 			}
-			if(cu.canOvercharge){
-				performOvercharge(cu, retreat, nav);
-			}
 		}
-	}
-
-	private void doMageMicro(TreeSet<CombatUnit> mages, boolean retreat, Nav nav) {
-		// TODO Auto-generated method stub
-	}
-
-	private void doKnightMicro(TreeSet<CombatUnit> knights, boolean retreat, Nav nav) {
-		// TODO Auto-generated method stub
 	}
 	
 	private void doSnipes(TreeSet<CombatUnit> rangers, boolean retreat, Nav nav) {
@@ -468,47 +437,61 @@ public class CombatSquad extends Squad{
 			}
 		}
 	}
+	
+	private void rangerMove(CombatUnit cu) {
+		Direction toMove = highestScoringDir(cu, true, true, this::rangerMoveScore);
+		if (toMove != null)
+			moveAndUpdate(cu, toMove);
+	}
 
-	private void performOvercharge(CombatUnit cu, boolean retreat, Nav nav) {
-		TreeSet<CombatUnit> overchargees = getUnitsToHeal(cu.myLoc);
-		CombatUnit tO = null; // tO is not very descriptive
-		double bestScore = -10000;
-		double score = 0;
-		for(CombatUnit o: overchargees){
-			switch(o.type){
-			case Healer: continue;
-			case Ranger: score = (gc.researchInfo().getLevel(UnitType.Ranger) == 3 ? gc.unit(o.ID).abilityHeat() * MagicNumbers.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.distFromNearestHostile; break;
-			case Knight: score = (gc.researchInfo().getLevel(UnitType.Knight) == 3 ? gc.unit(o.ID).abilityHeat() * MagicNumbers.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.distFromNearestHostile; break;
-			case Mage: score = (gc.researchInfo().getLevel(UnitType.Mage) == 4 ? gc.unit(o.ID).abilityHeat() * MagicNumbers.ABILITY_HEAT_OVERCHARGE_FACTOR : 0) - o.distFromNearestHostile;
-			}
-			if(score > bestScore){
-				tO = o;
-				bestScore = score;
+	private void rangerMoveAndAttack(CombatUnit cu) {
+		// move normally (but with a different scoring funct)
+		Direction toMove = highestScoringDir(cu, true, true, this::rangerMoveAttackScore);
+		if (toMove != null){
+			moveAndUpdate(cu, toMove);
+		}
+		// now attack if possible
+		Tile t = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
+		if (t.enemiesWithinRangerRange.size() > 0){
+			int toAttack = t.enemiesWithinRangerRange.first().ID;
+			gc.attack(cu.ID, toAttack);
+			updateDamage(cu, infoMan.targetUnits.get(toAttack));
+			cu.canAttack = false;
+		}
+	}
+
+//--------------------- HEALER MICRO ------------------------
+	
+	private void doHealerMicro(TreeSet<CombatUnit> healers, boolean retreat, Nav nav) {
+		// go through healers which can heal and heal units which are low on health and close to combat
+		for(CombatUnit cu: healers.descendingSet()){
+			if(cu.canAttack){
+				healSomeone(cu);
 			}
 		}
-		if(tO != null){
-			//Utils.log("overcharging unit " + tO.ID + " at " + tO.myLoc.getX() + " " + tO.myLoc.getY());
-			gc.overcharge(cu.ID, tO.ID);
-			cu.canOvercharge = false;
-			tO.update(gc, nav.optimalStepsTo(tO.myLoc, targetLoc));
-			TreeSet<CombatUnit> temp = new TreeSet<CombatUnit>(new AscendingStepsComp());
-			temp.add(tO);
-			int x = tO.myLoc.getX();
-			int y = tO.myLoc.getY();
-			int nx,ny;
-			for(int i = 0; i < 9; i++){
-				nx = x + Utils.dx[i];
-				ny = y + Utils.dy[i];
-				if(!infoMan.isOnMap(nx, ny) || !infoMan.tiles[nx][ny].isWalkable)
-					continue;
-				infoMan.tiles[nx][ny].updateContains(gc);
-				infoMan.tiles[nx][ny].updateEnemies(gc);
+		
+		// overcharge then retreat if retreating, otherwise move up then overcharge
+		if(retreat){
+			for(CombatUnit cu: healers.descendingSet()){
+				if(cu.canOvercharge){
+					performOvercharge(cu, retreat, nav);
+				}
+				if(cu.canMove){
+					runAway(cu);
+				}
 			}
-			switch(tO.type){
-			case Ranger: doRangerMicro(temp,retreat,nav); break;
-			case Knight: doKnightMicro(temp,retreat,nav); break;
-			case Mage: doMageMicro(temp,retreat,nav); break;
-			default:
+			return;
+		}
+		
+		for(CombatUnit cu: healers){
+			if(cu.canMove){
+				healerMove(cu,nav);
+				if(cu.canAttack){
+					healSomeone(cu);
+				}
+			}
+			if(cu.canOvercharge){
+				performOvercharge(cu, retreat, nav);
 			}
 		}
 	}
@@ -547,34 +530,45 @@ public class CombatSquad extends Squad{
     	return ret;
     }
 
-	private void rangerMoveAndAttack(CombatUnit cu, Nav nav) {
-		Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
-		//if we're not near any enemies nav, otherwise move and attack
-		if(myTile.distFromNearestHostile > MagicNumbers.MAX_DIST_THEY_COULD_HIT_NEXT_TURN){
-			//Utils.log("navving " + cu.myLoc.getX() + " " + cu.myLoc.getY());
-			Direction d = nav.dirToMove(cu.myLoc, targetLoc);
-			moveAndUpdate(cu, d);
-		} else if (cu.health <= MagicNumbers.RANGER_RUN_AWAY_HEALTH_THRESH) {
-			runAway(cu);
-		} else {
-			rangerMoveAndAttack(cu);
+	private void performOvercharge(CombatUnit cu, boolean retreat, Nav nav) {
+		TreeSet<CombatUnit> overchargees = getUnitsToHeal(cu.myLoc);
+		CombatUnit tO = null;
+		double bestScore = -10000;
+		double score = 0;
+		for(CombatUnit o: overchargees){
+			score = scoreOverchargee(o);
+			if(score > bestScore){
+				tO = o;
+				bestScore = score;
+			}
+		}
+		if(tO != null){
+			//Utils.log("overcharging unit " + tO.ID + " at " + tO.myLoc.getX() + " " + tO.myLoc.getY());
+			gc.overcharge(cu.ID, tO.ID);
+			cu.canOvercharge = false;
+			tO.update(gc, nav.optimalStepsTo(tO.myLoc, targetLoc));
+			TreeSet<CombatUnit> temp = new TreeSet<CombatUnit>(new AscendingStepsComp());
+			temp.add(tO);
+			int x = tO.myLoc.getX();
+			int y = tO.myLoc.getY();
+			int nx,ny;
+			for(int i = 0; i < 9; i++){
+				nx = x + Utils.dx[i];
+				ny = y + Utils.dy[i];
+				if(!infoMan.isOnMap(nx, ny) || !infoMan.tiles[nx][ny].isWalkable)
+					continue;
+				infoMan.tiles[nx][ny].updateContains(gc);
+				infoMan.tiles[nx][ny].updateEnemies(gc);
+			}
+			switch(tO.type){
+			case Ranger: doRangerMicro(temp, retreat, nav); break;
+			case Knight: doKnightMicro(temp, retreat, nav); break;
+			case Mage: doMageMicro(temp, retreat, nav); break;
+			default:
+			}
 		}
 	}
-	
-	private void rangerMove(CombatUnit cu, Nav nav) {
-		Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
-		//if we're not near any enemies nav, otherwise move
-		if(myTile.distFromNearestHostile > MagicNumbers.MAX_DIST_THEY_COULD_HIT_NEXT_TURN){
-			//Utils.log("navving " + cu.myLoc.getX() + " " + cu.myLoc.getY());
-			Direction d = nav.dirToMove(cu.myLoc, targetLoc);
-			moveAndUpdate(cu, d);
-		} else if (cu.health <= MagicNumbers.RANGER_RUN_AWAY_HEALTH_THRESH){
-			runAway(cu);
-		} else {
-			rangerMove(cu);
-		}
-	}
-	
+
 	private void healerMove(CombatUnit cu, Nav nav) {
 		Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
 		//if we're not near any enemies nav, otherwise run away
@@ -591,9 +585,32 @@ public class CombatSquad extends Squad{
 		if (toMove != null)
 			moveAndUpdate(cu, toMove);
 	}
-	
-	private void rangerMove(CombatUnit cu) {
-		Direction toMove = highestScoringDir(cu, true, true, this::rangerMoveScore);
+
+//--------------------- MAGE MICRO ------------------------
+
+	private void doMageMicro(TreeSet<CombatUnit> mages, boolean retreat, Nav nav) {
+		// TODO Auto-generated method stub
+	}
+
+//--------------------- KNIGHT MICRO ------------------------
+
+	private void doKnightMicro(TreeSet<CombatUnit> knights, boolean retreat, Nav nav) {
+		// TODO Auto-generated method stub
+	}
+
+/**************************** misc ********************************/
+
+	private void explore(Nav nav){
+		// TODO: should this use Nav's explore?
+		Direction dirToMove = Utils.orderedDirections[(int) (8*Math.random())];
+		for(int uid: units){
+			if(gc.canMove(uid, dirToMove) && gc.unit(uid).movementHeat() < 10)
+				gc.moveRobot(uid, dirToMove);
+		}
+	}
+
+	private void runAway(CombatUnit cu) {
+		Direction toMove = highestScoringDir(cu, true, true, this::runAwayScore);
 		if (toMove != null)
 			moveAndUpdate(cu, toMove);
 	}
@@ -622,24 +639,8 @@ public class CombatSquad extends Squad{
 		return bestIndex == -1 ? null : Utils.indexToDirection(bestIndex);
 	}
 	
-	private void rangerMoveAndAttack(CombatUnit cu) {
-		// move normally (but with a different scoring funct)
-		Direction toMove = highestScoringDir(cu, true, true, this::rangerMoveAttackScore);
-		if (toMove != null){
-			moveAndUpdate(cu, toMove);
-		}
-		// now attack if possible
-		Tile t = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
-		if (t.enemiesWithinRangerRange.size() > 0){
-			int toAttack = t.enemiesWithinRangerRange.first().ID;
-			gc.attack(cu.ID, toAttack);
-			updateDamage(cu, infoMan.targetUnits.get(toAttack));
-			cu.canAttack = false;
-		}
-	}
-
 	private void moveAndUpdate(CombatUnit cu, Direction d){
-		if(d == Direction.Center)
+		if(d == null || d == Direction.Center)
 			return;
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].containsUnit = false;
 		infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].myUnit = -1;
@@ -670,12 +671,18 @@ public class CombatSquad extends Squad{
 		infoMan.targetUnits.put(tu.ID, tu);
 	}
 
-	private boolean shouldWeRetreat(){
-		// TODO: make this better
-		// put in strategy too
-		return numEnemyUnits > combatUnits.size() * MagicNumbers.AGGRESION_FACTOR;
-	}
-
-/*************** utility functs. mostly updating stuff when adding/removing **************/
-	
+	public UnitType getRequestedUnit() {
+		int bestIndex = 0;
+		int bestScore = 10000;
+		for(int i = 0; i < 4; i++){
+			if(unitCompGoal[i] == 0)
+				continue;
+			int score = unitCounts[i] / unitCompGoal[i];
+			if(score < bestScore){
+				bestScore = score;
+				bestIndex = i;
+			}
+		}
+		return Utils.robotTypes[bestIndex];
+	}	
 }

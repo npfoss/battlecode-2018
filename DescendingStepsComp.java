@@ -5,7 +5,7 @@
 import java.util.Comparator;
 
 /*
-TODO: delete and use Ascending instead in all places
+REFACTOR: delete and use Ascending instead in all places
 */
 public class DescendingStepsComp implements Comparator<CombatUnit> {
 	@Override

@@ -163,18 +163,7 @@ public class InfoManager {
 				enemyLastSeen.put(unit.id(), (int) gc.round());
 				if(!unit.location().isOnMap())
 					continue;
-				long defense = 0;
-				if(unit.unitType() == UnitType.Knight)
-					defense = unit.knightDefense();
-				int damage = 0;
-				long range = 0;
-				if(unit.unitType() != UnitType.Factory && unit.unitType() != UnitType.Rocket){
-					damage = unit.damage();
-					range = unit.attackRange();
-				}
-				TargetUnit tu = new TargetUnit(unit.id(), unit.health(), damage,
-						unit.location().mapLocation(), unit.unitType(), range, defense, this);
-				targetUnits.put(unit.id(), tu);
+				targetUnits.put(unit.id(), new TargetUnit(unit, this));
 			}
 		}
 

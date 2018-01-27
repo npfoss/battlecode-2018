@@ -62,7 +62,7 @@ public class CombatManager{
 		//defend factories and rockets
 		for(Unit u: infoMan.factories){
 			MapLocation ml = u.location().mapLocation();
-			if(infoMan.getTargetUnits(ml, 100, true).size() > 0){ // 100 should be magic number
+			if(infoMan.getTargetUnits(ml, 100, true).size() > 0){ // REFACTOR: 100 should be magic number
 				addCombatSquad(ml, Objective.DEFEND_LOC, strat);
 			}
 		}
@@ -70,7 +70,7 @@ public class CombatManager{
 		if(infoMan.myPlanet == Planet.Earth){
 			for(Unit u: infoMan.rockets){
 				MapLocation ml = u.location().mapLocation();
-				if(infoMan.getTargetUnits(ml, 100, true).size() > 0){ // 100 should be magic number
+				if(infoMan.getTargetUnits(ml, 100, true).size() > 0){ // REFACTOR: 100 should be magic number
 					addCombatSquad(ml, Objective.DEFEND_LOC, strat);
 				}
 			}
@@ -83,9 +83,7 @@ public class CombatManager{
 
 		if((infoMan.combatSquads.size() == 1 && infoMan.combatSquads.get(0).objective == Objective.EXPLORE)
 				|| infoMan.myPlanet == Planet.Mars){
-			//Utils.log("here");
 			for(TargetUnit tu: infoMan.targetUnits.values()){
-				//Utils.log("sup");
 				addCombatSquad(tu.myLoc, Objective.ATTACK_LOC, strat);
 			}
 		}
@@ -102,7 +100,6 @@ public class CombatManager{
 						if(cs.targetLoc != null
 								&& ((!turnUnassigned.containsKey(a.id()) && gc.round() == 1)
 									|| (turnUnassigned.containsKey(a.id()) && turnUnassigned.get(a.id()) == gc.round()))){
-									// what the point of all this unassigned checking stuff?
 							MapLocation ml = cs.targetLoc;
 							if(a.location().isOnMap())
 								ml = a.location().mapLocation();
@@ -131,7 +128,7 @@ public class CombatManager{
 		for(CombatSquad cs: infoMan.combatSquads){
 			if(cs.objective != Objective.EXPLORE
 					&& (targetLoc.distanceSquaredTo(cs.targetLoc) < MagicNumbers.SQUAD_SEPARATION_THRESHOLD
-			   				|| targetLoc.distanceSquaredTo(cs.swarmLoc) < 75)) // what's this for exactly? // also magic number
+			   				|| targetLoc.distanceSquaredTo(cs.swarmLoc) < 75)) // REFACTOR: magic number
 				return;
 		}
 		CombatSquad cs = new CombatSquad(gc, infoMan, strat.combatComposition);
