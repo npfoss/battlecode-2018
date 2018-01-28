@@ -133,6 +133,8 @@ public class CombatManager{
 			infoMan.combatSquads.sort(Squad.byUrgency());
 			for(CombatSquad cs : infoMan.combatSquads) {
 				for(int i : infoMan.unassignedUnits) {
+					if(gc.unit(i).unitType() == UnitType.Worker)
+						continue;
 					Unit a = gc.unit(i);
 					if(cs.targetLoc != null
 							&& ((!turnUnassigned.containsKey(a.id()) && gc.round() == 1)
