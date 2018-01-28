@@ -43,7 +43,9 @@ public class Strategy{
 
 	private void determineInitalStrat() {
 		//TODO: make this depend on stuff
+		
 		researchOrder = new UnitType[]{UnitType.Worker,UnitType.Ranger,UnitType.Healer,UnitType.Healer,UnitType.Healer,UnitType.Rocket,UnitType.Ranger,UnitType.Ranger};
+		
 		if(infoMan.myPlanet == Planet.Mars){
 			maxWorkers = 10000;
 			minWorkers = 10;
@@ -62,6 +64,7 @@ public class Strategy{
 				theirStarts.add(u);
 			}
 		}
+		
 		for(Unit u: ourStarts){
 			int minDist = 10000;
 			for(Unit u2: theirStarts){
@@ -130,7 +133,7 @@ public class Strategy{
 			minFactories = 0;
 			maxFactories = 0;
 			takeAnyUnit = true;
-			rocketsToBuild = (numCombatants + 5) / 6;
+			rocketsToBuild = (numCombatants + infoMan.workerCount + 5) / 6;
 		}
 		else if(infoMan.researchLevels[5] > 0 && numCombatants > ((750 - gc.round()) /20)) {
 			rocketsToBuild++;
@@ -140,7 +143,7 @@ public class Strategy{
 			minWorkers = (int) (infoMan.fighterCount / MagicNumbers.FIGHTERS_PER_WORKER);
 		}
 		if(gc.karbonite() >= MagicNumbers.FACTORY_COST && gc.round() < MagicNumbers.SEND_EVERYTHING) {
-			maxFactories = infoMan.factories.size() + 1 > 6 ? 6 : infoMan.factories.size() + 1;
+			maxFactories = infoMan.factories.size() + 1 > 6  && gc.karbonite() < 600 ? 6 : infoMan.factories.size() + 1;
 			if(gc.karbonite() > 300 && minFactories < 3) {
 				minFactories++;
 			}
