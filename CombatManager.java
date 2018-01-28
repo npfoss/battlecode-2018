@@ -117,13 +117,15 @@ public class CombatManager{
 						cs.addUnit(a);
 						didSomething = true;
 					}
-					if(!didSomething){
+					if(didSomething){
 						break;
 					}
 				}
 				if(didSomething)
 					break;
 			}
+			if(!didSomething)
+				break;
 		}
 		
 		while(infoMan.unassignedUnits.size() > 0) {
@@ -145,13 +147,15 @@ public class CombatManager{
 					}
 					cs.addUnit(a);
 					didSomething = true;
-					if(!didSomething){
+					if(didSomething){
 						break;
 					}
 				}
-				if(didSomething)
+				if(!didSomething)
 					break;
 			}
+			if(!didSomething)
+				break;
 		}
 		
 		infoMan.logTimeCheckpoint("done updating CombatManager");
