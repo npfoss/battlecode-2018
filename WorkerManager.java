@@ -218,7 +218,8 @@ public class WorkerManager{
 		}
 		//Utils.log("checking for sanity: " + numKarbLeftInArea);
 		//Utils.log("The region im looking at has a size of " + infoMan.tiles[karbLoc.getX()][karbLoc.getY()].karbArea.tiles.size() + " and has this much karbonite on it: " + infoMan.tiles[karbLoc.getX()][karbLoc.getY()].karbArea.karbonite);
-		double score = strat.getReplicateScore(numKarbLeftInArea,ws.units.size(),distToKarbonite);
+		boolean enemyNearMe = infoMan.getTargetUnits(u.location().mapLocation(), MagicNumbers.REPLICATION_SCARED_RADIUS, false).size() > 0;
+		double score = strat.getReplicateScore(numKarbLeftInArea,ws.units.size(),distToKarbonite, enemyNearMe);
 		Utils.log("This unit: " + u.location().mapLocation() + " has a score of: "+ score + " with karbLeftInArea " + numKarbLeftInArea + " and dist " + distToKarbonite);
 		return (score <= 100 ? score : 100);
 	}

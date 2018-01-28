@@ -177,8 +177,10 @@ public class Strategy{
 		return numEnemyUnits > size * MagicNumbers.AGGRESION_FACTOR;
 	}
 
-	public double getReplicateScore(long numKarbLeftInArea, int numMiners, long distToKarbonite) {
-		return (((numKarbLeftInArea * 8.0) - numMiners*numMiners*65.0) /(distToKarbonite/2.0 + 10.0)) + (infoMan.myPlanet == Planet.Mars && gc.round() >= 750 ? 100 : 0);
+	public double getReplicateScore(long numKarbLeftInArea, int numMiners, long distToKarbonite, boolean enemyNearMe) {
+		return (((numKarbLeftInArea * 9.0) - numMiners*numMiners*70.0) /(distToKarbonite/2.0 + 10.0)) 
+				+ (infoMan.myPlanet == Planet.Mars && gc.round() >= 750 ? 100 : 0)
+				- (infoMan.myPlanet == Planet.Earth && enemyNearMe ? MagicNumbers.REPLICATION_ENEMY_FACTOR : 0);
 	}
 
 }
