@@ -133,6 +133,7 @@ public class WorkerSquad extends Squad {
 		}
 
 		if(karbLoc == null){
+			Utils.log("running away :(");
 			runAway(id,myLoc);
 			return;
 		}
