@@ -102,11 +102,11 @@ public class Strategy{
 			return;
 		}
 		if(knightRush){
-			if(gc.round() > 200){
+			if(gc.round() > 200 && (infoMan.fighterCount < infoMan.targetUnits.size() * 1.5 || gc.round() > 400)){
 				//end the rush
 				Utils.log("ending knight rush");
 				knightRush = false;
-				combatComposition = new int[]{2, 0, 3, 2};
+				combatComposition = new int[]{0, 0, 3, 2};
 			}
 			else{
 				if(gc.karbonite() >= MagicNumbers.FACTORY_COST) {

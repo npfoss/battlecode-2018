@@ -125,8 +125,8 @@ public class CombatManager{
 					break;
 			}
 			if(!didSomething){
-				for(int i : infoMan.unassignedUnits) {
-					infoMan.combatSquads.get(0).addUnit(gc.unit(i));
+				while(infoMan.unassignedUnits.size() > 0) {
+					infoMan.combatSquads.get(0).addUnit(gc.unit(infoMan.unassignedUnits.iterator().next()));
 					infoMan.combatSquads.sort(Squad.byUrgency());
 				}
 			}
