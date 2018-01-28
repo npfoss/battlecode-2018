@@ -35,26 +35,15 @@ public class Nav{
     public int optimalStepsTo(MapLocation start, MapLocation target){
         if (Utils.equalsMapLocation(start, target))
             return 0;
-        try{
     	if(!infoMan.isReachable(start, target)){
         	//can't get there but just return distance
     		return (int)(start.distanceSquaredTo(target));
         }
+        
         if (!infoMan.tiles[start.getX()][start.getY()].destToDir.containsKey(hashMapLoc(target))){
             generateBFSMap(start, target);
         }
-        // Utils.log(" this far");
         return infoMan.tiles[start.getX()][start.getY()].destToDir.get(hashMapLoc(target)).stepsToDest;
-        } catch (Exception e){
-            e.printStackTrace(System.out);
-            Utils.log("crime scene: " + mapLocToString(start) + " " + mapLocToString(target) + ":" + infoMan.isLocationWalkable(start) + " " + infoMan.tiles[start.getX()][start.getY()].destToDir.containsKey(hashMapLoc(target)));
-            try{
-                Utils.log("unit " + infoMan.gc.senseUnitAtLocation(start));
-            } catch (Exception p){
-                Utils.log("failed.");
-            }
-            return 12;
-        }
     }
 
     /*
@@ -67,21 +56,11 @@ public class Nav{
         if(!infoMan.isReachable(start, target)){
             return start.directionTo(target);
         }
+
         if (!infoMan.tiles[start.getX()][start.getY()].destToDir.containsKey(hashMapLoc(target))){
             generateBFSMap(start, target);
         }
-        try{
         return infoMan.tiles[start.getX()][start.getY()].destToDir.get(hashMapLoc(target)).direction;
-        } catch (Exception e){
-            e.printStackTrace(System.out);
-            Utils.log("2crime scene: " + mapLocToString(start) + " " + mapLocToString(target) + ":" + infoMan.isLocationWalkable(start) + " " + infoMan.tiles[start.getX()][start.getY()].destToDir.containsKey(hashMapLoc(target)));
-            try{
-                Utils.log("2unit " + infoMan.gc.senseUnitAtLocation(start));
-            } catch (Exception p){
-                Utils.log("2failed.");
-            }
-            return Direction.Center;
-        }
     }
 
     /*
@@ -96,6 +75,9 @@ public class Nav{
 
     // overloaded for convenience
     public Direction dirToMove(MapLocation start, Direction preferredDir){
+        if (preferredDir == Direction.Center){
+            return preferredDir;
+        }
 
         // now check if legal and stuff
         if (infoMan.isLocationClear(start.add(preferredDir))){
@@ -129,7 +111,9 @@ public class Nav{
     }
 
     public Direction dirToMoveSafely(MapLocation start, Direction preferredDir){
-        // Direction dirTowards = directionTowards(start, target);
+        if (preferredDir == Direction.Center){
+            return preferredDir;
+        }
         // now check if legal and safe and stuff
         MapLocation loc = start.add(preferredDir);
         double danger;
@@ -230,7 +214,7 @@ public class Nav{
         ArrayList<List<Integer>> nextLocs = new ArrayList<List<Integer>>();
         infoMan.tiles[target.getX()][target.getY()].destToDir.put(targetHash, new Signpost(Direction.Center, dist));
         boolean[][] visited = new boolean[infoMan.width][infoMan.height];
-        boolean[][] visitedNonDiag = new boolean[infoMan.wjidth][infoMan.height];
+        boolean[][] visitedNonDiag = new boolean[infoMan.width][infoMan.height];
 
         int startx = -1;
         int starty = -1;
@@ -256,7 +240,6 @@ public class Nav{
                     ny = y + Utils.dy[i];
                     if (nx == startx && ny == starty){
                         startdist = dist;
-                        Utils.log("found the start");
                     }
                     if (infoMan.isOnMap(nx, ny)
                             && !visitedNonDiag[nx][ny]
@@ -269,27 +252,7 @@ public class Nav{
                             nextLocs.add(Arrays.asList(nx, ny));
                             continue;
                         }
-                        if (visited[nx][ny] && !Utils.isDiagonalDirection(i)){
-                            sign = infoMan.tiles[nx][ny].destToDir.get(targetHash);
-                    // if(startdist < 32000)
-                        // Utils.log("middle flag");
-                            if (sign.stepsToDest == dist
-                                    && Utils.isDiagonalDirection(sign.direction)){
-                                // prefer to not move diagonaly if it's the same dist.
-                                // may prevent bottlenecks
-                                sign.direction = Utils.oppositeDirection(i);
-                                visitedNonDiag[nx][ny] = true;
-                            } /*else if (sign.stepsToDest > dist){
-                                sign.stepsToDest = dist;
-                                sign.direction = Utils.oppositeDirection(i);
-                                if(!(infoMan.tiles[nx][ny].myType == UnitType.Rocket
-                                        || infoMan.tiles[nx][ny].myType == UnitType.Factory)){
-                                    nextLocs.add(Arrays.asList(nx, ny));
-                                }
-                            }*/
-                        } else if (!visited[nx][ny]){
-                    // if(startdist < 32000)
-                        // Utils.log("middle flag first");
+                        if (!visited[nx][ny]){
                             infoMan.tiles[nx][ny].destToDir.put(targetHash, new Signpost(Utils.oppositeDirection(i), dist));
                             if(!(infoMan.tiles[nx][ny].myType == UnitType.Rocket
                                     || infoMan.tiles[nx][ny].myType == UnitType.Factory)){
@@ -297,10 +260,17 @@ public class Nav{
                             }
                             visited[nx][ny] = true;
                             visitedNonDiag[nx][ny] = !Utils.isDiagonalDirection(i);
+                        } else if (!Utils.isDiagonalDirection(i)){
+                            sign = infoMan.tiles[nx][ny].destToDir.get(targetHash);
+                            if (sign.stepsToDest == dist
+                                    && Utils.isDiagonalDirection(sign.direction)){
+                                // prefer to not move diagonaly if it's the same dist.
+                                // may prevent bottlenecks
+                                sign.direction = Utils.oppositeDirection(i);
+                                visitedNonDiag[nx][ny] = true;
+                            }
                         }
                     }
-                    // if(startdist < 32000)
-                        // Utils.log("flag two");
                 }
             }
             dist++;
