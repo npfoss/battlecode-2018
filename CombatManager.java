@@ -117,14 +117,19 @@ public class CombatManager{
 						cs.addUnit(a);
 						didSomething = true;
 					}
-					if(didSomething)
+					if(!didSomething){
 						break;
+					}
 				}
 				if(didSomething)
 					break;
 			}
-			if(!didSomething)
-				break;
+			if(!didSomething){
+				for(int i : infoMan.unassignedUnits) {
+					infoMan.combatSquads.get(0).addUnit(gc.unit(i));
+					infoMan.combatSquads.sort(Squad.byUrgency());
+				}
+			}
 		}
 		
 		infoMan.logTimeCheckpoint("done updating CombatManager");
