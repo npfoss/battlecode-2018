@@ -123,8 +123,10 @@ public class WorkerSquad extends Squad {
 		MapLocation karbLoc = myLoc;
 		if(targetKarbLocs.containsKey(id)){
 			MapLocation targetKarbLoc = targetKarbLocs.get(id);
-			if(targetKarbLoc != null && infoMan.tiles[targetKarbLoc.getX()][targetKarbLoc.getY()].karbonite == 0)
+			if(targetKarbLoc != null && infoMan.tiles[targetKarbLoc.getX()][targetKarbLoc.getY()].karbonite == 0){
+				Utils.log("trying to find new stuff!");
 				karbLoc = infoMan.getClosestKarbonite(myLoc);
+			}
 			else
 				karbLoc = targetKarbLoc;
 		}
