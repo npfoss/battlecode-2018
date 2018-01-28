@@ -29,7 +29,7 @@ public class InfoManager {
 	long lastCheckpoint;
 	int rocketsToBeBuilt;
 	int factoriesToBeBuilt;
-	boolean saveMoney;
+	int moneyToSave;
 	PlanetMap startingMap;
 	//int totalUnitCount;
 
@@ -123,6 +123,7 @@ public class InfoManager {
         factories = new ArrayList<Unit>();
         unassignedUnits = new HashSet<Integer>();
         researchLevels = new int[]{0,0,0,0,0,0}; //knight, mage, ranger, healer, worker, rocket
+        moneyToSave = 0;
 	}
 
 	public void update(Strategy strat) {

@@ -63,7 +63,6 @@ public class WorkerSquad extends Squad {
 			//oh shit someone killed our building better get away
 			objective = Objective.NONE;
 			infoMan.factoriesToBeBuilt--;
-			infoMan.saveMoney = false;
 			return;
 		}
 		if(t.unitID != -1 && t.myType == toBuild && gc.unit(t.unitID).structureIsBuilt() != 0) {
@@ -97,7 +96,6 @@ public class WorkerSquad extends Squad {
 			    case Rocket: infoMan.rocketsToBeBuilt--;
 			    	break;
 			    }
-			    infoMan.saveMoney = false;
 			}
 		}
 	}
@@ -293,7 +291,6 @@ public class WorkerSquad extends Squad {
 							    case Rocket: infoMan.rocketsToBeBuilt--;
 							    break;
 							    }
-							    infoMan.saveMoney = false;
 							}
 						}
 					}

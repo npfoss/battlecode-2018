@@ -113,14 +113,13 @@ public class WorkerManager{
 
 			if(infoMan.factories.size() < strat.maxFactories && infoMan.factoriesToBeBuilt == 0) {
 				boolean mustSteal = (strat.minFactories > infoMan.factories.size());
-				if(mustSteal) {
-					infoMan.saveMoney = true;
-				}
 				if(gc.karbonite() > 200) {
 				createBuildSquad(UnitType.Factory, mustSteal);
 				}
 			}
-
+			
+			infoMan.moneyToSave = infoMan.factoriesToBeBuilt * 200 + infoMan.rocketsToBeBuilt * 150;
+			
 			if(infoMan.workerCount < strat.maxWorkers){
 				tellWorkersToReplicate();
 			}
@@ -217,6 +216,8 @@ public class WorkerManager{
 			int toR = 0;
 			infoMan.workerSquads.sort(Squad.byUrgency());
 			for(WorkerSquad ws : infoMan.workerSquads) {
+				if(ws.objective == Objective.BUILD && ws.units.size() == MagicNumbers.MAX_WORKERS_PER_BUILDING)
+					continue;
 				for(int i : infoMan.unassignedUnits) {
 					Unit a = gc.unit(i);
 					if(!a.location().isOnMap() || a.unitType() != UnitType.Worker)
