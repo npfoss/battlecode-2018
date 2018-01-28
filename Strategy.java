@@ -106,7 +106,7 @@ public class Strategy{
 			return;
 		}
 		if(knightRush){
-			if(gc.round() > 200 && (infoMan.fighterCount < infoMan.targetUnits.size() * 1.5 || gc.round() > 400)){
+			if(gc.round() > 150 && (infoMan.enemyMages.size() > 0 || infoMan.enemyRangers.size() > 3 || gc.round() > 300)){
 				//end the rush
 				Utils.log("ending knight rush");
 				knightRush = false;
@@ -140,9 +140,9 @@ public class Strategy{
 			rocketsToBuild++;
 			rocketsBuilt++;
 		}
-		if(gc.round() > MagicNumbers.BUILD_UP_WORKERS && gc.round() < MagicNumbers.SEND_EVERYTHING){
-			minWorkers = (int) (infoMan.fighterCount / MagicNumbers.FIGHTERS_PER_WORKER);
-		}
+//		if(gc.round() > MagicNumbers.BUILD_UP_WORKERS && gc.round() < MagicNumbers.SEND_EVERYTHING){
+//			minWorkers = (int) (infoMan.fighterCount / MagicNumbers.FIGHTERS_PER_WORKER);
+//		}
 		if(gc.karbonite() >= MagicNumbers.FACTORY_COST && gc.round() < MagicNumbers.SEND_EVERYTHING) {
 			maxFactories = infoMan.factories.size() + 1 > 6  && gc.karbonite() < 600 ? 6 : infoMan.factories.size() + 1;
 			if(gc.karbonite() > 300 && minFactories < 3) {
