@@ -26,6 +26,9 @@ public class RocketDoNothing extends RocketManager{
     				if(gc.canUnload(r.id(), dirToUnload)) {
     					gc.unload(r.id(), dirToUnload);
     					didSomething = true;
+    					MapLocation locUnloaded = r.location().mapLocation().add(dirToUnload);
+    					//it's occupied now!
+    					infoMan.tiles[locUnloaded.getX()][locUnloaded.getY()].unitID = 0;
     				}
                 }
     			if(!didSomething)

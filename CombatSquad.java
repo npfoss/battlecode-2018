@@ -284,9 +284,9 @@ public class CombatSquad extends Squad{
 			if(cu.notOnMap && !cu.updateOnMap(gc))
 				continue;
 			MapLocation actualLoc = gc.unit(cu.ID).location().mapLocation();
-			//if(cu.myLoc.getX() != actualLoc.getX() || cu.myLoc.getY() != actualLoc.getY()){
-			//	Utils.log("HOUSTON WE HAVE A PROBLEM  with unit " + cu.ID + " cl = " + cu.myLoc + " actual = " + actualLoc);
-			//}
+			if(cu.myLoc.getX() != actualLoc.getX() || cu.myLoc.getY() != actualLoc.getY()){
+				Utils.log("HOUSTON WE HAVE A PROBLEM  with unit " + cu.ID + " cl = " + cu.myLoc + " actual = " + actualLoc);
+			}
 			cu.update(gc, nav.optimalStepsTo(cu.myLoc, targetLoc));
 			x = cu.myLoc.getX();
 			y = cu.myLoc.getY();
@@ -342,7 +342,7 @@ public class CombatSquad extends Squad{
 				continue;
 			Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
 			if(myTile.enemiesWithinRangerRange.size() > 0){
-				//Utils.log(cu.ID + " trying to attack " + myTile.enemiesWithinRangerRange.first().myLoc + " from " + cu.myLoc);
+				Utils.log(cu.ID + " trying to attack " + myTile.enemiesWithinRangerRange.first().myLoc + " from " + cu.myLoc);
 				gc.attack(cu.ID, myTile.enemiesWithinRangerRange.first().ID);
 				updateDamage(cu, myTile.enemiesWithinRangerRange.first());
 				cu.canAttack = false;
@@ -408,6 +408,8 @@ public class CombatSquad extends Squad{
 			if(tu.snipeDamageToDo <= snipers.size()*30){
 				Utils.log("sniping " + tu.myLoc);
 				for(int i = 0; i <= tu.snipeDamageToDo/30.0; i++){
+					if(snipers.size() == 0)
+						break;
 					gc.beginSnipe(snipers.get(snipers.size()-1).ID, tu.myLoc);
 					snipers.remove(snipers.size()-1);
 				}
@@ -431,7 +433,7 @@ public class CombatSquad extends Squad{
 		Tile t = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
 		if (t.enemiesWithinRangerRange.size() > 0){
 			int toAttack = t.enemiesWithinRangerRange.first().ID;
-			//Utils.log(cu.ID + " trying to attack " + t.enemiesWithinRangerRange.first().myLoc + " from " + cu.myLoc);
+			Utils.log(cu.ID + " trying to attack " + t.enemiesWithinRangerRange.first().myLoc + " from " + cu.myLoc);
 			gc.attack(cu.ID, toAttack);
 			updateDamage(cu, infoMan.targetUnits.get(toAttack));
 			cu.canAttack = false;
@@ -488,7 +490,7 @@ public class CombatSquad extends Squad{
 			}
 		}
 		if(tH != null){
-			//Utils.log(cu.ID + " at loc " + cu.myLoc + " healing " + tH.ID + " at " + tH.myLoc.getX() + " " + tH.myLoc.getY());
+			Utils.log(cu.ID + " at loc " + cu.myLoc + " healing " + tH.ID + " at " + tH.myLoc.getX() + " " + tH.myLoc.getY());
 			gc.heal(cu.ID, tH.ID);
 			cu.canAttack = false;
 			switch((int)(gc.researchInfo().getLevel(UnitType.Healer))){ // REFACTOR: probably a better way to do this
@@ -526,7 +528,7 @@ public class CombatSquad extends Squad{
 			}
 		}
 		if(tO != null){
-			//Utils.log(cu.ID + " at loc " + cu.myLoc + " overcharging unit " + tO.ID + " at " + tO.myLoc.getX() + " " + tO.myLoc.getY());
+			Utils.log(cu.ID + " at loc " + cu.myLoc + " overcharging unit " + tO.ID + " at " + tO.myLoc.getX() + " " + tO.myLoc.getY());
 			gc.overcharge(cu.ID, tO.ID);
 			cu.canOvercharge = false;
 			tO.update(gc, nav.optimalStepsTo(tO.myLoc, targetLoc));
@@ -624,7 +626,7 @@ public class CombatSquad extends Squad{
 			return;
 		cu.canMove = false;
 		cu.myLoc = cu.myLoc.add(d);
-		//Utils.log("updating " + cu.ID + " to " + cu.myLoc);
+		Utils.log("updating " + cu.ID + " to " + cu.myLoc);
 		infoMan.moveAndUpdate(cu.ID, d, cu.type);
 		cu.distFromNearestHostile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()].distFromNearestHostile;
 	}
