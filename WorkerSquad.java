@@ -122,14 +122,14 @@ public class WorkerSquad extends Squad {
 		else{
 			karbLoc = infoMan.getClosestKarbonite(myLoc);
 		}
-		//Utils.log("trying to move toward karbonite at location " + karbLoc);
+
 		if(karbLoc == null){
 			runAway(id,myLoc);
 			return;
 		}
 		
 		targetKarbLocs.put(id, karbLoc);
-		Direction d = nav.dirToMoveSafelyEfficient(myLoc, karbLoc);
+		Direction d = nav.dirToMoveSafely(myLoc, karbLoc);
 		//Utils.log("just a worker trying to move to " + myLoc.add(d));
 		infoMan.moveAndUpdate(id, d, UnitType.Worker);
 	
