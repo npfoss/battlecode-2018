@@ -126,6 +126,7 @@ public class InfoManager {
         researchLevels = new int[]{0,0,0,0,0,0}; //knight, mage, ranger, healer, worker, rocket
         
         pattern = gc.asteroidPattern();
+        moneyToSave = 0;
 	}
 
 	public void update(Strategy strat) {		

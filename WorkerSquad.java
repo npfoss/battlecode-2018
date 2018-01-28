@@ -135,14 +135,14 @@ public class WorkerSquad extends Squad {
 		}
 
 		if(karbLoc == null){
-			Utils.log("running away :(");
+			//Utils.log("running away :(");
 			runAway(id,myLoc);
 			return;
 		}
 		
 		targetKarbLocs.put(id, karbLoc);
 		Direction d = nav.dirToMoveSafely(myLoc, karbLoc);
-		Utils.log("just a worker trying to move to " + karbLoc);
+		//Utils.log("just a worker trying to move to " + karbLoc);
 		infoMan.moveAndUpdate(id, d, UnitType.Worker);
 	
 	}

@@ -45,6 +45,7 @@ public class Strategy{
 		researchOrder = new UnitType[]{UnitType.Ranger,UnitType.Worker,UnitType.Healer,UnitType.Healer,UnitType.Healer,UnitType.Rocket,UnitType.Ranger,UnitType.Ranger};
 		if(infoMan.myPlanet == Planet.Mars){
 			maxWorkers = 10000;
+			minWorkers = 10;
 			return;
 		}
 		int rushDist = -1;
@@ -83,8 +84,9 @@ public class Strategy{
 	}
 
 	public void update(){
-		if(infoMan.myPlanet == Planet.Mars)
+		if(infoMan.myPlanet == Planet.Mars){
 			return;
+		}
 		int numCombatants = 0;
 		for(CombatSquad cs: infoMan.combatSquads){
 			numCombatants += cs.units.size();

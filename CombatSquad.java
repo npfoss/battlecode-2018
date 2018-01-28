@@ -207,6 +207,7 @@ public class CombatSquad extends Squad{
 			}
 			separatedUnits.clear();
 		}
+		
 		int swarmThreshold = swarmUnits.size() * 2 + 10;
 		
 		HashSet<Integer> toRemove = new HashSet<Integer>();
@@ -216,7 +217,7 @@ public class CombatSquad extends Squad{
 				continue;
 			MapLocation ml = u.location().mapLocation();
 			if(ml.distanceSquaredTo(swarmLoc) <= swarmThreshold ||
-				infoMan.getTargetUnits(ml, MagicNumbers.MAX_DIST_THEY_COULD_HIT_NEXT_TURN, false).size() > 0){
+				infoMan.getTargetUnits(ml, MagicNumbers.MAX_DIST_THEY_COULD_HIT, false).size() > 0){
 				toRemove.add(i);
 				swarmUnits.put(i,combatUnits.get(i));
 				swarmThreshold+=2;

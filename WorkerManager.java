@@ -121,11 +121,13 @@ public class WorkerManager{
 					createBuildSquad(UnitType.Factory, mustSteal);
 			}
 			
-			infoMan.moneyToSave = 150 * strat.rocketsToBuild +
-								  200 * infoMan.factoriesToBeBuilt;
-			
-    		Utils.log("money to save = " + infoMan.moneyToSave);
-    		Utils.log("factories to be built = " + infoMan.factoriesToBeBuilt);
+			if(infoMan.myPlanet == Planet.Earth){
+				infoMan.moneyToSave = 150 * strat.rocketsToBuild +
+									  200 * infoMan.factoriesToBeBuilt;
+				
+	    		Utils.log("money to save = " + infoMan.moneyToSave);
+	    		Utils.log("factories to be built = " + infoMan.factoriesToBeBuilt);
+			}
 			
 			if(infoMan.workerCount < strat.maxWorkers){
 				tellWorkersToReplicate();
@@ -146,7 +148,7 @@ public class WorkerManager{
 		//if we must steal or if the score is higher than a certain threshold, steal that miner and up to 7 miners within a magic num of it.
 		int mustRepNum = (int) (gc.karbonite() / 60);
 		int maxToRep = 1000;
-		if(infoMan.myPlanet == Planet.Earth){
+		if(infoMan.myPlanet == Planet.Earth || gc.round() < 750){
 			mustRepNum = (strat.minWorkers > infoMan.workerCount ? strat.minWorkers - infoMan.workerCount : 0);
 			// Utils.log("Number to Rep: "+mustRepNum);
 			maxToRep = (int) (mustRepNum + (((gc.karbonite() - infoMan.moneyToSave) / 60) > 0 ? ((gc.karbonite() - infoMan.moneyToSave) / 60) : 0));
