@@ -122,10 +122,10 @@ public class WorkerManager{
 			}
 			
 			infoMan.moneyToSave = 150 * strat.rocketsToBuild +
-								  200 *(strat.minFactories > infoMan.factories.size() ? strat.minFactories - infoMan.factories.size() : 0);
+								  200 * infoMan.factoriesToBeBuilt;
 			
     		Utils.log("money to save = " + infoMan.moneyToSave);
-    		Utils.log("rockets to build = " + strat.rocketsToBuild);
+    		Utils.log("factories to be built = " + infoMan.factoriesToBeBuilt);
 			
 			if(infoMan.workerCount < strat.maxWorkers){
 				tellWorkersToReplicate();
