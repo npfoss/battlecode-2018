@@ -43,6 +43,10 @@ public class CombatManager{
 	// call update method of each squad?
 	// remember, the squads will move on their own after you update everything
 	public void update(Strategy strat){
+		for(CombatSquad cs: infoMan.combatSquads){
+			cs.unitCompGoal = strat.combatComposition;
+		}
+		
 		// set units whose objective is NONE (meaning they completed it) to unassignedUnits
 		ArrayList<CombatSquad> toRemove = new ArrayList<CombatSquad>();
 		for(CombatSquad cs: infoMan.combatSquads){

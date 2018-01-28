@@ -104,8 +104,9 @@ public class Strategy{
 		if(knightRush){
 			if(gc.round() > 200){
 				//end the rush
+				Utils.log("ending knight rush");
 				knightRush = false;
-				combatComposition = new int[]{1, 0, 3, 2};
+				combatComposition = new int[]{2, 0, 3, 2};
 			}
 			else{
 				if(gc.karbonite() >= MagicNumbers.FACTORY_COST) {
@@ -177,10 +178,11 @@ public class Strategy{
 		return numEnemyUnits > size * MagicNumbers.AGGRESION_FACTOR;
 	}
 
-	public double getReplicateScore(long numKarbLeftInArea, int numMiners, long distToKarbonite, boolean enemyNearMe) {
+	public double getReplicateScore(long numKarbLeftInArea, int numMiners, long distToKarbonite, long distToHostile) {
 		return (((numKarbLeftInArea * 9.0) - numMiners*numMiners*70.0) /(distToKarbonite/2.0 + 10.0)) 
 				+ (infoMan.myPlanet == Planet.Mars && gc.round() >= 750 ? 100 : 0)
-				- (infoMan.myPlanet == Planet.Earth && enemyNearMe ? MagicNumbers.REPLICATION_ENEMY_FACTOR : 0);
+				- (infoMan.myPlanet == Planet.Earth && infoMan.targetUnits.size() > 0 ? MagicNumbers.REPLICATION_ENEMY_FACTOR : 0)
+				- (infoMan.myPlanet == Planet.Earth ? (MagicNumbers.MAX_DIST_TO_CHECK - distToHostile) * MagicNumbers.REPLICATION_NEARBY_ENEMY_FACTOR : 0);
 	}
 
 }
