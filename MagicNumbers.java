@@ -31,22 +31,19 @@ public class MagicNumbers{
     //the bigger, the more we care:
     static double HEALER_HEALTH_FACTOR = 0.1;
     static double ABILITY_HEAT_OVERCHARGE_FACTOR = 0.02; 
-    static double HOSTILE_FACTOR_RUN_AWAY = 2.0; 
+    static double HOSTILE_FACTOR_RUN_AWAY = 10.0; 
     static double SWARM_FACTOR_RUN_AWAY = 1.0; 
     static double DAMAGE_FACTOR_RUN_AWAY = 100.0;
     static double TARGET_FACTOR_RANGER_MOVE = 1.0;
-    static double HOSTILE_FACTOR_RANGER_MOVE = 2.0;
+    static double HOSTILE_FACTOR_RANGER_MOVE = 10.0;
     static double SWARM_FACTOR_RANGER_MOVE = 1.5; 
     static double DAMAGE_FACTOR_RANGER_MOVE = 100.0;
-    static double DISTANCE_FACTOR_RANGER_MOVE = 10.0; 
-    static double HOSTILE_FACTOR_HEALER_MOVE = 1.0; 
-    static double SWARM_FACTOR_HEALER_MOVE = 1.5; 
+    static double DISTANCE_FACTOR_RANGER_MOVE = 50.0; 
+	static double ATTACK_FACTOR = 3.0;
+    static double HOSTILE_FACTOR_HEALER_MOVE = 10.0; 
+    static double SWARM_FACTOR_HEALER_MOVE = 2.5; 
     static double DAMAGE_FACTOR_HEALER_MOVE = 200.0;
-    static double DISTANCE_FACTOR_HEALER_MOVE = 10.0; 
-    static double HOSTILE_FACTOR_RANGER_MOVE_ATTACK = 1.0; 
-    static double DAMAGE_FACTOR_RANGER_MOVE_ATTACK = 100.0;
-    static double DISTANCE_FACTOR_RANGER_MOVE_ATTACK = 10.0;
-    static double SWARM_FACTOR_RANGER_MOVE_ATTACK = 1.5; 
+    static double DISTANCE_FACTOR_HEALER_MOVE = 30.0; 
 
     // Tile stuff
     static int MAX_DIST_TO_CHECK = 100; // also in WorkerManager

@@ -52,12 +52,10 @@ public class CombatSquad extends Squad{
 	public double rangerMoveAttackScore(Tile t, CombatUnit cu){
 		double baseScore = rangerMoveScore(t,cu);
 		if(t.enemiesWithinRangerRange.size() == 0){
-			return rangerMoveScore(t, cu);
+			return baseScore;
 		}
-		return t.distFromNearestHostile * MagicNumbers.HOSTILE_FACTOR_RANGER_MOVE_ATTACK 
-			- (t.distFromNearestHostile - goalRangerDistance > 0 ? t.distFromNearestHostile - goalRangerDistance : 0) * MagicNumbers.DISTANCE_FACTOR_RANGER_MOVE_ATTACK
-			- t.possibleDamage * MagicNumbers.DAMAGE_FACTOR_RANGER_MOVE_ATTACK
-			- t.myLoc.distanceSquaredTo(swarmLoc) * MagicNumbers.SWARM_FACTOR_RANGER_MOVE_ATTACK;
+		TargetUnit toAttack = t.enemiesWithinRangerRange.first();
+		return baseScore + (300 - toAttack.health) * MagicNumbers.ATTACK_FACTOR;
 	}
 
 	public double healerMoveScore(Tile t, CombatUnit cu){
@@ -622,6 +620,7 @@ public class CombatSquad extends Squad{
 	private void updateDamage(CombatUnit cu, TargetUnit tu){
 		tu = infoMan.targetUnits.get(tu.ID);
 		int damageDone = (int) (cu.damage - tu.defense);
+		Utils.log("doing " + damageDone + " dmg to a unit with " + tu.health + " health");
 		if(damageDone >= tu.health){
 			infoMan.targetUnits.remove(tu.ID);
 			infoMan.removeEnemyUnit(tu.ID, tu.type);
