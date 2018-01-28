@@ -17,8 +17,8 @@ updates enemy locations and buildings (where it last saw them etc)
 + tracks deaths
 
 basically all of the shared data of the team
-!!! TODO: *most* gc calls should happen here because we can cache everything !!!
 */
+
 public class InfoManager {
 	GameController gc;
 	Comms comms;
