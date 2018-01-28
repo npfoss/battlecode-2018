@@ -714,7 +714,8 @@ public class CombatSquad extends Squad{
 	private void updateDamage(CombatUnit cu, TargetUnit tu){
 		tu = infoMan.targetUnits.get(tu.ID);
 		int damageDone = (int) (cu.damage - tu.defense);
-		Utils.log("doing " + damageDone + " dmg to a unit with " + tu.health + " health");
+		if(debug)
+			Utils.log("doing " + damageDone + " dmg to a unit with " + tu.health + " health");
 		if(damageDone >= tu.health){
 			infoMan.targetUnits.remove(tu.ID);
 			infoMan.removeEnemyUnit(tu.ID, tu.type);
