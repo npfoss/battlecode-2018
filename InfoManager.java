@@ -584,6 +584,7 @@ public class InfoManager {
     			long dist = closestLoc.distanceSquaredTo(loc);
     			if(dist < minDist){
     				closest = closestLoc;
+    				minDist = dist;
     			}
     		}
     	}
