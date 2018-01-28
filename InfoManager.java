@@ -162,8 +162,8 @@ public class InfoManager {
 			AsteroidStrike as = pattern.asteroid(gc.round());
 			Tile t = tiles[as.getLocation().getX()][as.getLocation().getY()];
 			if(t.isWalkable){
+				Utils.log("found karb in sched");
 				t.updateKarbonite(as.getKarbonite());
-				Utils.log("adding karb");
 			}
 		}
 		
@@ -454,6 +454,7 @@ public class InfoManager {
 		}
 		KarboniteArea kA = new KarboniteArea(this);
 		karbAreas.add(kA);
+		Utils.log("adding karb area");
 		return kA;
 	}
 

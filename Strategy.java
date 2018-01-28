@@ -91,6 +91,7 @@ public class Strategy{
 			//Pack ur bags we gonna go to mars cuz earth is flooding and we dont wanna die
 			rocketComposition = new int[]{0,0,5,2,1};
 			minWorkers = 0;
+			minFactories = 0;
 			maxFactories = 0;
 			takeAnyUnit = true;
 			rocketsToBuild = (numCombatants + 5) / 6;

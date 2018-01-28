@@ -58,10 +58,15 @@ public class WorkerManager{
 		}
 
 		infoMan.tiles[x][y].updateEnemies(gc);
-		if(infoMan.tiles[x][y].distFromNearestHostile < infoMan.magicNums.MAX_DIST_TO_CHECK)
+		if(infoMan.tiles[x][y].distFromNearestHostile < MagicNumbers.MAX_DIST_TO_CHECK)
 			return false;
 
 		MapLocation loc = new MapLocation(infoMan.myPlanet,x,y);
+		
+		for(WorkerSquad ws: infoMan.workerSquads){
+			if(ws.targetLoc != null && ws.targetLoc.distanceSquaredTo(loc) <= 2)
+				return false;
+		}
 		
 		MapLocation n = loc.add(Direction.North);
 		MapLocation s = loc.add(Direction.South);
