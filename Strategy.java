@@ -105,7 +105,7 @@ public class Strategy{
 		//if you've totally dominated them, send a bunch at the same time.
 		//otherwise if it's getting close to the end of the game send a bunch at the same time
 		//otherwise even if you're not dominating, if you're not really engaging with the enemy/running out of space to build then steadily send.
-		else if(infoMan.researchLevels[5] > 0 && infoMan.fighterCount > (40 + (rocketsBuilt+rocketsToBuild)*8)) {
+		else if(infoMan.researchLevels[5] > 0 && infoMan.fighterCount > (40 + infoMan.rocketsToBeBuilt*8)) {
 			rocketsToBuild++;
 			rocketsBuilt++;
 		}
