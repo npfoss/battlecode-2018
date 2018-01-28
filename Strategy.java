@@ -31,6 +31,7 @@ public class Strategy{
 	int rocketsBuilt;
 	boolean takeAnyUnit;
 	boolean knightRush;
+	int rushDist;
 	Nav nav;
 
     public Strategy(InfoManager im, GameController g, Nav n){
@@ -51,7 +52,7 @@ public class Strategy{
 			minWorkers = 10;
 			return;
 		}
-		int rushDist = -1;
+		rushDist = -1;
 		VecUnit vu = gc.startingMap(infoMan.myPlanet).getInitial_units();
 		ArrayList<Unit> ourStarts = new ArrayList<Unit>();
 		ArrayList<Unit> theirStarts = new ArrayList<Unit>();
@@ -66,16 +67,16 @@ public class Strategy{
 		}
 		
 		for(Unit u: ourStarts){
-			int minDist = 10000;
+			int maxDist = -1;
 			for(Unit u2: theirStarts){
 				MapLocation ml1 = u.location().mapLocation();
 				MapLocation ml2 = u2.location().mapLocation();
-				if(infoMan.isReachable(ml1, ml2) && nav.optimalStepsTo(ml1,ml2) < minDist){
-					minDist = nav.optimalStepsTo(ml1, ml2);
+				if(infoMan.isReachable(ml1, ml2) && nav.optimalStepsTo(ml1,ml2) > maxDist){
+					maxDist = nav.optimalStepsTo(ml1, ml2);
 				}
 			}
-			if(minDist < 10000 && minDist > rushDist)
-				rushDist = minDist;
+			if(maxDist >-1 && maxDist > rushDist)
+				rushDist = maxDist;
 		}
 		if(rushDist == -1)
 			rushDist = 100000; //can't get to enemy
@@ -114,7 +115,7 @@ public class Strategy{
 			else{
 				if(gc.karbonite() >= MagicNumbers.FACTORY_COST) {
 					maxFactories = infoMan.factories.size() + 1 > 6 ? 6 : infoMan.factories.size() + 1;
-					if(gc.karbonite() > 300 && minFactories < 3) {
+					if(gc.karbonite() > 200 && minFactories < 3) {
 						Utils.log("plz build more factories");
 						minFactories++;
 					}
@@ -135,7 +136,7 @@ public class Strategy{
 			takeAnyUnit = true;
 			rocketsToBuild = (numCombatants + infoMan.workerCount + 5) / 6;
 		}
-		else if(infoMan.researchLevels[5] > 0 && numCombatants > ((750 - gc.round()) /20)) {
+		else if(infoMan.researchLevels[5] > 0 && (numCombatants > ((750 - gc.round()) /(rushDist == 100000 ? 20 : 5)) || infoMan.tilesWeCanSee > infoMan.tiles.length * infoMan.tiles[0].length * 0.65)) {
 			rocketsToBuild++;
 			rocketsBuilt++;
 		}

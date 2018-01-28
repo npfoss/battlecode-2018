@@ -30,6 +30,7 @@ public class InfoManager {
 	int rocketsToBeBuilt;
 	int factoriesToBeBuilt;
 	int moneyToSave;
+	int tilesWeCanSee;
 	PlanetMap startingMap;
 	//int totalUnitCount;
 
@@ -124,7 +125,8 @@ public class InfoManager {
         factories = new ArrayList<Unit>();
         unassignedUnits = new HashSet<Integer>();
         researchLevels = new int[]{0,0,0,0,0,0}; //knight, mage, ranger, healer, worker, rocket
-        
+
+		tilesWeCanSee = 0;
         pattern = gc.asteroidPattern();
         moneyToSave = 0;
 	}
@@ -144,12 +146,14 @@ public class InfoManager {
         newRockets.clear();
 		
 		targetUnits.clear();
+		tilesWeCanSee = 0;
 
 		//updating map info
 		for(int x = 0; x < tiles.length; x++){
 			for(int y = 0; y < tiles[0].length; y++){
 				MapLocation loc = tiles[x][y].myLoc;
 				if(gc.canSenseLocation(loc)){
+					tilesWeCanSee++;
 					tiles[x][y].roundLastUpdated = (int) gc.round();
 					tiles[x][y].enemiesUpdated = false;
 					tiles[x][y].unitID = -1;
