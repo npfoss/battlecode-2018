@@ -29,6 +29,7 @@ public class CombatSquad extends Squad{
 	int goalRangerDistance;
 	int[] unitCounts;
 	int[] unitCompGoal;
+	Strategy strat;
 
 /************ ALL THE THINGS TO TWEAK ****************/
 
@@ -65,14 +66,17 @@ public class CombatSquad extends Squad{
 			return baseScore;
 		}
 		TargetUnit toAttack = t.enemiesWithinKnightRange.first();
-		return baseScore + (300 - toAttack.health) * MagicNumbers.ATTACK_FACTOR;
+		double score = baseScore + (300 - toAttack.health) * MagicNumbers.ATTACK_FACTOR;
+		return score;
 	}
 	
 	public double knightMoveScore(Tile t, CombatUnit cu){
-		return - t.distFromNearestHostile * MagicNumbers.HOSTILE_FACTOR_KNIGHT_MOVE
-			- t.possibleDamage * MagicNumbers.DAMAGE_FACTOR_KNIGHT_MOVE
-			- t.myLoc.distanceSquaredTo(swarmLoc) * MagicNumbers.SWARM_FACTOR_KNIGHT_MOVE
-			- t.myLoc.distanceSquaredTo(targetLoc) * MagicNumbers.TARGET_FACTOR_KNIGHT_MOVE;
+		double score = - t.distFromNearestTarget * MagicNumbers.HOSTILE_FACTOR_KNIGHT_MOVE
+				- t.possibleDamage * MagicNumbers.DAMAGE_FACTOR_KNIGHT_MOVE
+				- t.myLoc.distanceSquaredTo(swarmLoc) * MagicNumbers.SWARM_FACTOR_KNIGHT_MOVE
+				- t.myLoc.distanceSquaredTo(targetLoc) * MagicNumbers.TARGET_FACTOR_KNIGHT_MOVE;
+		Utils.log("knight score for " + t.myLoc + " = " + score);
+		return score;
 	}
 
 	public double healerMoveScore(Tile t, CombatUnit cu){
@@ -93,7 +97,7 @@ public class CombatSquad extends Squad{
 	}
 
 	private boolean shouldWeRetreat(){
-		return Strategy.shouldWeRetreat(numEnemyUnits,swarmUnits.size());
+		return strat.shouldWeRetreat(numEnemyUnits,swarmUnits.size());
 	}
 
 	private boolean areWeDone(){
@@ -115,13 +119,14 @@ public class CombatSquad extends Squad{
 
 /******************** END TWEAKING *******************/
 /******************** NORMAL SQUAD STUFF *************************/
-	public CombatSquad(GameController g, InfoManager im, int[] ucg) {
+	public CombatSquad(GameController g, InfoManager im, Strategy s, int[] ucg) {
 		super(im);
 		combatUnits = new HashMap<Integer,CombatUnit>();
 		separatedUnits = new HashSet<Integer>();
 		swarmUnits = new HashMap<Integer,CombatUnit>();
 		unitCounts = new int[]{0,0,0,0}; //knight,mage,ranger,healer
 		unitCompGoal = ucg;
+		strat = s;
 	}
 
 	public void update(){

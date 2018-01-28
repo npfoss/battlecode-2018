@@ -178,8 +178,8 @@ public class Strategy{
 		return (numEnemyUnits * 2 - size + 15) * 10;
 	}
 
-	public static boolean shouldWeRetreat(int numEnemyUnits, int size) {
-		return numEnemyUnits > size * MagicNumbers.AGGRESION_FACTOR;
+	public boolean shouldWeRetreat(int numEnemyUnits, int size) {
+		return numEnemyUnits > size * (knightRush ? 2.0 : MagicNumbers.AGGRESION_FACTOR);
 	}
 
 	public double getReplicateScore(long numKarbLeftInArea, int numMiners, long distToKarbonite, long distToHostile) {
