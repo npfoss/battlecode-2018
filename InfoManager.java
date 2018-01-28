@@ -380,6 +380,15 @@ public class InfoManager {
         return ret;
     }
     
+    public TreeSet<TargetUnit> getTargetUnitsExcludeWorker(MapLocation ml, int radius){
+        TreeSet<TargetUnit> ret = new TreeSet<TargetUnit>(new descendingPriorityComp());
+        for(TargetUnit tu: targetUnits.values()){
+            if(!tu.type == UnitType.Worker && tu.myLoc.distanceSquaredTo(ml) <= radius)
+                ret.add(tu);
+        }
+        return ret;
+    }
+    
     public int distToHostile(MapLocation ml){
     	TreeSet<TargetUnit> tus = getTargetUnits(ml,150,true);
     	int closest = 150;

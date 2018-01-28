@@ -59,7 +59,7 @@ public class WorkerManager{
 
 		MapLocation loc = new MapLocation(infoMan.myPlanet,x,y);
 		
-		if(infoMan.getTargetUnits(loc, MagicNumbers.FACTORY_SCARED_RADIUS, false).size() > 0)
+		if(infoMan.getTargetUnitsExcludeWorker(loc, MagicNumbers.FACTORY_SCARED_RADIUS).size() > 0)
 			return false;
 		
 		for(WorkerSquad ws: infoMan.workerSquads){

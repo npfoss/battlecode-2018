@@ -65,7 +65,7 @@ public class MagicNumbers{
     static int MAX_DIST_TO_STEAL = 20;
     static long KARB_SEPARATION_DISTANCE = 10;
     static Double MIN_SCORE_TO_REPLICATE = 50.0;
-    static int FACTORY_SCARED_RADIUS = 150;
+    static int FACTORY_SCARED_RADIUS = 120;
     static double REPLICATION_ENEMY_FACTOR = 2000.0;
     static int REPLICATION_SCARED_RADIUS = 150;
     static double REPLICATION_NEARBY_ENEMY_FACTOR = 100.0;
