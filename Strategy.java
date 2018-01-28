@@ -91,7 +91,7 @@ public class Strategy{
 		for(CombatSquad cs: infoMan.combatSquads){
 			numCombatants += cs.units.size();
 		}
-		if(gc.round() > MagicNumbers.SEND_EVERYTHING) {
+		if(gc.round() >= MagicNumbers.SEND_EVERYTHING) {
 			//Pack ur bags we gonna go to mars cuz earth is flooding and we dont wanna die
 			rocketComposition = new int[]{0,0,5,2,1};
 			minWorkers = 0;
@@ -107,7 +107,7 @@ public class Strategy{
 		if(gc.round() > MagicNumbers.BUILD_UP_WORKERS && gc.round() < MagicNumbers.SEND_EVERYTHING){
 			minWorkers = (int) (infoMan.fighterCount / MagicNumbers.FIGHTERS_PER_WORKER);
 		}
-		if(gc.karbonite() >= MagicNumbers.FACTORY_COST ) {
+		if(gc.karbonite() >= MagicNumbers.FACTORY_COST && gc.round() < MagicNumbers.SEND_EVERYTHING) {
 			maxFactories = infoMan.factories.size() + 1 > 6 ? 6 : infoMan.factories.size() + 1;
 			if(gc.karbonite() > 300 && minFactories < 3) {
 				minFactories++;

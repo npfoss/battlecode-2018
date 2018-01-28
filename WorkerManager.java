@@ -126,6 +126,7 @@ public class WorkerManager{
 				
 	    		Utils.log("money to save = " + infoMan.moneyToSave);
 	    		Utils.log("factories to be built = " + infoMan.factoriesToBeBuilt);
+	    		//Utils.log("strat.maxFacts = " + strat.maxFactories);
 			}
 			
 			if(infoMan.workerCount < strat.maxWorkers){

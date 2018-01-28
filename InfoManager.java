@@ -151,10 +151,11 @@ public class InfoManager {
 				MapLocation loc = tiles[x][y].myLoc;
 				if(gc.canSenseLocation(loc)){
 					tiles[x][y].roundLastUpdated = (int) gc.round();
-					tiles[x][y].updateKarbonite(gc.karboniteAt(loc));
 					tiles[x][y].enemiesUpdated = false;
 					tiles[x][y].unitID = -1;
 					tiles[x][y].isWalkable = startingMap.isPassableTerrainAt(loc) > 0;
+					if(tiles[x][y].isWalkable)
+						tiles[x][y].updateKarbonite(gc.karboniteAt(loc));
 				}
 			}
 		}
