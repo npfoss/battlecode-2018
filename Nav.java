@@ -203,6 +203,7 @@ public class Nav{
     }
 
     public Direction dirToExplore(MapLocation loc){
+    	//REFACTOR: actually use this in other files
         return dirToMoveSafely(loc, Utils.orderedDirections[(int)(Math.random()*8)]);
     }
 
@@ -266,8 +267,10 @@ public class Nav{
                                     && Utils.isDiagonalDirection(sign.direction)){
                                 // prefer to not move diagonaly if it's the same dist.
                                 // may prevent bottlenecks
+
                                 sign.direction = Utils.oppositeDirection(i);
                                 visitedNonDiag[nx][ny] = true;
+
                             }
                         }
                     }
@@ -299,6 +302,7 @@ public class Nav{
         return hashCoords(loc.getX(), loc.getY());
     }
 
+    //REFACTOR: why is this a thing? because the rocket's move had nav and not infoMan when I wrote it :P
     public MapLocation getNextMarsDest(){
         return infoMan.getNextMarsDest();
     }
