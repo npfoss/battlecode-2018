@@ -52,7 +52,7 @@ public class ProductionManager{
     		UnitType toMake = null;
     		if(toFill != null && toFill.requestedUnits.size() > 0){
     			toMake = toFill.requestedUnits.get(0);
-    			if(infoMan.workers.size() < 1)
+    			if(infoMan.workerCount < 1)
     				toMake = UnitType.Worker;
     		}
     		if(toMake != null && gc.canProduceRobot(id,toMake) && gc.round() < MagicNumbers.ROUND_TO_STOP_PRODUCTION) {
