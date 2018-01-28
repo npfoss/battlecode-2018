@@ -79,7 +79,7 @@ public class Strategy{
         maxFactories = 1;
         minFactories = 0;
         minWorkers = 3;
-        maxWorkers = rushDist;
+        maxWorkers = (rushDist < 30 ? rushDist : 30);
         takeAnyUnit = false;
 	}
 

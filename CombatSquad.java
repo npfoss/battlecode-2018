@@ -50,8 +50,7 @@ public class CombatSquad extends Squad{
 	}
 
 	public double rangerMoveAttackScore(Tile t, CombatUnit cu){
-		// TODO: @Eli: I think it makes more sense to always have the move score as the base score,
-		//			but then add extra if it can attack something. (but I'll leave it how it was pre-refactor)
+		double baseScore = rangerMoveScore(t,cu);
 		if(t.enemiesWithinRangerRange.size() == 0){
 			return rangerMoveScore(t, cu);
 		}
