@@ -383,7 +383,7 @@ public class InfoManager {
     public TreeSet<TargetUnit> getTargetUnitsExcludeWorker(MapLocation ml, int radius){
         TreeSet<TargetUnit> ret = new TreeSet<TargetUnit>(new descendingPriorityComp());
         for(TargetUnit tu: targetUnits.values()){
-            if(!tu.type == UnitType.Worker && tu.myLoc.distanceSquaredTo(ml) <= radius)
+            if(tu.type != UnitType.Worker && tu.myLoc.distanceSquaredTo(ml) <= radius)
                 ret.add(tu);
         }
         return ret;
