@@ -65,14 +65,17 @@ public class CombatSquad extends Squad{
 			return baseScore;
 		}
 		TargetUnit toAttack = t.enemiesWithinKnightRange.first();
-		return baseScore + (300 - toAttack.health) * MagicNumbers.ATTACK_FACTOR;
+		double score = baseScore + (300 - toAttack.health) * MagicNumbers.ATTACK_FACTOR;
+		return score;
 	}
 	
 	public double knightMoveScore(Tile t, CombatUnit cu){
-		return - t.distFromNearestHostile * MagicNumbers.HOSTILE_FACTOR_KNIGHT_MOVE
-			- t.possibleDamage * MagicNumbers.DAMAGE_FACTOR_KNIGHT_MOVE
-			- t.myLoc.distanceSquaredTo(swarmLoc) * MagicNumbers.SWARM_FACTOR_KNIGHT_MOVE
-			- t.myLoc.distanceSquaredTo(targetLoc) * MagicNumbers.TARGET_FACTOR_KNIGHT_MOVE;
+		double score = - t.distFromNearestTarget * MagicNumbers.HOSTILE_FACTOR_KNIGHT_MOVE
+				- t.possibleDamage * MagicNumbers.DAMAGE_FACTOR_KNIGHT_MOVE
+				- t.myLoc.distanceSquaredTo(swarmLoc) * MagicNumbers.SWARM_FACTOR_KNIGHT_MOVE
+				- t.myLoc.distanceSquaredTo(targetLoc) * MagicNumbers.TARGET_FACTOR_KNIGHT_MOVE;
+		Utils.log("knight score for " + t.myLoc + " = " + score);
+		return score;
 	}
 
 	public double healerMoveScore(Tile t, CombatUnit cu){
