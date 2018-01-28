@@ -33,14 +33,28 @@ public class Nav{
     assuming no movable units obstruct you
     */
     public int optimalStepsTo(MapLocation start, MapLocation target){
+        if (Utils.equalsMapLocation(start, target))
+            return 0;
+        try{
     	if(!infoMan.isReachable(start, target)){
         	//can't get there but just return distance
     		return (int)(start.distanceSquaredTo(target));
         }
         if (!infoMan.tiles[start.getX()][start.getY()].destToDir.containsKey(hashMapLoc(target))){
-            generateBFSMap(target);
+            generateBFSMap(start, target);
         }
+        // Utils.log(" this far");
         return infoMan.tiles[start.getX()][start.getY()].destToDir.get(hashMapLoc(target)).stepsToDest;
+        } catch (Exception e){
+            e.printStackTrace(System.out);
+            Utils.log("crime scene: " + mapLocToString(start) + " " + mapLocToString(target) + ":" + infoMan.isLocationWalkable(start) + " " + infoMan.tiles[start.getX()][start.getY()].destToDir.containsKey(hashMapLoc(target)));
+            try{
+                Utils.log("unit " + infoMan.gc.senseUnitAtLocation(start));
+            } catch (Exception p){
+                Utils.log("failed.");
+            }
+            return 12;
+        }
     }
 
     /*
@@ -48,10 +62,26 @@ public class Nav{
     ignoring other units
     */
     public Direction directionTowards(MapLocation start, MapLocation target){
-        if (!infoMan.tiles[start.getX()][start.getY()].destToDir.containsKey(hashMapLoc(target))){
-            generateBFSMap(target);
+        if (Utils.equalsMapLocation(start, target))
+            return Direction.Center;
+        if(!infoMan.isReachable(start, target)){
+            return start.directionTo(target);
         }
+        if (!infoMan.tiles[start.getX()][start.getY()].destToDir.containsKey(hashMapLoc(target))){
+            generateBFSMap(start, target);
+        }
+        try{
         return infoMan.tiles[start.getX()][start.getY()].destToDir.get(hashMapLoc(target)).direction;
+        } catch (Exception e){
+            e.printStackTrace(System.out);
+            Utils.log("2crime scene: " + mapLocToString(start) + " " + mapLocToString(target) + ":" + infoMan.isLocationWalkable(start) + " " + infoMan.tiles[start.getX()][start.getY()].destToDir.containsKey(hashMapLoc(target)));
+            try{
+                Utils.log("2unit " + infoMan.gc.senseUnitAtLocation(start));
+            } catch (Exception p){
+                Utils.log("2failed.");
+            }
+            return Direction.Center;
+        }
     }
 
     /*
@@ -59,10 +89,9 @@ public class Nav{
     takes into account movable obstructions like other robots
     */
     public Direction dirToMove(MapLocation start, MapLocation target){
-    	if(infoMan.isReachable(start, target))
-    		return dirToMove(start, directionTowards(start, target));
-    	else
-    		return dirToMove(start, start.directionTo(target));
+        if (Utils.equalsMapLocation(start, target))
+            return Direction.Center;
+    	return dirToMove(start, directionTowards(start, target));
     }
 
     // overloaded for convenience
@@ -94,10 +123,9 @@ public class Nav{
     }
 
     public Direction dirToMoveSafely(MapLocation start, MapLocation target){
-    	if(infoMan.isReachable(start, target))
-    		return dirToMoveSafely(start, directionTowards(start, target));
-    	else
-    		return dirToMoveSafely(start, start.directionTo(target));
+        if (Utils.equalsMapLocation(start, target))
+            return Direction.Center;
+    	return dirToMoveSafely(start, directionTowards(start, target));
     }
 
     public Direction dirToMoveSafely(MapLocation start, Direction preferredDir){
@@ -177,11 +205,15 @@ public class Nav{
     }
     
     public Direction dirToMoveEfficient(MapLocation start, MapLocation target){
+        if (Utils.equalsMapLocation(start, target))
+            return Direction.Center;
         // TODO
         return dirToMove(start, start.directionTo(target));
     }
     
     public Direction dirToMoveSafelyEfficient(MapLocation start, MapLocation target){
+        if (Utils.equalsMapLocation(start, target))
+            return Direction.Center;
         // TODO
         return dirToMoveSafely(start, start.directionTo(target));
     }
@@ -190,30 +222,44 @@ public class Nav{
         return dirToMoveSafely(loc, Utils.orderedDirections[(int)(Math.random()*8)]);
     }
 
-    public void generateBFSMap(MapLocation target){
+    public void generateBFSMap(MapLocation start, MapLocation target){
         Utils.log("Generating map to " + mapLocToString(target));
         short dist = 0;
         ArrayList<List<Integer>> currentLocs = new ArrayList<List<Integer>>();
         ArrayList<List<Integer>> nextLocs = new ArrayList<List<Integer>>();
         infoMan.tiles[target.getX()][target.getY()].destToDir.put(hashMapLoc(target), new Signpost(Direction.Center, (short)0));
 
+        int startx = -1;
+        int starty = -1;
+        if (start != null){
+            startx = start.getX();
+            starty = start.getY();
+        }
+        short startdist = 32000;
+
         currentLocs.add(Arrays.asList(target.getX(), target.getY()));
         dist++;
         Signpost sign;
         int x, y, nx, ny;
-        while (currentLocs.size() > 0){
+        while (currentLocs.size() > 0 && dist < startdist + 1){
             for (List<Integer> coords: currentLocs){
                 x = coords.get(0);
                 y = coords.get(1);
                 for (int i = 0; i < 8; i++){
                     nx = x + Utils.dx[i];
                     ny = y + Utils.dy[i];
+                    if (nx == startx && ny == starty){
+                        startdist = dist;
+                        Utils.log("found the start");
+                    }
                     if (infoMan.isOnMap(nx, ny)
                             && (infoMan.isLocationWalkable(nx, ny)
                                     || infoMan.tiles[nx][ny].myType == UnitType.Rocket
                                     || infoMan.tiles[nx][ny].myType == UnitType.Factory)){
                         if (infoMan.tiles[nx][ny].destToDir.containsKey(hashMapLoc(target))){
                             sign = infoMan.tiles[nx][ny].destToDir.get(hashMapLoc(target));
+                    // if(startdist < 32000)
+                        // Utils.log("middle flag");
                             if (sign.stepsToDest == dist
                                     && !Utils.isDiagonalDirection(i)
                                     && Utils.isDiagonalDirection(sign.direction)){
@@ -230,6 +276,8 @@ public class Nav{
                                 }
                             }
                         } else {
+                    // if(startdist < 32000)
+                        // Utils.log("middle flag first");
                             infoMan.tiles[nx][ny].destToDir.put(hashMapLoc(target), new Signpost(Utils.oppositeDirection(i), dist));
                             if(!(infoMan.tiles[nx][ny].myType == UnitType.Rocket
                                     || infoMan.tiles[nx][ny].myType == UnitType.Factory)){
@@ -237,6 +285,8 @@ public class Nav{
                             }
                         }
                     }
+                    // if(startdist < 32000)
+                        // Utils.log("flag two");
                 }
             }
             dist++;

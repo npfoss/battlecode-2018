@@ -186,4 +186,8 @@ public class Utils{
         }
         return maxInd;
     }
+
+    public static boolean equalsMapLocation(MapLocation loc1, MapLocation loc2){
+        return loc1.getX() == loc2.getX() && loc1.getY() == loc2.getY() && loc1.getPlanet() == loc2.getPlanet();
+    }
 }
