@@ -34,9 +34,6 @@ public class RocketDoNothing extends RocketManager{
     			if(!didSomething)
     				break;
     		}
-    		if(r.structureGarrison().size() == 0) {
-    			gc.disintegrateUnit(r.id());
-    		}
     	}
     }
 }

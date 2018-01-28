@@ -74,6 +74,8 @@ public class RocketSquad extends Squad {
 		// start at 1 because rocket is first one
 		for(int i = 1; i < units.size(); i++) {
 			int id = units.get(i);
+			if(!gc.canSenseUnit(id))
+				continue;
 			Unit astronaut = gc.unit(id);
 			if(astronaut.location().isInGarrison()){
 				numUnitsInside++;
