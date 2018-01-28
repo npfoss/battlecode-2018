@@ -82,8 +82,6 @@ public class RocketSquad extends Squad {
 				numUnitsInside++;
 			} else if(!astronaut.location().mapLocation().isAdjacentTo(targetLoc) && gc.isMoveReady(id)) {
 				//Move towards the target location
-				/* TODO: this is not going to work if the tiles around the
-				 * 		rocket are marked as dangerous (without a fix) */
 				if(targetLoc == null) {
 					Utils.log("This is the saddest time because we are about to throw an exception");
 				}

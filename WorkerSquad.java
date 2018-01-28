@@ -129,7 +129,7 @@ public class WorkerSquad extends Squad {
 		else{
 			karbLoc = infoMan.getClosestKarbonite(myLoc);
 		}
-		//Utils.log("trying to move toward karbonite at location " + karbLoc);
+
 		if(karbLoc == null){
 			runAway(id,myLoc);
 			return;
@@ -249,7 +249,6 @@ public class WorkerSquad extends Squad {
 			Unit worker = gc.unit(id);
 			if(worker.location().isInSpace() || worker.location().isInGarrison())
 				continue;
-			//TODO: replicate based on manager's choice
 			if(worker.abilityHeat() < 10 && infoMan.workersToRep.contains(id)){
 				replicateWorker(id);
 			}

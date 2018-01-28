@@ -7,11 +7,8 @@ for Earth
 creates and assigns RocketSquads when we build new rockets
 
 NOTE: infoMan decides where to send rockets
-
-TODO:
--coordinate multiple simultaneous launches if Mars says to
-    (will have to communicate that to squads)
 */
+
 public class RocketManager{
     InfoManager infoMan;
     public GameController gc;
@@ -120,7 +117,6 @@ public class RocketManager{
         if (infoMan.isInSquads2(unit, infoMan.rocketSquads)) return false;
         if(squad.urgency > rs.urgency)
         	return false;
-        // TODO: compare urgencies of rs and the unit's squad
 
         return true;
     }
