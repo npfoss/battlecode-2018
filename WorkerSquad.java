@@ -59,7 +59,7 @@ public class WorkerSquad extends Squad {
 		int x = targetLoc.getX();
 		int y = targetLoc.getY();
 		Tile t = infoMan.tiles[x][y];
-		if((t.unitID == -1 && blueprinted) || infoMan.getTargetUnits(t.myLoc, MagicNumbers.FACTORY_SCARED_RADIUS, false).size() > 0) {
+		if(((t.unitID == -1 || t.myType != toBuild) && blueprinted) || (!blueprinted && infoMan.getTargetUnits(t.myLoc, MagicNumbers.FACTORY_SCARED_RADIUS, false).size() > 0)) {
 			//oh shit someone killed our building better get away or it's not safe
 			if(!blueprinted){
 				switch(toBuild){

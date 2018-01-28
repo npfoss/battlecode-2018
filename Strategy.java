@@ -122,7 +122,7 @@ public class Strategy{
 	}
 	
 	public int calcRocketUrgency(int numUnits) {
-		return (numUnits == 8 ? 0 : (gc.round() > MagicNumbers.SEND_EVERYTHING ? 100 : 50));
+		return 100;
 	}
 	
 	public boolean shouldLaunch(Unit rocket, int numUnitsInside) {
