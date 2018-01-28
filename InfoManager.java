@@ -30,6 +30,7 @@ public class InfoManager {
 	int rocketsToBeBuilt;
 	int factoriesToBeBuilt;
 	int moneyToSave;
+	int tilesWeCanSee;
 	PlanetMap startingMap;
 	//int totalUnitCount;
 
@@ -124,7 +125,8 @@ public class InfoManager {
         factories = new ArrayList<Unit>();
         unassignedUnits = new HashSet<Integer>();
         researchLevels = new int[]{0,0,0,0,0,0}; //knight, mage, ranger, healer, worker, rocket
-        
+
+		tilesWeCanSee = 0;
         pattern = gc.asteroidPattern();
         moneyToSave = 0;
 	}
@@ -144,12 +146,14 @@ public class InfoManager {
         newRockets.clear();
 		
 		targetUnits.clear();
+		tilesWeCanSee = 0;
 
 		//updating map info
 		for(int x = 0; x < tiles.length; x++){
 			for(int y = 0; y < tiles[0].length; y++){
 				MapLocation loc = tiles[x][y].myLoc;
 				if(gc.canSenseLocation(loc)){
+					tilesWeCanSee++;
 					tiles[x][y].roundLastUpdated = (int) gc.round();
 					tiles[x][y].enemiesUpdated = false;
 					tiles[x][y].unitID = -1;
@@ -573,17 +577,21 @@ public class InfoManager {
     
     public MapLocation getClosestKarbonite(MapLocation loc){
     	long minDist = 1000000;
-    	KarboniteArea closest = null;
+    	MapLocation closest = null;
     	for(KarboniteArea kA: karbAreas){
-    		if(kA.tiles.size() > 0 && kA.center.distanceSquaredTo(loc) < minDist && isReachable(loc,kA.tiles.get(0).myLoc)){
-    			minDist = kA.center.distanceSquaredTo(loc);
-    			closest = kA;
+    		if(kA.tiles.size() > 0 && isReachable(loc,kA.tiles.get(0).myLoc)){
+    			MapLocation closestLoc = kA.getClosestTile(loc).myLoc;
+    			long dist = closestLoc.distanceSquaredTo(loc);
+    			if(dist < minDist){
+    				closest = closestLoc;
+    				minDist = dist;
+    			}
     		}
     	}
     	if(closest == null)
     		return null;
     	//Utils.log("closest karb is in area with center " + closest.center);
-    	return closest.getClosestTile(loc).myLoc;
+    	return closest;
     }
     
 /*******  FOR LOGGING AND DEBUGGING *********/

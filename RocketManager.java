@@ -88,15 +88,29 @@ public class RocketManager{
             if ((toSteal[maxInd] == null || rs.targetLoc.distanceSquaredTo(unit.location().mapLocation()) < maxDist)
                     && canStealUnit(rs, unit)){
             	// Utils.log("Tryna steal a unit");
-                toSteal[maxInd] = unit;
-                maxInd = Utils.maxDistIndex(toSteal, rs.targetLoc);
-                maxDist = toSteal[maxInd] == null ? 999999 : rs.targetLoc.distanceSquaredTo(unit.location().mapLocation());
+            	toSteal[maxInd] = unit;
+            	maxInd = Utils.maxDistIndex(toSteal, rs.targetLoc);
+            	maxDist = toSteal[maxInd] == null ? 999999 : rs.targetLoc.distanceSquaredTo(unit.location().mapLocation());
             }
+        }
+        if(gc.round() > 700 && gc.unit(rs.units.get(0)).structureIsBuilt() > 0) {
+        	for (Unit unit : infoMan.workers){
+        		if(!unit.location().isOnMap())
+        			continue;
+        		if ((toSteal[maxInd] == null || rs.targetLoc.distanceSquaredTo(unit.location().mapLocation()) < maxDist)
+        				&& canStealUnit(rs, unit)){
+        			// Utils.log("Tryna steal a unit");
+        			toSteal[maxInd] = unit;
+        			maxInd = Utils.maxDistIndex(toSteal, rs.targetLoc);
+        			maxDist = toSteal[maxInd] == null ? 999999 : rs.targetLoc.distanceSquaredTo(unit.location().mapLocation());
+        		}
+        	}
+
         }
 
         // do the deed
         for (Unit unit : toSteal){
-            if (unit != null){
+        	if (unit != null){
                 Utils.log("actually stealing " + unit.id());
                 Squad squad = infoMan.getSquad(unit);
                 rs.units.add(unit.id());
