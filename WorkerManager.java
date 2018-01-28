@@ -83,7 +83,8 @@ public class WorkerManager{
 		boolean bww = !infoMan.isOnMap(w) ? false : infoMan.startingMap.isPassableTerrainAt(w) > 0;
 		
 		if(bnn == bn && bss == bs && bee == be && bww == bw)
-			return(bn || bs) && (be || bw);
+			return ((bn?1:0) + (bs?1:0) + (be?1:0) + (bw?1:0))>= 3;
+			//return(bn || bs) && (be || bw);
 		return bn && bs && be && bw;
 	}
 
