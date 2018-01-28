@@ -53,7 +53,7 @@ public class MagicNumbers{
 
     // ProductionManager
     static int MAX_FIGHTER_COUNT = 100;
-    static long ROUND_TO_STOP_PRODUCTION = 710;
+    static long ROUND_TO_STOP_PRODUCTION = 675;
 
     //for workers
     static int FACTORY_COST = 200;

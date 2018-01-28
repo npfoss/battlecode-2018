@@ -129,9 +129,7 @@ public class InfoManager {
         pattern = gc.asteroidPattern();
 	}
 
-	public void update(Strategy strat) {
-		//TODO: if you're mars add karbonite to tiles according to weather.
-		
+	public void update(Strategy strat) {		
 		lastCheckpoint = System.nanoTime();
 		
 		// called at the beginning of each turn
@@ -164,7 +162,8 @@ public class InfoManager {
 		if(myPlanet == Planet.Mars && pattern.hasAsteroid(gc.round())){
 			AsteroidStrike as = pattern.asteroid(gc.round());
 			Tile t = tiles[as.getLocation().getX()][as.getLocation().getY()];
-			t.updateKarbonite(as.getKarbonite());
+			if(t.isWalkable)
+				t.updateKarbonite(as.getKarbonite());
 		}
 		
 		//keeping track of our/enemy units, squad management
