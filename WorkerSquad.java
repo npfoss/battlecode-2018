@@ -59,10 +59,15 @@ public class WorkerSquad extends Squad {
 		int x = targetLoc.getX();
 		int y = targetLoc.getY();
 		Tile t = infoMan.tiles[x][y];
-		if(t.unitID == -1 && blueprinted) {
-			//oh shit someone killed our building better get away
+		if((t.unitID == -1 && blueprinted) || infoMan.getTargetUnits(t.myLoc, MagicNumbers.FACTORY_SCARED_RADIUS, false).size() > 0) {
+			//oh shit someone killed our building better get away or it's not safe
+			if(!blueprinted){
+				switch(toBuild){
+				case Factory: infoMan.factoriesToBeBuilt--; break;
+				default: infoMan.rocketsToBeBuilt--;
+				}
+			}
 			objective = Objective.NONE;
-			infoMan.factoriesToBeBuilt--;
 			return;
 		}
 		if(t.unitID != -1 && t.myType == toBuild && gc.unit(t.unitID).structureIsBuilt() != 0) {

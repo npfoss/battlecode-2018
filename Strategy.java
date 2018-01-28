@@ -42,7 +42,7 @@ public class Strategy{
 
 	private void determineInitalStrat() {
 		//TODO: make this depend on stuff
-		researchOrder = new UnitType[]{UnitType.Ranger,UnitType.Worker,UnitType.Healer,UnitType.Healer,UnitType.Healer,UnitType.Rocket,UnitType.Ranger,UnitType.Ranger};
+		researchOrder = new UnitType[]{UnitType.Worker,UnitType.Ranger,UnitType.Healer,UnitType.Healer,UnitType.Healer,UnitType.Rocket,UnitType.Ranger,UnitType.Ranger};
 		if(infoMan.myPlanet == Planet.Mars){
 			maxWorkers = 10000;
 			minWorkers = 10;
@@ -148,7 +148,7 @@ public class Strategy{
 	}
 
 	public double getReplicateScore(long numKarbLeftInArea, int numMiners, long distToKarbonite) {
-		return (((numKarbLeftInArea * 10.0) - numMiners*numMiners*50) /(distToKarbonite + 10)) + (infoMan.myPlanet == Planet.Mars && gc.round() >= 750 ? 100 : 0);
+		return (((numKarbLeftInArea * 8.0) - numMiners*numMiners*65.0) /(distToKarbonite/2.0 + 10.0)) + (infoMan.myPlanet == Planet.Mars && gc.round() >= 750 ? 100 : 0);
 	}
 
 }

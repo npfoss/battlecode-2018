@@ -62,6 +62,7 @@ public class MagicNumbers{
     static int MAX_DIST_TO_STEAL = 20;
     static long KARB_SEPARATION_DISTANCE = 10;
     static Double MIN_SCORE_TO_REPLICATE = 50.0;
+    static int FACTORY_SCARED_RADIUS = 150;
 
     // rockets
     static long SEND_EVERYTHING = 600;

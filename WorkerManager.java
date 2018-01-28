@@ -57,11 +57,10 @@ public class WorkerManager{
 			}
 		}
 
-		infoMan.tiles[x][y].updateEnemies(gc);
-		if(infoMan.tiles[x][y].distFromNearestHostile < MagicNumbers.MAX_DIST_TO_CHECK)
-			return false;
-
 		MapLocation loc = new MapLocation(infoMan.myPlanet,x,y);
+		
+		if(infoMan.getTargetUnits(loc, MagicNumbers.FACTORY_SCARED_RADIUS, false).size() > 0)
+			return false;
 		
 		for(WorkerSquad ws: infoMan.workerSquads){
 			if(ws.targetLoc != null && ws.targetLoc.distanceSquaredTo(loc) <= 2)
@@ -122,7 +121,7 @@ public class WorkerManager{
 			}
 			
 			if(infoMan.myPlanet == Planet.Earth){
-				infoMan.moneyToSave = 150 * strat.rocketsToBuild +
+				infoMan.moneyToSave = 150 * infoMan.rocketsToBeBuilt +
 									  200 * infoMan.factoriesToBeBuilt;
 				
 	    		Utils.log("money to save = " + infoMan.moneyToSave);
