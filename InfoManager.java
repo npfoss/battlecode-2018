@@ -1,7 +1,13 @@
+/****************/
+/* REFACTOR ME! */
+/****************/
+
 import bc.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.TreeSet;
 
 /*
@@ -17,6 +23,7 @@ public class InfoManager {
 	GameController gc;
 	Comms comms;
 	Planet myPlanet;
+    Team myTeam;
 	MagicNumbers magicNums;
 	int height, width;
 	long lastCheckpoint;
@@ -60,8 +67,10 @@ public class InfoManager {
     ArrayList<Region> regions;
     ArrayList<KarboniteArea> karbAreas;
     Tile[][] tiles;
-    int marsx, marsy; // TODO: don't use this system, it sucks
     ArrayList<MapLocation> placesWeveSentTo;
+    // short[][][][][] destToDir; // startx, starty, targetx, targety, [Direction, stepsToDest]
+
+    // research
     int[] researchLevels;
 
 	public InfoManager(GameController g, MagicNumbers mn) {
@@ -75,6 +84,7 @@ public class InfoManager {
 		combatSquads = new ArrayList<CombatSquad>();
 
 		myPlanet = gc.planet();
+        myTeam = gc.team();
 
 		enemyRockets = new HashSet<Integer>();
 		enemyWorkers = new HashSet<Integer>();
@@ -95,14 +105,12 @@ public class InfoManager {
         width = (int) startingMap.getWidth();
 
         tiles = new Tile[width][height];
+        // destToDir = new short[width][height][width][height][2];
         regions = new ArrayList<Region>();
         workersToRep = new HashSet<Integer>();
         karbAreas = new ArrayList<KarboniteArea>();
         initMap();
         
-        
-        marsx = 0;
-        marsy = 0;
         placesWeveSentTo = new ArrayList<MapLocation>();
         factoriesToBeBuilt = 0;
         rocketsToBeBuilt = 0;
@@ -134,25 +142,23 @@ public class InfoManager {
 		targetUnits.clear();
 
 		//updating map info
-				for(int x = 0; x < tiles.length; x++){
-					for(int y = 0; y < tiles[0].length; y++){
-						MapLocation loc = tiles[x][y].myLoc;
-						if(gc.canSenseLocation(loc)){
-							tiles[x][y].roundLastUpdated = (int) gc.round();
-		                    tiles[x][y].updateKarbonite(gc.karboniteAt(loc));
-		                    tiles[x][y].enemiesUpdated = false;
-		                    tiles[x][y].unitID = -1;
-		                    if(startingMap.isPassableTerrainAt(loc) > 0)
-		                    	tiles[x][y].isWalkable = true;
-		                    // TODO: check if there's now a factory there
-		                    //      (to update walkability)
-		                }
-					}
+		for(int x = 0; x < tiles.length; x++){
+			for(int y = 0; y < tiles[0].length; y++){
+				MapLocation loc = tiles[x][y].myLoc;
+				if(gc.canSenseLocation(loc)){
+					tiles[x][y].roundLastUpdated = (int) gc.round();
+					tiles[x][y].updateKarbonite(gc.karboniteAt(loc));
+					tiles[x][y].enemiesUpdated = false;
+					tiles[x][y].unitID = -1;
+					tiles[x][y].isWalkable = startingMap.isPassableTerrainAt(loc) > 0;
 				}
+			}
+		}
 		
 		//keeping track of our/enemy units, squad management
 		//REFACTOR: while going through units, add to tiles whether or not there is a unit there so we don't have to call gc.hasUnitAtLocation;
 		VecUnit units = gc.units();
+		workerCount = 0;
 		HashSet<Integer> ids = new HashSet<Integer>();
 		for (int i = 0; i < units.size(); i++) {
 			Unit unit = units.get(i);
@@ -162,56 +168,43 @@ public class InfoManager {
             if(unit.location().isOnMap()) {
             	int x = unit.location().mapLocation().getX();
             	int y = unit.location().mapLocation().getY();
+            	Utils.log("setting tile " + x + " " + y);
             	tiles[x][y].unitID = unit.id();
             	tiles[x][y].myType = unit.unitType();
             	if(unit.unitType() == UnitType.Factory || unit.unitType() == UnitType.Rocket)
             		tiles[x][y].isWalkable = false;
             }
-			if(unit.team() == gc.team()){
+			if(unit.team() == myTeam){
 				ids.add(unit.id());
 				switch (unit.unitType()) {
 				case Worker:
 					workers.add(unit);
-					if (!isInSquads1(unit, workerSquads) && !isInSquads2(unit, rocketSquads))
+					workerCount++;
+					if (!isInSquads(unit)){
 						unassignedUnits.add(unit.id());
+					}
 					break;
 				case Factory:
 					factories.add(unit);
 					break;
 				case Rocket:
 					rockets.add(unit);
-                    Utils.log("THERE IS A ROCKET!");
-					if (!isInSquads2(unit, rocketSquads))
+					if (!isInSquads(unit))
 						newRockets.add(unit);
 					break;
 				default:
-					//if(myPlanet == Planet.Mars)
-					//	Utils.log("wow");
 					fighters.add(unit);
-					if (!isInSquads3(unit, combatSquads) && !isInSquads2(unit,rocketSquads)){
-						//if(myPlanet == Planet.Mars)
-						//	Utils.log("no way");
+					if (!isInSquads(unit)){
 						unassignedUnits.add(unit.id());
 					}
 					break;
 				}
 			} else {
-				addEnemyUnit(unit.id(),unit.unitType());
-				enemyLastSeen.put(unit.id(),(int) gc.round());
+				addEnemyUnit(unit.id(), unit.unitType());
+				enemyLastSeen.put(unit.id(), (int) gc.round());
 				if(!unit.location().isOnMap())
 					continue;
-				long defense = 0;
-				if(unit.unitType() == UnitType.Knight)
-					defense = unit.knightDefense();
-				int damage = 0;
-				long range = 0;
-				if(unit.unitType() != UnitType.Factory && unit.unitType() != UnitType.Rocket){
-					damage = unit.damage();
-					range = unit.attackRange();
-				}
-				TargetUnit tu = new TargetUnit(unit.id(),unit.health(),damage,
-						unit.location().mapLocation(),unit.unitType(),range,defense, this);
-				targetUnits.put(unit.id(), tu);
+				targetUnits.put(unit.id(), new TargetUnit(unit, this));
 			}
 		}
 		units.delete();
@@ -247,8 +240,6 @@ public class InfoManager {
 			s.update();
 		}
 		
-		workerCount = workers.size();
-
 		logTimeCheckpoint("infoMan update done");
 	}
 
@@ -331,7 +322,7 @@ public class InfoManager {
         return null;
     }
 
-    public Squad getSquad2(Unit unit, ArrayList<RocketSquad> squad){
+    public Squad getSquad1(Unit unit, ArrayList<WorkerSquad> squad){
         for (Squad s : squad) {
             for (int uid : s.units) {
                 if (unit.id() == uid){
@@ -341,7 +332,7 @@ public class InfoManager {
         }
         return null;
     }
-    public Squad getSquad1(Unit unit, ArrayList<WorkerSquad> squad){
+    public Squad getSquad2(Unit unit, ArrayList<RocketSquad> squad){
         for (Squad s : squad) {
             for (int uid : s.units) {
                 if (unit.id() == uid){
@@ -398,7 +389,7 @@ public class InfoManager {
                         regions.add(newRegion);
                     } else {
                         // impassible terrain
-                        tiles[x][y] = new Tile(false, startingMap.initialKarboniteAt(loc), null, loc, magicNums, this, null);
+                        tiles[x][y] = new Tile(false, startingMap.initialKarboniteAt(loc), null, loc, this, null);
                     }
                 }
             }
@@ -407,13 +398,44 @@ public class InfoManager {
 
     // takes a passable maplocation, adds it and everything reachable
     //      from it to the given region
-    public void floodfill(Region region, MapLocation loc){
+    public void floodfill(Region region, MapLocation l){
+    	Queue<MapLocation> q = new LinkedList<MapLocation>();
+    	q.add(l);
+    	while(!q.isEmpty()){
+    		MapLocation loc = q.poll();
+    		if(tiles[loc.getX()][loc.getY()] != null)
+    			continue;
+	        long karbs = startingMap.initialKarboniteAt(loc);
+	        KarboniteArea karbArea = null;
+	        if(karbs > 0)
+	        	karbArea = getKarbArea(loc, region);
+	        tiles[loc.getX()][loc.getY()] = new Tile(true, karbs, region, loc, this, karbArea);
+	        if(karbArea != null) {
+	        	karbArea.addTile(tiles[loc.getX()][loc.getY()]);
+	        	//Utils.log("adding " + loc + " to an area.");
+	        }
+	        region.tiles.add(tiles[loc.getX()][loc.getY()]);
+	        region.karbonite += karbs;
+	        for (Direction dir : Utils.orderedDirections){
+	            MapLocation neighbor = loc.add(dir);
+	            if (isOnMap(neighbor)
+	                    && tiles[neighbor.getX()][neighbor.getY()] == null
+	                    && startingMap.isPassableTerrainAt(neighbor) > 0){
+	            	//Utils.log("adding " + neighbor.getX() + " " + neighbor.getY());
+	                q.add(neighbor);
+	            }
+	        }
+    	}
+    }
+    
+    /* old one that maybe works better? for debugging
+    public void floodfill(PlanetMap startingMap, Region region, MapLocation loc){
+    	Utils.log("x = " + loc.getX() + " y = " + loc.getY());
         long karbs = startingMap.initialKarboniteAt(loc);
-        
         KarboniteArea karbArea = null;
         if(karbs > 0)
         	karbArea = getKarbArea(loc, region);
-        tiles[loc.getX()][loc.getY()] = new Tile(true, karbs, region, loc, magicNums, this, karbArea);
+        tiles[loc.getX()][loc.getY()] = new Tile(true, karbs, region, loc, this, karbArea);
         if(karbArea != null) {
         	karbArea.addTile(tiles[loc.getX()][loc.getY()]);
         	//Utils.log("adding " + loc + " to an area.");
@@ -427,10 +449,10 @@ public class InfoManager {
             if (isOnMap(neighbor)
                     && tiles[neighbor.getX()][neighbor.getY()] == null
                     && startingMap.isPassableTerrainAt(neighbor) > 0){
-                floodfill(region, neighbor);
+                floodfill(startingMap, region, neighbor);
             }
         }
-    }
+    }*/
 
     public KarboniteArea getKarbArea(MapLocation loc, Region r) {
 		for(KarboniteArea kA: karbAreas){
@@ -445,8 +467,8 @@ public class InfoManager {
 		return kA;
 	}
 
-	public boolean isOnMap(int x, int y){
-        return 0 <= x && 0 <= y && x < tiles.length && y < tiles[0].length;
+    public boolean isOnMap(int x, int y){
+        return 0 <= x && 0 <= y && x < width && y < height;
     }
 
     public boolean isOnMap(MapLocation loc){
@@ -456,18 +478,20 @@ public class InfoManager {
     // this means on map, walkable, AND no unit currently in the way
     // returns false if we can't see that loc
     public boolean isLocationClear(MapLocation loc){
-        try{
-            return isLocationWalkable(loc) && tiles[loc.getX()][loc.getY()].unitID == -1;
-        } catch (Exception e) {
-            System.out.println("isLocationClear threw Exception. help");
-            e.printStackTrace(System.out);
-            return false;
-        }
+        return isLocationWalkable(loc) && tiles[loc.getX()][loc.getY()].unitID == -1;
+    }
+
+    public boolean isLocationClear(int x, int y){
+        return isLocationWalkable(x, y) && tiles[x][y].unitID == -1;
     }
 
     // means on the map, passable terrain, and none of our buildings there
     public boolean isLocationWalkable(MapLocation loc) {
-        return isOnMap(loc) && tiles[loc.getX()][loc.getY()].isWalkable;
+        return isLocationWalkable(loc.getX(), loc.getY());
+    }
+
+    public boolean isLocationWalkable(int x, int y) {
+        return isOnMap(x, y) && tiles[x][y].isWalkable;
     }
 
     // are two map locations reachable from each other? if in same region
@@ -523,6 +547,7 @@ public class InfoManager {
     	MapLocation start = gc.unit(id).location().mapLocation();
     	gc.moveRobot(id, d);
     	tiles[start.getX()][start.getY()].unitID = -1;
+    	Utils.log("unsetting " + start.getX() + " " + start.getY());
     	MapLocation end = start.add(d);
     	tiles[end.getX()][end.getY()].unitID = id;
     	tiles[end.getX()][end.getY()].myType = type;

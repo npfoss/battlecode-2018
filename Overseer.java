@@ -26,10 +26,10 @@ public class Overseer{
         else
         	magicNums = new MagicNumbersMars();
         
-        infoMan = new InfoManager(gc,magicNums);
-        strat = new Strategy(infoMan,gc);
-        workerMan = new WorkerManager(infoMan,gc,strat);
-        combatMan = new CombatManager(infoMan,gc,magicNums,strat);
+        infoMan = new InfoManager(gc, magicNums);
+        strat = new Strategy(infoMan, gc);
+        workerMan = new WorkerManager(infoMan, gc, strat);
+        combatMan = new CombatManager(infoMan, gc, strat);
         nav = new Nav(infoMan);
         
         if(gc.planet() == Planet.Earth){
@@ -66,7 +66,7 @@ public class Overseer{
             cs.move(nav);
         }
         for(RocketSquad rs : infoMan.rocketSquads){
-        	rs.move(nav);
+        	rs.move(nav,strat);
         }
 
         gc.nextTurn();

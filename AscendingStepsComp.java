@@ -1,7 +1,12 @@
+/****************/
+/* REFACTOR ME! */
+/****************/
+
 import java.util.Comparator;
 
 /*
 just a comparator used for organizing combat--(to move in an intelligent order)
+// TODO: may want to take unit type into account (like knights first always to rush in?)
 */
 public class AscendingStepsComp implements Comparator<CombatUnit> {
 

@@ -28,6 +28,10 @@ public class KarboniteArea{
     }
     
     private void updateCenter(){
+    	if(tiles.size() == 0){
+    		center = null;
+    		return;
+    	}
     	double xsum = 0;
     	double ysum = 0;
     	for(Tile t: tiles){

@@ -90,6 +90,7 @@ public class WorkerManager{
 			for(WorkerSquad ws: infoMan.workerSquads){
 				if(ws.objective == Objective.NONE){
 					for(int uid: ws.units){
+						// Utils.log("uu adding " + uid);
 						infoMan.unassignedUnits.add(uid);
 					}
 					toRemove.add(ws);
@@ -110,7 +111,7 @@ public class WorkerManager{
 				}
 			}
 
-			if(infoMan.factories.size() < strat.maxFactories) {
+			if(infoMan.factories.size() < strat.maxFactories && infoMan.factoriesToBeBuilt == 0) {
 				boolean mustSteal = (strat.minFactories > infoMan.factories.size());
 				createBuildSquad(UnitType.Factory, mustSteal);
 			}
@@ -130,6 +131,7 @@ public class WorkerManager{
 		//give each miner a score indicating whether we should steal them
 		//if we must steal or if the score is higher than a certain threshold, steal that miner and up to 7 miners within a magic num of it.
 		int mustRepNum = (strat.minWorkers > infoMan.workerCount ? strat.minWorkers - infoMan.workerCount : 0);
+		// Utils.log("Number to Rep: "+mustRepNum);
 		int maxToRep = strat.maxWorkers - infoMan.workerCount;
 		if(gc.karbonite() < 200 && (infoMan.factoriesToBeBuilt > 0 || infoMan.rocketsToBeBuilt > 0))
 			maxToRep = mustRepNum;
@@ -183,27 +185,32 @@ public class WorkerManager{
 		boolean didSomething = false;
 		while(infoMan.unassignedUnits.size() > 0) {
 			didSomething = false;
+			int toR = 0;
 			infoMan.workerSquads.sort(Squad.byUrgency());
 			for(WorkerSquad ws : infoMan.workerSquads) {
 				for(int i : infoMan.unassignedUnits) {
 					Unit a = gc.unit(i);
-					if(!a.location().isOnMap())
+					if(!a.location().isOnMap() || a.unitType() != UnitType.Worker)
 						continue;
 					Unit wsunit = null;
 					if(ws.units.size() > 0)
 						wsunit = gc.unit(ws.units.get(0));
 					if(ws.units.size() == 0 || !wsunit.location().isOnMap() || infoMan.isReachable(wsunit.location().mapLocation(),a.location().mapLocation())){
-						ws.units.add(a.id());
-						infoMan.unassignedUnits.remove(i);
+						ws.units.add(i);
+						toR = i;
+						//Utils.log("1 adding " + i);
 						ws.update();
 						didSomething = true;
 						break;
 					}
 				}
-				if(didSomething)
+				if(didSomething){
+					infoMan.unassignedUnits.remove(toR);
 					break;
+				}
 			}
 			if(!didSomething) {
+				HashSet<Integer> toRemove = new HashSet<Integer>();
 				for(int i : infoMan.unassignedUnits) {
 					Unit a = gc.unit(i);
 					if(!a.location().isOnMap())
@@ -212,12 +219,16 @@ public class WorkerManager{
 						WorkerSquad wsn = new WorkerSquad(infoMan,strat);
 						wsn.objective = Objective.MINE;
 						wsn.units.add(i);
-						infoMan.unassignedUnits.remove(i);
+						//Utils.log("2 adding " + i);
+						toRemove.add(i);
 						wsn.update();
 						infoMan.workerSquads.add(wsn);
 						didSomething = true;
 						break;
 					}
+				}
+				for(int id: toRemove){
+					infoMan.unassignedUnits.remove(id);
 				}
 			}
 
@@ -292,6 +303,7 @@ public class WorkerManager{
 			for(int id: toSteal) {
 				lameSquad.removeUnit(id);
 				newSquad.units.add(id);
+				//Utils.log("3 adding " + id);
 			}
 			newSquad.targetLoc = findBuildLoc(newSquad);
 			infoMan.workerSquads.add(newSquad);

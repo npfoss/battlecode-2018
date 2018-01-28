@@ -27,12 +27,15 @@ public class ProductionManager{
     		int id = factory.id();
     		//TODO: pick an intelligent direction
     		boolean didSomething = false;
-    		while(gc.unit(id).structureGarrison().size() > 0) {
+    		while(factory.structureGarrison().size() > 0) {
     			didSomething = false;
     			for(Direction dirToUnload : Utils.orderedDirections)
     				if(gc.canUnload(factory.id(), dirToUnload)) {
     					gc.unload(id, dirToUnload);
     					didSomething = true;
+    					MapLocation locUnloaded = factory.location().mapLocation().add(dirToUnload);
+    					//it's occupied now!
+    					infoMan.tiles[locUnloaded.getX()][locUnloaded.getY()].unitID = 0;
     				}
     			if(!didSomething)
     				break;
