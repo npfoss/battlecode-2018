@@ -215,7 +215,7 @@ public class WorkerSquad extends Squad {
 				tempDirection = Direction.North;
 			}
 			for(Direction dirToReplicate : Utils.directionsToward(tempDirection)) {
-				Utils.log("My direction to replicate is " + dirToReplicate + "," + targetLoc);
+				//Utils.log("My direction to replicate is " + dirToReplicate + "," + targetLoc);
 				if (gc.canReplicate(id, dirToReplicate)) {
 					gc.replicate(id, dirToReplicate);
 					MapLocation rloc = gc.unit(id).location().mapLocation().add(dirToReplicate);

@@ -42,6 +42,9 @@ public class Strategy{
 
 	private void determineInitalStrat() {
 		//TODO: make this depend on stuff
+		researchOrder = new UnitType[]{UnitType.Ranger,UnitType.Worker,UnitType.Healer,UnitType.Healer,UnitType.Healer,UnitType.Rocket,UnitType.Ranger,UnitType.Ranger};
+		if(infoMan.myPlanet == Planet.Mars)
+			return;
 		int rushDist = -1;
 		VecUnit vu = gc.startingMap(infoMan.myPlanet).getInitial_units();
 		ArrayList<Unit> ourStarts = new ArrayList<Unit>();
@@ -67,7 +70,6 @@ public class Strategy{
 			if(minDist < 10000 && minDist > rushDist)
 				rushDist = minDist;
 		}
-		researchOrder = new UnitType[]{UnitType.Ranger,UnitType.Worker,UnitType.Healer,UnitType.Healer,UnitType.Healer,UnitType.Rocket,UnitType.Ranger,UnitType.Ranger};
 		combatComposition = new int[]{0, 0, 3, 2}; //knight,mage,ranger,healer
         rocketComposition = defaultRocketComposition;
         rocketsToBuild = 0;

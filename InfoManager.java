@@ -74,7 +74,8 @@ public class InfoManager {
 
     // research
     int[] researchLevels;
-
+    AsteroidPattern pattern;
+    
 	public InfoManager(GameController g, MagicNumbers mn) {
 		gc = g;
 		magicNums = mn;
@@ -124,6 +125,8 @@ public class InfoManager {
         unassignedUnits = new HashSet<Integer>();
         researchLevels = new int[]{0,0,0,0,0,0}; //knight, mage, ranger, healer, worker, rocket
         moneyToSave = 0;
+        
+        pattern = gc.asteroidPattern();
 	}
 
 	public void update(Strategy strat) {
@@ -156,6 +159,12 @@ public class InfoManager {
 					tiles[x][y].isWalkable = startingMap.isPassableTerrainAt(loc) > 0;
 				}
 			}
+		}
+		
+		if(myPlanet == Planet.Mars && pattern.hasAsteroid(gc.round())){
+			AsteroidStrike as = pattern.asteroid(gc.round());
+			Tile t = tiles[as.getLocation().getX()][as.getLocation().getY()];
+			t.updateKarbonite(as.getKarbonite());
 		}
 		
 		//keeping track of our/enemy units, squad management
@@ -434,32 +443,6 @@ public class InfoManager {
 	        }
     	}
     }
-    
-    /* old one that maybe works better? for debugging
-    public void floodfill(PlanetMap startingMap, Region region, MapLocation loc){
-    	Utils.log("x = " + loc.getX() + " y = " + loc.getY());
-        long karbs = startingMap.initialKarboniteAt(loc);
-        KarboniteArea karbArea = null;
-        if(karbs > 0)
-        	karbArea = getKarbArea(loc, region);
-        tiles[loc.getX()][loc.getY()] = new Tile(true, karbs, region, loc, this, karbArea);
-        if(karbArea != null) {
-        	karbArea.addTile(tiles[loc.getX()][loc.getY()]);
-        	//Utils.log("adding " + loc + " to an area.");
-        }
-        region.tiles.add(tiles[loc.getX()][loc.getY()]);
-        region.karbonite += karbs;
-
-        // now floodfill
-        for (Direction dir : Utils.orderedDirections){
-            MapLocation neighbor = loc.add(dir);
-            if (isOnMap(neighbor)
-                    && tiles[neighbor.getX()][neighbor.getY()] == null
-                    && startingMap.isPassableTerrainAt(neighbor) > 0){
-                floodfill(startingMap, region, neighbor);
-            }
-        }
-    }*/
 
     public KarboniteArea getKarbArea(MapLocation loc, Region r) {
 		for(KarboniteArea kA: karbAreas){
