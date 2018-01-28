@@ -170,7 +170,7 @@ public class CombatManager{
 			   				|| targetLoc.distanceSquaredTo(cs.swarmLoc) < MagicNumbers.SWARM_SEPARATION_THRESHOLD))
 				return;
 		}
-		CombatSquad cs = new CombatSquad(gc, infoMan, strat.combatComposition);
+		CombatSquad cs = new CombatSquad(gc, infoMan, strat, strat.combatComposition);
 		cs.objective = obj;
 		cs.targetLoc = targetLoc;
 		cs.update();

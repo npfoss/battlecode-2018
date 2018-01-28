@@ -29,6 +29,7 @@ public class CombatSquad extends Squad{
 	int goalRangerDistance;
 	int[] unitCounts;
 	int[] unitCompGoal;
+	Strategy strat;
 
 /************ ALL THE THINGS TO TWEAK ****************/
 
@@ -96,7 +97,7 @@ public class CombatSquad extends Squad{
 	}
 
 	private boolean shouldWeRetreat(){
-		return Strategy.shouldWeRetreat(numEnemyUnits,swarmUnits.size());
+		return strat.shouldWeRetreat(numEnemyUnits,swarmUnits.size());
 	}
 
 	private boolean areWeDone(){
@@ -118,13 +119,14 @@ public class CombatSquad extends Squad{
 
 /******************** END TWEAKING *******************/
 /******************** NORMAL SQUAD STUFF *************************/
-	public CombatSquad(GameController g, InfoManager im, int[] ucg) {
+	public CombatSquad(GameController g, InfoManager im, Strategy s, int[] ucg) {
 		super(im);
 		combatUnits = new HashMap<Integer,CombatUnit>();
 		separatedUnits = new HashSet<Integer>();
 		swarmUnits = new HashMap<Integer,CombatUnit>();
 		unitCounts = new int[]{0,0,0,0}; //knight,mage,ranger,healer
 		unitCompGoal = ucg;
+		strat = s;
 	}
 
 	public void update(){
