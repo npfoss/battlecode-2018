@@ -285,6 +285,8 @@ public class WorkerSquad extends Squad {
 							}
 						}
 						for(Direction dirToBuild : Utils.orderedDirections) {
+							if(blueprinted)
+								break;
 							if (gc.karbonite() > bc.bcUnitTypeBlueprintCost(toBuild)
 									&& gc.canBlueprint(id, toBuild, dirToBuild)) {
 								gc.blueprint(worker.id(), toBuild, dirToBuild);

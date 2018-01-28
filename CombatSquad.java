@@ -19,7 +19,7 @@ combat micro lives here
 public class CombatSquad extends Squad{
 
 	//keep track of units into two groups: those with the main swarm and those separated from it
-	public boolean debug = true;
+	public boolean debug = false;
 	HashMap<Integer,CombatUnit> combatUnits; //ID to CombatUnit
     HashSet<Integer> separatedUnits;
     HashMap<Integer,CombatUnit> swarmUnits;
