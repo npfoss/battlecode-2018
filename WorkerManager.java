@@ -128,6 +128,9 @@ public class WorkerManager{
 		}
 		else{
 			assignUnassignedUnits();
+			if(infoMan.workerCount < strat.maxWorkers){
+				tellWorkersToReplicate();
+			}
 		}
 
 	}

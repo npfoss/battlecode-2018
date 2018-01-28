@@ -146,7 +146,7 @@ public class Strategy{
 	}
 
 	public double getReplicateScore(long numKarbLeftInArea, int numMiners, long distToKarbonite) {
-		return (((numKarbLeftInArea * 10.0) - numMiners*300.0) /(distToKarbonite + 10)) + (infoMan.myPlanet == Planet.Mars ? 100 : 0);
+		return (((numKarbLeftInArea * 10.0) - numMiners*numMiners*50) /(distToKarbonite + 10)) + (infoMan.myPlanet == Planet.Mars && gc.round() >= 750 ? 100 : 0);
 	}
 
 }
