@@ -19,6 +19,7 @@ public class MagicNumbers{
 
     // for tweaking CombatManager
     static int SQUAD_SEPARATION_THRESHOLD = 50;
+	static int DEFEND_RANGE = 200;
 
     // for tweaking CombatSquad
     static int ENEMY_UNIT_DIST_THRESHOLD = 200;

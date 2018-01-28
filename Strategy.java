@@ -92,4 +92,13 @@ public class Strategy{
 		return true;
 		//return gc.karbonite() >= MagicNumbers.FACTORY_COST - infoMan.workerCount * 10;
 	}
+
+	public static int calcCombatUrgency(int numEnemyUnits, int size) {
+		return (numEnemyUnits * 2 - size + 15) * 10;
+	}
+
+	public static boolean shouldWeRetreat(int numEnemyUnits, int size) {
+		return numEnemyUnits > size * MagicNumbers.AGGRESION_FACTOR;
+	}
+
 }
