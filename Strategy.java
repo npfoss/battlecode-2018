@@ -112,6 +112,7 @@ public class Strategy{
 				if(gc.karbonite() >= MagicNumbers.FACTORY_COST) {
 					maxFactories = infoMan.factories.size() + 1 > 6 ? 6 : infoMan.factories.size() + 1;
 					if(gc.karbonite() > 300 && minFactories < 3) {
+						Utils.log("plz build more factories");
 						minFactories++;
 					}
 				}
