@@ -68,7 +68,6 @@ public class Tile{
             if(karbonite == 0){
             	if(karbArea == null){
             		karbArea = infoMan.getKarbArea(myLoc,region);
-            		karbArea.addTile(this);
             	}
             	karbArea.addTile(this);
             }

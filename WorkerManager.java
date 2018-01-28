@@ -144,12 +144,18 @@ public class WorkerManager{
 	private void tellWorkersToReplicate() {
 		//give each miner a score indicating whether we should steal them
 		//if we must steal or if the score is higher than a certain threshold, steal that miner and up to 7 miners within a magic num of it.
-		int mustRepNum = (strat.minWorkers > infoMan.workerCount ? strat.minWorkers - infoMan.workerCount : 0);
-		// Utils.log("Number to Rep: "+mustRepNum);
-		int maxToRep = (int) (mustRepNum + (((gc.karbonite() - infoMan.moneyToSave) / 60) > 0 ? ((gc.karbonite() - infoMan.moneyToSave) / 60) : 0));
-		if(maxToRep == 0)
-			return;
-		maxToRep = (maxToRep > strat.maxWorkers - infoMan.workerCount ? strat.maxWorkers - infoMan.workerCount : maxToRep);
+		int mustRepNum = (int) (gc.karbonite() / 60);
+		int maxToRep = 1000;
+		if(infoMan.myPlanet == Planet.Earth){
+			mustRepNum = (strat.minWorkers > infoMan.workerCount ? strat.minWorkers - infoMan.workerCount : 0);
+			// Utils.log("Number to Rep: "+mustRepNum);
+			maxToRep = (int) (mustRepNum + (((gc.karbonite() - infoMan.moneyToSave) / 60) > 0 ? ((gc.karbonite() - infoMan.moneyToSave) / 60) : 0));
+			if(maxToRep == 0)
+				return;
+			maxToRep = (maxToRep > strat.maxWorkers - infoMan.workerCount ? strat.maxWorkers - infoMan.workerCount : maxToRep);
+		}
+		
+		
 		TreeMap<Double,ArrayList<Integer>> replicateScores = new TreeMap<Double,ArrayList<Integer>>();
 	
 		for(WorkerSquad ws: infoMan.workerSquads) {
