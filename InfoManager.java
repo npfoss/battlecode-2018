@@ -168,7 +168,7 @@ public class InfoManager {
 				t.updateKarbonite(as.getKarbonite());
 			}
 		}
-		
+				
 		//keeping track of our/enemy units, squad management
 		VecUnit units = gc.units();
 		workerCount = 0;

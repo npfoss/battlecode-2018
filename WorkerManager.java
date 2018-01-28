@@ -363,8 +363,8 @@ public class WorkerManager{
 	}
 	
 	private MapLocation findBuildLoc(WorkerSquad newSquad) {
-		MapLocation start = Utils.averageMapLocation(gc, newSquad.units);
 		MapLocation sampleLoc = gc.unit(newSquad.units.get(0)).location().mapLocation();
+		MapLocation start = sampleLoc;
 		int x = start.getX();
 		int y = start.getY();
 		if(okayToBuild(x,y,newSquad.toBuild))
