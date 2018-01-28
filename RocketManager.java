@@ -93,7 +93,7 @@ public class RocketManager{
             	maxDist = toSteal[maxInd] == null ? 999999 : rs.targetLoc.distanceSquaredTo(unit.location().mapLocation());
             }
         }
-        if(gc.round() > 700) {
+        if(gc.round() > 700 && gc.unit(rs.units.get(0)).structureIsBuilt() > 0) {
         	for (Unit unit : infoMan.workers){
         		if(!unit.location().isOnMap())
         			continue;
