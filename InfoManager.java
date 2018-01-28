@@ -161,8 +161,10 @@ public class InfoManager {
 		if(myPlanet == Planet.Mars && pattern.hasAsteroid(gc.round())){
 			AsteroidStrike as = pattern.asteroid(gc.round());
 			Tile t = tiles[as.getLocation().getX()][as.getLocation().getY()];
-			if(t.isWalkable)
+			if(t.isWalkable){
 				t.updateKarbonite(as.getKarbonite());
+				Utils.log("adding karb");
+			}
 		}
 		
 		//keeping track of our/enemy units, squad management
