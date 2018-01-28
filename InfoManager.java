@@ -571,7 +571,7 @@ public class InfoManager {
     	long minDist = 1000000;
     	KarboniteArea closest = null;
     	for(KarboniteArea kA: karbAreas){
-    		if(kA.tiles.size() > 0 && kA.center.distanceSquaredTo(loc) < minDist){
+    		if(kA.tiles.size() > 0 && kA.center.distanceSquaredTo(loc) < minDist && isReachable(loc,kA.tiles.get(0).myLoc)){
     			minDist = kA.center.distanceSquaredTo(loc);
     			closest = kA;
     		}

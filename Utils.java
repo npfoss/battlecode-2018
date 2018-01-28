@@ -62,6 +62,21 @@ public class Utils{
          ret[6] = oppositeDirection(dir);
          return ret;
     }
+    public static Direction[] directionsToward(Direction dir) {
+    	Direction left = dir;
+    	Direction right = dir;
+    	Direction[] ret = new Direction[8];
+    	ret[0] = dir;
+    	int counter = 1;
+    	for (int i = 0; i < 3; i++){
+    		left = Utils.rotateLeft(left);
+    		right = Utils.rotateRight(right);
+    		ret[counter++] = left;
+    		ret[counter++] = right;
+    	}
+    	ret[7] = oppositeDirection(dir);
+    	return ret;
+    }
     
     public static Direction rotateLeft(Direction dir){
         switch(dir){

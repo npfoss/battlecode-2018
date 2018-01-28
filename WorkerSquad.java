@@ -37,7 +37,8 @@ public class WorkerSquad extends Squad {
 				infoMan.moveAndUpdate(id, movedir, UnitType.Worker);
 				worker = gc.unit(id);
 			}
-			else if(worker.location().mapLocation() == targetLoc) {//We are on top of the targetLoc, move away
+			else if(Utils.equalsMapLocation(worker.location().mapLocation(),targetLoc)) {//We are on top of the targetLoc, move away
+				Utils.log("Trying to move away from build location");
 				for(Direction dirToMove : Utils.orderedDirections) {
 					if (gc.canMove(id, dirToMove)) {
 						infoMan.moveAndUpdate(id, dirToMove, UnitType.Worker);
@@ -58,6 +59,12 @@ public class WorkerSquad extends Squad {
 		int x = targetLoc.getX();
 		int y = targetLoc.getY();
 		Tile t = infoMan.tiles[x][y];
+		if(t.unitID == -1 && blueprinted) {
+			//oh shit someone killed our building better get away
+			objective = Objective.NONE;
+			infoMan.factoriesToBeBuilt--;
+			return;
+		}
 		if(t.unitID != -1 && t.myType == toBuild && gc.unit(t.unitID).structureIsBuilt() != 0) {
 			objective = Objective.NONE;
 			return; 
@@ -114,7 +121,7 @@ public class WorkerSquad extends Squad {
 		MapLocation karbLoc = myLoc;
 		if(targetKarbLocs.containsKey(id)){
 			MapLocation targetKarbLoc = targetKarbLocs.get(id);
-			if(infoMan.tiles[targetKarbLoc.getX()][targetKarbLoc.getY()].karbonite == 0)
+			if(targetKarbLoc != null && infoMan.tiles[targetKarbLoc.getX()][targetKarbLoc.getY()].karbonite == 0)
 				karbLoc = infoMan.getClosestKarbonite(myLoc);
 			else
 				karbLoc = targetKarbLoc;
@@ -201,13 +208,18 @@ public class WorkerSquad extends Squad {
 	
 	public void replicateWorker(int id) {
 		if(targetLoc != null) {
-			for(Direction dirToReplicate : Utils.directionsTowardButNotIncluding(gc.unit(id).location().mapLocation().directionTo(targetLoc))) {
+			Direction tempDirection = gc.unit(id).location().mapLocation().directionTo(targetLoc);
+			if(tempDirection == Direction.Center) {
+				tempDirection = Direction.North;
+			}
+			for(Direction dirToReplicate : Utils.directionsToward(tempDirection)) {
+				Utils.log("My direction to replicate is " + dirToReplicate + "," + targetLoc);
 				if (gc.canReplicate(id, dirToReplicate)) {
 					gc.replicate(id, dirToReplicate);
 					MapLocation rloc = gc.unit(id).location().mapLocation().add(dirToReplicate);
 					Unit repped = gc.senseUnitAtLocation(rloc);
 				    infoMan.tiles[rloc.getX()][rloc.getY()].unitID = repped.id();
-				    infoMan.tiles[rloc.getX()][rloc.getY()].myType = toBuild;
+				    infoMan.tiles[rloc.getX()][rloc.getY()].myType = UnitType.Worker;
 					infoMan.workerCount++;
 					infoMan.workersToRep.remove(id);
 					break;
@@ -221,7 +233,7 @@ public class WorkerSquad extends Squad {
 					MapLocation rloc = gc.unit(id).location().mapLocation().add(dirToReplicate);
 					Unit repped = gc.senseUnitAtLocation(rloc);
 				    infoMan.tiles[rloc.getX()][rloc.getY()].unitID = repped.id();
-				    infoMan.tiles[rloc.getX()][rloc.getY()].myType = toBuild;
+				    infoMan.tiles[rloc.getX()][rloc.getY()].myType = UnitType.Worker;
 					infoMan.workerCount++;
 					infoMan.workersToRep.remove(id);
 					break;
@@ -285,9 +297,12 @@ public class WorkerSquad extends Squad {
 				tryToMine(id);
 				break;
 			case MINE:
-				if(!tryToMine(id))
+				if(!tryToMine(id)) {
 					moveTowardsKarbonite(id,nav);
-				tryToMine(id);
+					tryToMine(id);
+				}else {
+					moveTowardsKarbonite(id,nav);
+				}
 				break;
 			default:
 				break;
