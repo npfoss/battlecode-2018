@@ -43,8 +43,10 @@ public class Strategy{
 	private void determineInitalStrat() {
 		//TODO: make this depend on stuff
 		researchOrder = new UnitType[]{UnitType.Ranger,UnitType.Worker,UnitType.Healer,UnitType.Healer,UnitType.Healer,UnitType.Rocket,UnitType.Ranger,UnitType.Ranger};
-		if(infoMan.myPlanet == Planet.Mars)
+		if(infoMan.myPlanet == Planet.Mars){
+			maxWorkers = 10000;
 			return;
+		}
 		int rushDist = -1;
 		VecUnit vu = gc.startingMap(infoMan.myPlanet).getInitial_units();
 		ArrayList<Unit> ourStarts = new ArrayList<Unit>();
