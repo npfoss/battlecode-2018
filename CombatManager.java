@@ -124,11 +124,33 @@ public class CombatManager{
 				if(didSomething)
 					break;
 			}
-			if(!didSomething){
-				while(infoMan.unassignedUnits.size() > 0) {
-					infoMan.combatSquads.get(0).addUnit(gc.unit(infoMan.unassignedUnits.iterator().next()));
-					infoMan.combatSquads.sort(Squad.byUrgency());
+		}
+		
+		while(infoMan.unassignedUnits.size() > 0) {
+			didSomething = false;
+			infoMan.combatSquads.sort(Squad.byUrgency());
+			for(CombatSquad cs : infoMan.combatSquads) {
+				for(int i : infoMan.unassignedUnits) {
+					Unit a = gc.unit(i);
+					if(cs.targetLoc != null
+							&& ((!turnUnassigned.containsKey(a.id()) && gc.round() == 1)
+								|| (turnUnassigned.containsKey(a.id()) && turnUnassigned.get(a.id()) == gc.round()))){
+						MapLocation ml = cs.targetLoc;
+						if(a.location().isOnMap())
+							ml = a.location().mapLocation();
+						else
+							ml = gc.unit(a.location().structure()).location().mapLocation();
+						if(!infoMan.isReachable(cs.targetLoc, ml))
+							continue;
+					}
+					cs.addUnit(a);
+					didSomething = true;
+					if(!didSomething){
+						break;
+					}
 				}
+				if(didSomething)
+					break;
 			}
 		}
 		

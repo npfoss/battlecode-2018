@@ -147,7 +147,8 @@ public class WorkerSquad extends Squad {
 		
 		targetKarbLocs.put(id, karbLoc);
 		Direction d = nav.dirToMoveSafely(myLoc, karbLoc);
-		Utils.log("just a worker trying to move to " + karbLoc);
+		if(infoMan.myPlanet == Planet.Mars)
+			Utils.log("just a worker trying to move to " + karbLoc);
 		infoMan.moveAndUpdate(id, d, UnitType.Worker);
 	
 	}

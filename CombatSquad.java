@@ -24,6 +24,7 @@ public class CombatSquad extends Squad{
     HashSet<Integer> separatedUnits;
     HashMap<Integer,CombatUnit> swarmUnits;
 	MapLocation swarmLoc;
+	ArrayList<Unit> acceptableUnits;
 	int numEnemyUnits;
 	int goalRangerDistance;
 	int[] unitCounts;
