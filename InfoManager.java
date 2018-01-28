@@ -527,9 +527,11 @@ public class InfoManager {
         		if(minDist > bestDist){
         			bestDist = minDist;
         			bestloc = loc;
+        			Utils.log("new bestloc = " + bestloc);
         		}
         	}
         }
+		Utils.log("decided on dest of = " + bestloc);
         placesWeveSentTo.add(bestloc);
         return bestloc;
     }

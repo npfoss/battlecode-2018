@@ -16,7 +16,8 @@ public class MagicNumbers{
     static int MAGE_RANGE = 30;
     static int HEALER_RANGE = 30;
     static int MAX_DIST_THEY_COULD_HIT_NEXT_TURN = 72;
-    static int MAX_DIST_THEY_COULD_HIT = 50; // UNUSED, delete pls
+    static int MAX_DIST_THEY_COULD_HIT = 50; 
+    static int MAX_DIST_RUSH = 20;
 
     // for tweaking CombatManager
     static int SQUAD_SEPARATION_THRESHOLD = 50;
@@ -26,6 +27,7 @@ public class MagicNumbers{
     // for tweaking CombatSquad
     static int ENEMY_UNIT_DIST_THRESHOLD = 200;
     static int RANGER_RUN_AWAY_HEALTH_THRESH = 0;
+    static int KNIGHT_RUN_AWAY_HEALTH_THRESH = 0;
     static int MIN_RANGER_GOAL_DIST = 50;
     static double AGGRESION_FACTOR = 1.0; //bigger = more aggressive
     //the bigger, the more we care:
@@ -39,6 +41,10 @@ public class MagicNumbers{
     static double SWARM_FACTOR_RANGER_MOVE = 1.5; 
     static double DAMAGE_FACTOR_RANGER_MOVE = 100.0;
     static double DISTANCE_FACTOR_RANGER_MOVE = 50.0; 
+    static double TARGET_FACTOR_KNIGHT_MOVE = 1.0;
+    static double HOSTILE_FACTOR_KNIGHT_MOVE = 100.0; // get closer to hostiles
+    static double SWARM_FACTOR_KNIGHT_MOVE = 1.5; 
+    static double DAMAGE_FACTOR_KNIGHT_MOVE = 50.0;
 	static double ATTACK_FACTOR = 3.0;
     static double HOSTILE_FACTOR_HEALER_MOVE = 10.0; 
     static double SWARM_FACTOR_HEALER_MOVE = 2.5; 
