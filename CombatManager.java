@@ -62,8 +62,8 @@ public class CombatManager{
 		//defend factories and rockets
 		for(Unit u: infoMan.factories){
 			MapLocation ml = u.location().mapLocation();
-			TreeSet<TargetUnit> tus = infoMan.getTargetUnits(ml, 100, true);
-			if(tus.size() > 0){ // REFACTOR: 100 should be magic number
+			TreeSet<TargetUnit> tus = infoMan.getTargetUnits(ml, MagicNumbers.DEFEND_RANGE, true);
+			if(tus.size() > 0){ 
 				addCombatSquad(ml, Objective.DEFEND_LOC, strat);
 			}
 		}
@@ -71,8 +71,8 @@ public class CombatManager{
 		if(infoMan.myPlanet == Planet.Earth){
 			for(Unit u: infoMan.rockets){
 				MapLocation ml = u.location().mapLocation();
-				TreeSet<TargetUnit> tus = infoMan.getTargetUnits(ml, 100, true);
-				if(tus.size() > 0){ // REFACTOR: 100 should be magic number
+				TreeSet<TargetUnit> tus = infoMan.getTargetUnits(ml, MagicNumbers.DEFEND_RANGE, true);
+				if(tus.size() > 0){
 					addCombatSquad(ml, Objective.DEFEND_LOC, strat);
 				}
 			}
