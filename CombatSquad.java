@@ -72,7 +72,7 @@ public class CombatSquad extends Squad{
 	
 	public double knightMoveScore(Tile t, CombatUnit cu){
 		double score = - t.distFromNearestTarget * MagicNumbers.HOSTILE_FACTOR_KNIGHT_MOVE
-				//- t.possibleDamage * MagicNumbers.DAMAGE_FACTOR_KNIGHT_MOVE
+				- t.possibleDamage * MagicNumbers.DAMAGE_FACTOR_KNIGHT_MOVE
 				- t.myLoc.distanceSquaredTo(swarmLoc) * MagicNumbers.SWARM_FACTOR_KNIGHT_MOVE
 				- t.myLoc.distanceSquaredTo(targetLoc) * MagicNumbers.TARGET_FACTOR_KNIGHT_MOVE;
 		Utils.log("knight score for " + t.myLoc + " = " + score);
