@@ -113,7 +113,12 @@ public class WorkerManager{
 
 			if(infoMan.factories.size() < strat.maxFactories && infoMan.factoriesToBeBuilt == 0) {
 				boolean mustSteal = (strat.minFactories > infoMan.factories.size());
+				if(mustSteal) {
+					infoMan.saveMoney = true;
+				}
+				if(gc.karbonite() > 200) {
 				createBuildSquad(UnitType.Factory, mustSteal);
+				}
 			}
 
 			if(infoMan.workerCount < strat.maxWorkers){
@@ -133,8 +138,10 @@ public class WorkerManager{
 		int mustRepNum = (strat.minWorkers > infoMan.workerCount ? strat.minWorkers - infoMan.workerCount : 0);
 		// Utils.log("Number to Rep: "+mustRepNum);
 		int maxToRep = strat.maxWorkers - infoMan.workerCount;
-		if(gc.karbonite() < 200 && (infoMan.factoriesToBeBuilt > 0 || infoMan.rocketsToBeBuilt > 0))
-			maxToRep = mustRepNum;
+		if(infoMan.factoriesToBeBuilt > 0 || infoMan.rocketsToBeBuilt > 0) {
+			int numToBeBuilt = infoMan.factoriesToBeBuilt + infoMan.rocketsToBeBuilt;
+			maxToRep = (int) (mustRepNum + (((gc.karbonite() - 200 * numToBeBuilt) / 60) > 0 ? ((gc.karbonite() - 200 * numToBeBuilt) / 60) : 0));
+		}
 		if(maxToRep == 0)
 			return;
 		TreeMap<Double,ArrayList<Integer>> replicateScores = new TreeMap<Double,ArrayList<Integer>>();
@@ -172,12 +179,35 @@ public class WorkerManager{
 		//TODO: improve
 		long numKarbLeftInArea = 0; 
 		long distToKarbonite = 100;
-		if(ws.targetKarbLocs.containsKey(u.id())) {
-			MapLocation karbLoc = ws.targetKarbLocs.get(u.id());
-			distToKarbonite = u.location().mapLocation().distanceSquaredTo(karbLoc);
-			numKarbLeftInArea = infoMan.tiles[karbLoc.getX()][karbLoc.getY()].karbArea.karbonite;
+		MapLocation karbLoc;
+		if(ws.targetKarbLocs.containsKey(u.id())){
+			MapLocation targetKarbLoc = ws.targetKarbLocs.get(u.id());
+			if(targetKarbLoc == null)
+				return 0;
+			if(infoMan.tiles[targetKarbLoc.getX()][targetKarbLoc.getY()].karbonite == 0)
+				karbLoc = infoMan.getClosestKarbonite(u.location().mapLocation());
+			else
+				karbLoc = targetKarbLoc;
+			if(karbLoc == null)
+				return 0;
 		}
-		double score = (numKarbLeftInArea * 2.0) / (ws.units.size() * (distToKarbonite + 1));
+		else{
+			karbLoc = infoMan.getClosestKarbonite(u.location().mapLocation());
+			ws.targetKarbLocs.put(u.id(), karbLoc);
+			if(karbLoc == null)
+				return 0;
+		}
+		
+		if(ws.targetKarbLocs.containsKey(u.id())) {
+			karbLoc = ws.targetKarbLocs.get(u.id());
+				distToKarbonite = u.location().mapLocation().distanceSquaredTo(karbLoc);
+				numKarbLeftInArea = infoMan.tiles[karbLoc.getX()][karbLoc.getY()].karbArea.karbonite;
+
+		}
+		Utils.log("checking for sanity: " + numKarbLeftInArea);
+		Utils.log("The region im looking at has a size of " + infoMan.tiles[karbLoc.getX()][karbLoc.getY()].karbArea.tiles.size() + " and has this much karbonite on it: " + infoMan.tiles[karbLoc.getX()][karbLoc.getY()].karbArea.karbonite);
+		double score = (((numKarbLeftInArea * 10.0) - ws.units.size()*300.0) /(distToKarbonite + 10));
+		Utils.log("This unit: " + u.location().mapLocation() + " has a score of: "+ score);
 		return (score <= 100 ? score : 100);
 	}
 
@@ -259,8 +289,10 @@ public class WorkerManager{
 		}
 		if(lameMiner != -1 && (bestScore > MagicNumbers.MINIMUM_SCORE_TO_STEAL || mustSteal)) {
 			switch(type){
-				case Factory: infoMan.factoriesToBeBuilt++;
-				default: infoMan.rocketsToBeBuilt++;
+			case Factory: infoMan.factoriesToBeBuilt++;
+			break;
+			default: infoMan.rocketsToBeBuilt++;
+			break;
 			}
 			WorkerSquad newSquad = new WorkerSquad(infoMan,strat);
 			newSquad.objective = Objective.BUILD;
@@ -357,7 +389,14 @@ public class WorkerManager{
 		//if it can mine return a lower number
 		//else return a larger number (meaning its lame)
 		//TODO improve
-		return 100 - replicateScore(gc.unit(id),ws);
+		long distToKarbonite = 100;
+		if(ws.targetKarbLocs.containsKey(id)) {
+			MapLocation karbLoc = ws.targetKarbLocs.get(id);
+			if(karbLoc != null)
+				distToKarbonite = gc.unit(id).location().mapLocation().distanceSquaredTo(karbLoc);
+				
+		}
+		return  distToKarbonite > 100 ? 100 : distToKarbonite;
 	}
 	
 	/* unused

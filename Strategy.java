@@ -60,12 +60,16 @@ public class Strategy{
 		}
 		if(gc.karbonite() >= MagicNumbers.FACTORY_COST ) {
 			maxFactories = infoMan.factories.size() + 1 > 6 ? 6 : infoMan.factories.size() +1;
+			if(gc.karbonite() > 300 && minFactories < 3) {
+				minFactories++;
+			}
 		}
+		
 		//increment rocketsToBuild appropriately
 		//if you've totally dominated them, send a bunch at the same time.
 		//otherwise if it's getting close to the end of the game send a bunch at the same time
 		//otherwise even if you're not dominating, if you're not really engaging with the enemy/running out of space to build then steadily send.
-		else if(infoMan.researchLevels[5] > 0 && infoMan.fighters.size() > (50 + rocketsBuilt*8)) {
+		else if(infoMan.researchLevels[5] > 0 && infoMan.fighters.size() > (50 + (rocketsBuilt+rocketsToBuild)*8)) {
 			rocketsToBuild++;
 			rocketsBuilt++;
 		}
