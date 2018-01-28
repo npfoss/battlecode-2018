@@ -132,7 +132,7 @@ public class Strategy{
 			takeAnyUnit = true;
 			rocketsToBuild = (numCombatants + 5) / 6;
 		}
-		else if(infoMan.researchLevels[5] > 0 && numCombatants > ((750 - gc.round()) / 4)) {
+		else if(infoMan.researchLevels[5] > 0 && numCombatants > ((750 - gc.round()) /20)) {
 			rocketsToBuild++;
 			rocketsBuilt++;
 		}
