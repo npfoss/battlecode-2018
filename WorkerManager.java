@@ -197,7 +197,6 @@ public class WorkerManager{
 			karbLoc = ws.targetKarbLocs.get(u.id());
 				distToKarbonite = u.location().mapLocation().distanceSquaredTo(karbLoc);
 				numKarbLeftInArea = infoMan.tiles[karbLoc.getX()][karbLoc.getY()].karbArea.karbonite;
-
 		}
 		//Utils.log("checking for sanity: " + numKarbLeftInArea);
 		//Utils.log("The region im looking at has a size of " + infoMan.tiles[karbLoc.getX()][karbLoc.getY()].karbArea.tiles.size() + " and has this much karbonite on it: " + infoMan.tiles[karbLoc.getX()][karbLoc.getY()].karbArea.karbonite);
