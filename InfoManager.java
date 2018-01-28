@@ -39,7 +39,8 @@ public class InfoManager {
 	ArrayList<Unit> fighters;
 	
 	int workerCount;
-
+	int fighterCount;
+	
 	HashSet<Integer> unassignedUnits; // *no rockets*
     ArrayList<Unit> newRockets;
 
@@ -160,15 +161,17 @@ public class InfoManager {
 		//REFACTOR: while going through units, add to tiles whether or not there is a unit there so we don't have to call gc.hasUnitAtLocation;
 		VecUnit units = gc.units();
 		workerCount = 0;
+		fighterCount = 0;
 		HashSet<Integer> ids = new HashSet<Integer>();
 		for (int i = 0; i < units.size(); i++) {
 			Unit unit = units.get(i);
-            if(unit.location().isInSpace()){
+			Location loc = unit.location();
+            if(loc.isInSpace()){
                 continue;
             }
-            if(unit.location().isOnMap()) {
-            	int x = unit.location().mapLocation().getX();
-            	int y = unit.location().mapLocation().getY();
+            if(loc.isOnMap()) {
+            	int x = loc.mapLocation().getX();
+            	int y = loc.mapLocation().getY();
             	//Utils.log("setting tile " + x + " " + y);
             	tiles[x][y].unitID = unit.id();
             	tiles[x][y].myType = unit.unitType();
@@ -180,7 +183,8 @@ public class InfoManager {
 				switch (unit.unitType()) {
 				case Worker:
 					workers.add(unit);
-					workerCount++;
+					if(loc.isOnMap())
+						workerCount++;
 					if (!isInSquads(unit)){
 						unassignedUnits.add(unit.id());
 					}
@@ -195,6 +199,8 @@ public class InfoManager {
 					break;
 				default:
 					fighters.add(unit);
+					if(loc.isOnMap())
+						fighterCount++;
 					if (!isInSquads(unit)){
 						unassignedUnits.add(unit.id());
 					}

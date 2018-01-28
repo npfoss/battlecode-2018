@@ -45,7 +45,7 @@ public class Strategy{
         maxFactories = 1;
         minFactories = 0;
         minWorkers = 3;
-        maxWorkers = 20;
+        maxWorkers = 100;
         takeAnyUnit = false;
 	}
 
@@ -56,7 +56,14 @@ public class Strategy{
 			//Pack ur bags we gonna go to mars cuz earth is flooding and we dont wanna die
 			rocketComposition = new int[]{0,0,4,2,2};
 			takeAnyUnit = true;
-			rocketsToBuild = 100;
+			int numCombatants = 0;
+			for(CombatSquad cs: infoMan.combatSquads){
+				numCombatants += cs.units.size();
+			}
+			rocketsToBuild = (numCombatants + 5) / 6;
+		}
+		else if(gc.round() > MagicNumbers.BUILD_UP_WORKERS){
+			minWorkers = (int) (infoMan.fighterCount / MagicNumbers.FIGHTERS_PER_WORKER);
 		}
 		if(gc.karbonite() >= MagicNumbers.FACTORY_COST ) {
 			maxFactories = infoMan.factories.size() + 1 > 6 ? 6 : infoMan.factories.size() +1;
@@ -64,7 +71,6 @@ public class Strategy{
 				minFactories++;
 			}
 		}
-		
 		//increment rocketsToBuild appropriately
 		//if you've totally dominated them, send a bunch at the same time.
 		//otherwise if it's getting close to the end of the game send a bunch at the same time
@@ -88,7 +94,8 @@ public class Strategy{
 	public boolean shouldLaunch(Unit rocket, int numUnitsInside) {
 		//TODO: make this better
 		return gc.round() + 1 == MagicNumbers.EARTH_FLOOD_ROUND
-		|| rocket.health() * 2 < rocket.maxHealth();
+		|| (rocket.health() * 2 < rocket.maxHealth() || 
+	    infoMan.tiles[rocket.location().mapLocation().getX()][rocket.location().mapLocation().getY()].possibleDamage > 0) && numUnitsInside > 0;
 	}
 	
 	public boolean shouldGoToBuildLoc() {
