@@ -38,7 +38,8 @@ public class MagicNumbers{
     static double HOSTILE_FACTOR_RANGER_MOVE = 10.0;
     static double SWARM_FACTOR_RANGER_MOVE = 1.5; 
     static double DAMAGE_FACTOR_RANGER_MOVE = 100.0;
-    static double DISTANCE_FACTOR_RANGER_MOVE = 10.0; 
+    static double DISTANCE_FACTOR_RANGER_MOVE = 50.0; 
+	static double ATTACK_FACTOR = 3.0;
     static double HOSTILE_FACTOR_HEALER_MOVE = 10.0; 
     static double SWARM_FACTOR_HEALER_MOVE = 2.5; 
     static double DAMAGE_FACTOR_HEALER_MOVE = 200.0;
