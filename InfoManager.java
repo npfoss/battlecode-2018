@@ -577,17 +577,20 @@ public class InfoManager {
     
     public MapLocation getClosestKarbonite(MapLocation loc){
     	long minDist = 1000000;
-    	KarboniteArea closest = null;
+    	MapLocation closest = null;
     	for(KarboniteArea kA: karbAreas){
-    		if(kA.tiles.size() > 0 && kA.center.distanceSquaredTo(loc) < minDist && isReachable(loc,kA.tiles.get(0).myLoc)){
-    			minDist = kA.center.distanceSquaredTo(loc);
-    			closest = kA;
+    		if(kA.tiles.size() > 0 && isReachable(loc,kA.tiles.get(0).myLoc)){
+    			MapLocation closestLoc = kA.getClosestTile(loc).myLoc;
+    			long dist = closestLoc.distanceSquaredTo(loc);
+    			if(dist < minDist){
+    				closest = closestLoc;
+    			}
     		}
     	}
     	if(closest == null)
     		return null;
     	//Utils.log("closest karb is in area with center " + closest.center);
-    	return closest.getClosestTile(loc).myLoc;
+    	return closest;
     }
     
 /*******  FOR LOGGING AND DEBUGGING *********/

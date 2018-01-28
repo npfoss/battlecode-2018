@@ -110,7 +110,7 @@ public class CombatSquad extends Squad{
 	}
 
 	public void updateUrgency(){
-		urgency = Strategy.calcCombatUrgency(numEnemyUnits,swarmUnits.size()); // TODO: tweak this formula, possibly put it in strategy
+		urgency = Strategy.calcCombatUrgency(numEnemyUnits,swarmUnits.size(), objective); 
 		if(urgency < 0)
 			urgency = 0;
 		else if(urgency > 100)

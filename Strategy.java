@@ -175,8 +175,8 @@ public class Strategy{
 		//return gc.karbonite() >= MagicNumbers.FACTORY_COST - infoMan.workerCount * 10;
 	}
 
-	public static int calcCombatUrgency(int numEnemyUnits, int size) {
-		return (numEnemyUnits * 2 - size) * 5;
+	public static int calcCombatUrgency(int numEnemyUnits, int size, Objective o) {
+		return (numEnemyUnits * 2 - size) * (o == Objective.DEFEND_LOC ? 15 : 5);
 	}
 
 	public boolean shouldWeRetreat(int numEnemyUnits, int size) {
