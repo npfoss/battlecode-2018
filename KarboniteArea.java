@@ -23,8 +23,9 @@ public class KarboniteArea{
     }
     
     public void removeTile(Tile t){
-    	if(tiles.remove(t))
-    		Utils.log("remove successful!");;
+    	//if(tiles.remove(t))
+    	//	Utils.log("remove successful!");
+    	tiles.remove(t);
     	updateCenter();
     }
     

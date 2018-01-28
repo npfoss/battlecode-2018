@@ -43,6 +43,10 @@ public class CombatManager{
 	// call update method of each squad?
 	// remember, the squads will move on their own after you update everything
 	public void update(Strategy strat){
+		for(CombatSquad cs: infoMan.combatSquads){
+			cs.unitCompGoal = strat.combatComposition;
+		}
+		
 		// set units whose objective is NONE (meaning they completed it) to unassignedUnits
 		ArrayList<CombatSquad> toRemove = new ArrayList<CombatSquad>();
 		for(CombatSquad cs: infoMan.combatSquads){
@@ -113,10 +117,43 @@ public class CombatManager{
 						cs.addUnit(a);
 						didSomething = true;
 					}
-					if(didSomething)
+					if(didSomething){
 						break;
+					}
 				}
 				if(didSomething)
+					break;
+			}
+			if(!didSomething)
+				break;
+		}
+		
+		while(infoMan.unassignedUnits.size() > 0) {
+			didSomething = false;
+			infoMan.combatSquads.sort(Squad.byUrgency());
+			for(CombatSquad cs : infoMan.combatSquads) {
+				for(int i : infoMan.unassignedUnits) {
+					if(gc.unit(i).unitType() == UnitType.Worker)
+						continue;
+					Unit a = gc.unit(i);
+					if(cs.targetLoc != null
+							&& ((!turnUnassigned.containsKey(a.id()) && gc.round() == 1)
+								|| (turnUnassigned.containsKey(a.id()) && turnUnassigned.get(a.id()) == gc.round()))){
+						MapLocation ml = cs.targetLoc;
+						if(a.location().isOnMap())
+							ml = a.location().mapLocation();
+						else
+							ml = gc.unit(a.location().structure()).location().mapLocation();
+						if(!infoMan.isReachable(cs.targetLoc, ml))
+							continue;
+					}
+					cs.addUnit(a);
+					didSomething = true;
+					if(didSomething){
+						break;
+					}
+				}
+				if(!didSomething)
 					break;
 			}
 			if(!didSomething)

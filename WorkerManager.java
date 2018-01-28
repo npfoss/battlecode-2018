@@ -59,7 +59,7 @@ public class WorkerManager{
 
 		MapLocation loc = new MapLocation(infoMan.myPlanet,x,y);
 		
-		if(infoMan.getTargetUnits(loc, MagicNumbers.FACTORY_SCARED_RADIUS, false).size() > 0)
+		if(infoMan.getTargetUnitsExcludeWorker(loc, MagicNumbers.FACTORY_SCARED_RADIUS).size() > 0)
 			return false;
 		
 		for(WorkerSquad ws: infoMan.workerSquads){
@@ -218,8 +218,11 @@ public class WorkerManager{
 		}
 		//Utils.log("checking for sanity: " + numKarbLeftInArea);
 		//Utils.log("The region im looking at has a size of " + infoMan.tiles[karbLoc.getX()][karbLoc.getY()].karbArea.tiles.size() + " and has this much karbonite on it: " + infoMan.tiles[karbLoc.getX()][karbLoc.getY()].karbArea.karbonite);
-		double score = strat.getReplicateScore(numKarbLeftInArea,ws.units.size(),distToKarbonite);
-		//Utils.log("This unit: " + u.location().mapLocation() + " has a score of: "+ score);
+		//boolean enemyNearMe = infoMan.getTargetUnits(u.location().mapLocation(), MagicNumbers.REPLICATION_SCARED_RADIUS, false).size() > 0;
+		Tile myTile = infoMan.tiles[u.location().mapLocation().getX()][u.location().mapLocation().getY()];
+		myTile.updateEnemies(gc);
+		double score = strat.getReplicateScore(numKarbLeftInArea,ws.units.size(),distToKarbonite, myTile.distFromNearestHostile);
+		Utils.log("This unit: " + u.location().mapLocation() + " has a score of: "+ score + " with karbLeftInArea " + numKarbLeftInArea + " and dist " + distToKarbonite);
 		return (score <= 100 ? score : 100);
 	}
 

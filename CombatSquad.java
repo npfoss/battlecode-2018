@@ -24,6 +24,7 @@ public class CombatSquad extends Squad{
     HashSet<Integer> separatedUnits;
     HashMap<Integer,CombatUnit> swarmUnits;
 	MapLocation swarmLoc;
+	ArrayList<Unit> acceptableUnits;
 	int numEnemyUnits;
 	int goalRangerDistance;
 	int[] unitCounts;
@@ -57,6 +58,22 @@ public class CombatSquad extends Squad{
 		TargetUnit toAttack = t.enemiesWithinRangerRange.first();
 		return baseScore + (300 - toAttack.health) * MagicNumbers.ATTACK_FACTOR;
 	}
+	
+	public double knightMoveAttackScore(Tile t, CombatUnit cu){
+		double baseScore = knightMoveScore(t,cu);
+		if(t.enemiesWithinKnightRange.size() == 0){
+			return baseScore;
+		}
+		TargetUnit toAttack = t.enemiesWithinKnightRange.first();
+		return baseScore + (300 - toAttack.health) * MagicNumbers.ATTACK_FACTOR;
+	}
+	
+	public double knightMoveScore(Tile t, CombatUnit cu){
+		return - t.distFromNearestHostile * MagicNumbers.HOSTILE_FACTOR_KNIGHT_MOVE
+			- t.possibleDamage * MagicNumbers.DAMAGE_FACTOR_KNIGHT_MOVE
+			- t.myLoc.distanceSquaredTo(swarmLoc) * MagicNumbers.SWARM_FACTOR_KNIGHT_MOVE
+			- t.myLoc.distanceSquaredTo(targetLoc) * MagicNumbers.TARGET_FACTOR_KNIGHT_MOVE;
+	}
 
 	public double healerMoveScore(Tile t, CombatUnit cu){
 		return t.distFromNearestHostile * MagicNumbers.HOSTILE_FACTOR_HEALER_MOVE
@@ -76,8 +93,6 @@ public class CombatSquad extends Squad{
 	}
 
 	private boolean shouldWeRetreat(){
-		// TODO: make this better
-		// put in strategy too?
 		return Strategy.shouldWeRetreat(numEnemyUnits,swarmUnits.size());
 	}
 
@@ -422,6 +437,30 @@ public class CombatSquad extends Squad{
 			cu.canAttack = false;
 		}
 	}
+	
+	private void knightMove(CombatUnit cu) {
+		Direction toMove = highestScoringDir(cu, true, true, this::knightMoveScore);
+		if (toMove != null)
+			moveAndUpdate(cu, toMove);
+	}
+	
+	private void knightMoveAndAttack(CombatUnit cu) {
+		// move normally (but with a different scoring funct)
+		Direction toMove = highestScoringDir(cu, true, true, this::knightMoveAttackScore);
+		if (toMove != null){
+			moveAndUpdate(cu, toMove);
+		}
+		// now attack if possible
+		Tile t = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
+		if (t.enemiesWithinKnightRange.size() > 0){
+			int toAttack = t.enemiesWithinKnightRange.first().ID;
+			if(debug)
+				Utils.log(cu.ID + " trying to attack " + t.enemiesWithinKnightRange.first().myLoc + " from " + cu.myLoc);
+			gc.attack(cu.ID, toAttack);
+			updateDamage(cu, infoMan.targetUnits.get(toAttack));
+			cu.canAttack = false;
+		}
+	}
 
 //--------------------- HEALER MICRO ------------------------
 	
@@ -564,7 +603,56 @@ public class CombatSquad extends Squad{
 //--------------------- KNIGHT MICRO ------------------------
 
 	private void doKnightMicro(TreeSet<CombatUnit> knights, boolean retreat, Nav nav) {
-		// TODO Auto-generated method stub
+		//first go through rangers which can attack already
+		for(CombatUnit cu: knights.descendingSet()){
+			if(!cu.canAttack)
+				continue;
+			Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
+			if(myTile.enemiesWithinKnightRange.size() > 0){
+				if(debug)
+					Utils.log(cu.ID + " trying to attack " + myTile.enemiesWithinKnightRange.first().myLoc + " from " + cu.myLoc);
+				gc.attack(cu.ID, myTile.enemiesWithinKnightRange.first().ID);
+				updateDamage(cu, myTile.enemiesWithinKnightRange.first());
+				cu.canAttack = false;
+			}
+		}
+
+		//now if retreating, run away
+		if(retreat){
+			for(CombatUnit cu: knights.descendingSet()){
+				if(cu.canMove){
+					runAway(cu);
+				}
+			}
+			return;
+		}
+
+		//otherwise, do moves and attacks heuristically
+		for(CombatUnit cu: knights){ 
+			if(!cu.canMove){
+				continue;
+			}
+			// first check if we should nav
+			Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
+			//if we're not near any enemies nav, otherwise move and maybe attack
+			if(!swarmUnits.containsKey(cu.ID)){
+				Direction d = nav.dirToMove(cu.myLoc, swarmLoc);
+				moveAndUpdate(cu, d);
+			}
+			else if(myTile.distFromNearestHostile > MagicNumbers.MAX_DIST_THEY_COULD_HIT_NEXT_TURN){
+				Direction d = nav.dirToMove(cu.myLoc, targetLoc);
+				moveAndUpdate(cu, d);
+			} else if (cu.health <= MagicNumbers.KNIGHT_RUN_AWAY_HEALTH_THRESH){
+				runAway(cu);
+			} else {
+				// ok, we're not using nav
+				if(cu.canAttack){
+					knightMoveAndAttack(cu);
+				} else {
+					knightMove(cu);
+				}
+			}
+		}
 	}
 
 /**************************** misc ********************************/
