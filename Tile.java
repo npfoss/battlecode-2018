@@ -66,7 +66,10 @@ public class Tile{
                 region.karbonite += newKarb - karbonite;
             }
             if(karbonite == 0){
-            	karbArea = infoMan.getKarbArea(myLoc,region);
+            	if(karbArea == null){
+            		karbArea = infoMan.getKarbArea(myLoc,region);
+            	}
+            	karbArea.addTile(this);
             }
             else{
             	karbArea.karbonite += newKarb - karbonite;

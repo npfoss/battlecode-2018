@@ -27,10 +27,10 @@ public class Overseer{
         	magicNums = new MagicNumbersMars();
         
         infoMan = new InfoManager(gc, magicNums);
-        strat = new Strategy(infoMan, gc);
+        nav = new Nav(infoMan);
+        strat = new Strategy(infoMan, gc, nav);
         workerMan = new WorkerManager(infoMan, gc, strat);
         combatMan = new CombatManager(infoMan, gc, strat);
-        nav = new Nav(infoMan);
         
         if(gc.planet() == Planet.Earth){
             prodMan = new ProductionManager(infoMan, gc);

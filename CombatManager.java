@@ -130,7 +130,7 @@ public class CombatManager{
 		for(CombatSquad cs: infoMan.combatSquads){
 			if(cs.objective != Objective.EXPLORE
 					&& (targetLoc.distanceSquaredTo(cs.targetLoc) < MagicNumbers.SQUAD_SEPARATION_THRESHOLD
-			   				|| targetLoc.distanceSquaredTo(cs.swarmLoc) < 75)) // REFACTOR: magic number
+			   				|| targetLoc.distanceSquaredTo(cs.swarmLoc) < MagicNumbers.SWARM_SEPARATION_THRESHOLD))
 				return;
 		}
 		CombatSquad cs = new CombatSquad(gc, infoMan, strat.combatComposition);

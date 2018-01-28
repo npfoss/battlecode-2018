@@ -29,7 +29,7 @@ public class InfoManager {
 	long lastCheckpoint;
 	int rocketsToBeBuilt;
 	int factoriesToBeBuilt;
-	boolean saveMoney;
+	int moneyToSave;
 	PlanetMap startingMap;
 	//int totalUnitCount;
 
@@ -39,7 +39,8 @@ public class InfoManager {
 	ArrayList<Unit> fighters;
 	
 	int workerCount;
-
+	int fighterCount;
+	
 	HashSet<Integer> unassignedUnits; // *no rockets*
     ArrayList<Unit> newRockets;
 
@@ -73,7 +74,8 @@ public class InfoManager {
 
     // research
     int[] researchLevels;
-
+    AsteroidPattern pattern;
+    
 	public InfoManager(GameController g, MagicNumbers mn) {
 		gc = g;
 		magicNums = mn;
@@ -122,11 +124,12 @@ public class InfoManager {
         factories = new ArrayList<Unit>();
         unassignedUnits = new HashSet<Integer>();
         researchLevels = new int[]{0,0,0,0,0,0}; //knight, mage, ranger, healer, worker, rocket
+        
+        pattern = gc.asteroidPattern();
+        moneyToSave = 0;
 	}
 
-	public void update(Strategy strat) {
-		//TODO: if you're mars add karbonite to tiles according to weather.
-		
+	public void update(Strategy strat) {		
 		lastCheckpoint = System.nanoTime();
 		
 		// called at the beginning of each turn
@@ -156,19 +159,29 @@ public class InfoManager {
 			}
 		}
 		
+		if(myPlanet == Planet.Mars && pattern.hasAsteroid(gc.round())){
+			AsteroidStrike as = pattern.asteroid(gc.round());
+			Tile t = tiles[as.getLocation().getX()][as.getLocation().getY()];
+			if(t.isWalkable){
+				//Utils.log("found karb in sched");
+				t.updateKarbonite(as.getKarbonite());
+			}
+		}
+		
 		//keeping track of our/enemy units, squad management
-		//REFACTOR: while going through units, add to tiles whether or not there is a unit there so we don't have to call gc.hasUnitAtLocation;
 		VecUnit units = gc.units();
 		workerCount = 0;
+		fighterCount = 0;
 		HashSet<Integer> ids = new HashSet<Integer>();
 		for (int i = 0; i < units.size(); i++) {
 			Unit unit = units.get(i);
-            if(unit.location().isInSpace()){
+			Location loc = unit.location();
+            if(loc.isInSpace()){
                 continue;
             }
-            if(unit.location().isOnMap()) {
-            	int x = unit.location().mapLocation().getX();
-            	int y = unit.location().mapLocation().getY();
+            if(loc.isOnMap()) {
+            	int x = loc.mapLocation().getX();
+            	int y = loc.mapLocation().getY();
             	//Utils.log("setting tile " + x + " " + y);
             	tiles[x][y].unitID = unit.id();
             	tiles[x][y].myType = unit.unitType();
@@ -180,7 +193,8 @@ public class InfoManager {
 				switch (unit.unitType()) {
 				case Worker:
 					workers.add(unit);
-					workerCount++;
+					if(loc.isOnMap())
+						workerCount++;
 					if (!isInSquads(unit)){
 						unassignedUnits.add(unit.id());
 					}
@@ -195,6 +209,8 @@ public class InfoManager {
 					break;
 				default:
 					fighters.add(unit);
+					if(loc.isOnMap())
+						fighterCount++;
 					if (!isInSquads(unit)){
 						unassignedUnits.add(unit.id());
 					}
@@ -428,32 +444,6 @@ public class InfoManager {
 	        }
     	}
     }
-    
-    /* old one that maybe works better? for debugging
-    public void floodfill(PlanetMap startingMap, Region region, MapLocation loc){
-    	Utils.log("x = " + loc.getX() + " y = " + loc.getY());
-        long karbs = startingMap.initialKarboniteAt(loc);
-        KarboniteArea karbArea = null;
-        if(karbs > 0)
-        	karbArea = getKarbArea(loc, region);
-        tiles[loc.getX()][loc.getY()] = new Tile(true, karbs, region, loc, this, karbArea);
-        if(karbArea != null) {
-        	karbArea.addTile(tiles[loc.getX()][loc.getY()]);
-        	//Utils.log("adding " + loc + " to an area.");
-        }
-        region.tiles.add(tiles[loc.getX()][loc.getY()]);
-        region.karbonite += karbs;
-
-        // now floodfill
-        for (Direction dir : Utils.orderedDirections){
-            MapLocation neighbor = loc.add(dir);
-            if (isOnMap(neighbor)
-                    && tiles[neighbor.getX()][neighbor.getY()] == null
-                    && startingMap.isPassableTerrainAt(neighbor) > 0){
-                floodfill(startingMap, region, neighbor);
-            }
-        }
-    }*/
 
     public KarboniteArea getKarbArea(MapLocation loc, Region r) {
 		for(KarboniteArea kA: karbAreas){
@@ -465,6 +455,7 @@ public class InfoManager {
 		}
 		KarboniteArea kA = new KarboniteArea(this);
 		karbAreas.add(kA);
+		//Utils.log("adding karb area");
 		return kA;
 	}
 
@@ -558,7 +549,7 @@ public class InfoManager {
     	long minDist = 1000000;
     	KarboniteArea closest = null;
     	for(KarboniteArea kA: karbAreas){
-    		if(kA.center.distanceSquaredTo(loc) < minDist){
+    		if(kA.tiles.size() > 0 && kA.center.distanceSquaredTo(loc) < minDist && isReachable(loc,kA.tiles.get(0).myLoc)){
     			minDist = kA.center.distanceSquaredTo(loc);
     			closest = kA;
     		}
@@ -589,6 +580,10 @@ public class InfoManager {
     	long duration = System.nanoTime() - lastCheckpoint;
     	lastCheckpoint = System.nanoTime();
     	//Utils.log(identifier + ": " + duration + " ns since last checkpoint.");
+    }
+
+    public boolean isReachable(int x, int y, MapLocation loc) {
+        return isOnMap(x,y) && isOnMap(loc) && tiles[x][y].region == tiles[loc.getX()][loc.getY()].region;
     }
 
 }

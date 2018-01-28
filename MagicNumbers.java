@@ -4,7 +4,8 @@ import bc.*;
 Options - global constants/adjustment stuff
 */
 public class MagicNumbers{
-    // example
+
+	// example
     static double g;
 
     // general purpose
@@ -19,6 +20,7 @@ public class MagicNumbers{
 
     // for tweaking CombatManager
     static int SQUAD_SEPARATION_THRESHOLD = 50;
+    static int SWARM_SEPARATION_THRESHOLD = 75;
 	static int DEFEND_RANGE = 200;
 
     // for tweaking CombatSquad
@@ -51,7 +53,7 @@ public class MagicNumbers{
 
     // ProductionManager
     static int MAX_FIGHTER_COUNT = 100;
-    static long ROUND_TO_STOP_PRODUCTION = 650;
+    static long ROUND_TO_STOP_PRODUCTION = 675;
 
     //for workers
     static int FACTORY_COST = 200;
@@ -59,10 +61,13 @@ public class MagicNumbers{
     static double MINIMUM_SCORE_TO_STEAL = 10;
     static int MAX_DIST_TO_STEAL = 20;
     static long KARB_SEPARATION_DISTANCE = 10;
-    static Double MIN_SCORE_TO_REPLICATE = 30.0;
+    static Double MIN_SCORE_TO_REPLICATE = 50.0;
+    static int FACTORY_SCARED_RADIUS = 150;
 
     // rockets
     static long SEND_EVERYTHING = 600;
+    static long BUILD_UP_WORKERS = 400;
+    static double FIGHTERS_PER_WORKER = 3.5;
 
     // unsorted
 }

@@ -26,7 +26,6 @@ public class WorkerManager{
 	GameController gc;
 	Strategy strat;
 
-
 	public WorkerManager(InfoManager im, GameController g, Strategy s){
 		infoMan = im;
 		gc = g;
@@ -58,11 +57,15 @@ public class WorkerManager{
 			}
 		}
 
-		infoMan.tiles[x][y].updateEnemies(gc);
-		if(infoMan.tiles[x][y].distFromNearestHostile < infoMan.magicNums.MAX_DIST_TO_CHECK)
-			return false;
-
 		MapLocation loc = new MapLocation(infoMan.myPlanet,x,y);
+		
+		if(infoMan.getTargetUnits(loc, MagicNumbers.FACTORY_SCARED_RADIUS, false).size() > 0)
+			return false;
+		
+		for(WorkerSquad ws: infoMan.workerSquads){
+			if(ws.targetLoc != null && ws.targetLoc.distanceSquaredTo(loc) <= 2)
+				return false;
+		}
 		
 		MapLocation n = loc.add(Direction.North);
 		MapLocation s = loc.add(Direction.South);
@@ -113,14 +116,18 @@ public class WorkerManager{
 
 			if(infoMan.factories.size() < strat.maxFactories && infoMan.factoriesToBeBuilt == 0) {
 				boolean mustSteal = (strat.minFactories > infoMan.factories.size());
-				if(mustSteal) {
-					infoMan.saveMoney = true;
-				}
-				if(gc.karbonite() > 200) {
-				createBuildSquad(UnitType.Factory, mustSteal);
-				}
+				if(gc.karbonite() >= 200)
+					createBuildSquad(UnitType.Factory, mustSteal);
 			}
-
+			
+			if(infoMan.myPlanet == Planet.Earth){
+				infoMan.moneyToSave = 150 * infoMan.rocketsToBeBuilt +
+									  200 * infoMan.factoriesToBeBuilt;
+				
+	    		Utils.log("money to save = " + infoMan.moneyToSave);
+	    		Utils.log("factories to be built = " + infoMan.factoriesToBeBuilt);
+			}
+			
 			if(infoMan.workerCount < strat.maxWorkers){
 				tellWorkersToReplicate();
 			}
@@ -128,6 +135,9 @@ public class WorkerManager{
 		}
 		else{
 			assignUnassignedUnits();
+			if(infoMan.workerCount < strat.maxWorkers){
+				tellWorkersToReplicate();
+			}
 		}
 
 	}
@@ -135,15 +145,18 @@ public class WorkerManager{
 	private void tellWorkersToReplicate() {
 		//give each miner a score indicating whether we should steal them
 		//if we must steal or if the score is higher than a certain threshold, steal that miner and up to 7 miners within a magic num of it.
-		int mustRepNum = (strat.minWorkers > infoMan.workerCount ? strat.minWorkers - infoMan.workerCount : 0);
-		// Utils.log("Number to Rep: "+mustRepNum);
-		int maxToRep = strat.maxWorkers - infoMan.workerCount;
-		if(infoMan.factoriesToBeBuilt > 0 || infoMan.rocketsToBeBuilt > 0) {
-			int numToBeBuilt = infoMan.factoriesToBeBuilt + infoMan.rocketsToBeBuilt;
-			maxToRep = (int) (mustRepNum + (((gc.karbonite() - 200 * numToBeBuilt) / 60) > 0 ? ((gc.karbonite() - 200 * numToBeBuilt) / 60) : 0));
+		int mustRepNum = (int) (gc.karbonite() / 60);
+		int maxToRep = 1000;
+		if(infoMan.myPlanet == Planet.Earth || gc.round() < 750){
+			mustRepNum = (strat.minWorkers > infoMan.workerCount ? strat.minWorkers - infoMan.workerCount : 0);
+			// Utils.log("Number to Rep: "+mustRepNum);
+			maxToRep = (int) (mustRepNum + (((gc.karbonite() - infoMan.moneyToSave) / 60) > 0 ? ((gc.karbonite() - infoMan.moneyToSave) / 60) : 0));
+			if(maxToRep == 0)
+				return;
+			maxToRep = (maxToRep > strat.maxWorkers - infoMan.workerCount ? strat.maxWorkers - infoMan.workerCount : maxToRep);
 		}
-		if(maxToRep == 0)
-			return;
+		
+		
 		TreeMap<Double,ArrayList<Integer>> replicateScores = new TreeMap<Double,ArrayList<Integer>>();
 	
 		for(WorkerSquad ws: infoMan.workerSquads) {
@@ -176,7 +189,6 @@ public class WorkerManager{
 	}
 
 	private double replicateScore(Unit u, WorkerSquad ws) {
-		//TODO: improve
 		long numKarbLeftInArea = 0; 
 		long distToKarbonite = 100;
 		MapLocation karbLoc;
@@ -202,12 +214,11 @@ public class WorkerManager{
 			karbLoc = ws.targetKarbLocs.get(u.id());
 				distToKarbonite = u.location().mapLocation().distanceSquaredTo(karbLoc);
 				numKarbLeftInArea = infoMan.tiles[karbLoc.getX()][karbLoc.getY()].karbArea.karbonite;
-
 		}
-		Utils.log("checking for sanity: " + numKarbLeftInArea);
-		Utils.log("The region im looking at has a size of " + infoMan.tiles[karbLoc.getX()][karbLoc.getY()].karbArea.tiles.size() + " and has this much karbonite on it: " + infoMan.tiles[karbLoc.getX()][karbLoc.getY()].karbArea.karbonite);
-		double score = (((numKarbLeftInArea * 10.0) - ws.units.size()*300.0) /(distToKarbonite + 10));
-		Utils.log("This unit: " + u.location().mapLocation() + " has a score of: "+ score);
+		//Utils.log("checking for sanity: " + numKarbLeftInArea);
+		//Utils.log("The region im looking at has a size of " + infoMan.tiles[karbLoc.getX()][karbLoc.getY()].karbArea.tiles.size() + " and has this much karbonite on it: " + infoMan.tiles[karbLoc.getX()][karbLoc.getY()].karbArea.karbonite);
+		double score = strat.getReplicateScore(numKarbLeftInArea,ws.units.size(),distToKarbonite);
+		//Utils.log("This unit: " + u.location().mapLocation() + " has a score of: "+ score);
 		return (score <= 100 ? score : 100);
 	}
 
@@ -218,6 +229,8 @@ public class WorkerManager{
 			int toR = 0;
 			infoMan.workerSquads.sort(Squad.byUrgency());
 			for(WorkerSquad ws : infoMan.workerSquads) {
+				if(ws.objective == Objective.BUILD && ws.units.size() == MagicNumbers.MAX_WORKERS_PER_BUILDING)
+					continue;
 				for(int i : infoMan.unassignedUnits) {
 					Unit a = gc.unit(i);
 					if(!a.location().isOnMap() || a.unitType() != UnitType.Worker)
@@ -303,7 +316,8 @@ public class WorkerManager{
 			toSteal.add(lameMiner);
 			MapLocation lmloc = gc.unit(lameMiner).location().mapLocation();
 			for(int u: lameSquad.units) {
-				if(u == lameMiner || !gc.unit(u).location().isOnMap())
+				
+				if(u == lameMiner || !gc.unit(u).location().isOnMap() || !infoMan.isReachable(gc.unit(u).location().mapLocation(), lmloc))
 					continue;
 				int dist = (int)gc.unit(u).location().mapLocation().distanceSquaredTo(lmloc);
 				distances.add(dist);
@@ -346,6 +360,7 @@ public class WorkerManager{
 	
 	private MapLocation findBuildLoc(WorkerSquad newSquad) {
 		MapLocation start = Utils.averageMapLocation(gc, newSquad.units);
+		MapLocation sampleLoc = gc.unit(newSquad.units.get(0)).location().mapLocation();
 		int x = start.getX();
 		int y = start.getY();
 		if(okayToBuild(x,y,newSquad.toBuild))
@@ -356,12 +371,12 @@ public class WorkerManager{
 			if(dir){
 				for(int a = 0; a < increment; a++){
 					y--;
-					if(okayToBuild(x,y,newSquad.toBuild))
+					if(infoMan.isReachable(x, y, sampleLoc) && okayToBuild(x,y,newSquad.toBuild))
 						return new MapLocation(infoMan.myPlanet,x,y);
 				}
 				for(int a = 0; a < increment; a++){
 					x++;
-					if(okayToBuild(x,y,newSquad.toBuild))
+					if(infoMan.isReachable(x, y, sampleLoc) && okayToBuild(x,y,newSquad.toBuild))
 						return new MapLocation(infoMan.myPlanet,x,y);
 				}
 				increment++;
@@ -370,12 +385,12 @@ public class WorkerManager{
 			else{
 				for(int a = 0; a < increment; a++){
 					y++;
-					if(okayToBuild(x,y,newSquad.toBuild))
+					if(infoMan.isReachable(x, y, sampleLoc) && okayToBuild(x,y,newSquad.toBuild))
 						return new MapLocation(infoMan.myPlanet,x,y);
 				}
 				for(int a = 0; a < increment; a++){
 					x--;
-					if(okayToBuild(x,y,newSquad.toBuild))
+					if(infoMan.isReachable(x, y, sampleLoc) && okayToBuild(x,y,newSquad.toBuild))
 						return new MapLocation(infoMan.myPlanet,x,y);
 				}
 				increment++;
@@ -394,8 +409,13 @@ public class WorkerManager{
 			MapLocation karbLoc = ws.targetKarbLocs.get(id);
 			if(karbLoc != null)
 				distToKarbonite = gc.unit(id).location().mapLocation().distanceSquaredTo(karbLoc);
-				
 		}
+		else{
+			Double distToK = infoMan.distToClosestKarbonite(gc.unit(id).location().mapLocation());
+			if(distToK != null)
+				distToKarbonite = distToK.longValue();
+		}
+		//Utils.log("giving out a lame score of " + distToKarbonite);
 		return  distToKarbonite > 100 ? 100 : distToKarbonite;
 	}
 	

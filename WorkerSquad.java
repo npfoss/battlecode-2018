@@ -59,11 +59,15 @@ public class WorkerSquad extends Squad {
 		int x = targetLoc.getX();
 		int y = targetLoc.getY();
 		Tile t = infoMan.tiles[x][y];
-		if(t.unitID == -1 && blueprinted) {
-			//oh shit someone killed our building better get away
+		if(((t.unitID == -1 || t.myType != toBuild) && blueprinted) || (!blueprinted && infoMan.getTargetUnits(t.myLoc, MagicNumbers.FACTORY_SCARED_RADIUS, false).size() > 0)) {
+			//oh shit someone killed our building better get away or it's not safe
+			if(!blueprinted){
+				switch(toBuild){
+				case Factory: infoMan.factoriesToBeBuilt--; break;
+				default: infoMan.rocketsToBeBuilt--;
+				}
+			}
 			objective = Objective.NONE;
-			infoMan.factoriesToBeBuilt--;
-			infoMan.saveMoney = false;
 			return;
 		}
 		if(t.unitID != -1 && t.myType == toBuild && gc.unit(t.unitID).structureIsBuilt() != 0) {
@@ -97,7 +101,6 @@ public class WorkerSquad extends Squad {
 			    case Rocket: infoMan.rocketsToBeBuilt--;
 			    	break;
 			    }
-			    infoMan.saveMoney = false;
 			}
 		}
 	}
@@ -125,8 +128,10 @@ public class WorkerSquad extends Squad {
 		MapLocation karbLoc = myLoc;
 		if(targetKarbLocs.containsKey(id)){
 			MapLocation targetKarbLoc = targetKarbLocs.get(id);
-			if(targetKarbLoc != null && infoMan.tiles[targetKarbLoc.getX()][targetKarbLoc.getY()].karbonite == 0)
+			if(targetKarbLoc != null && infoMan.tiles[targetKarbLoc.getX()][targetKarbLoc.getY()].karbonite == 0){
+				//Utils.log("trying to find new stuff!");
 				karbLoc = infoMan.getClosestKarbonite(myLoc);
+			}
 			else
 				karbLoc = targetKarbLoc;
 		}
@@ -135,13 +140,14 @@ public class WorkerSquad extends Squad {
 		}
 
 		if(karbLoc == null){
+			//Utils.log("running away :(");
 			runAway(id,myLoc);
 			return;
 		}
 		
 		targetKarbLocs.put(id, karbLoc);
 		Direction d = nav.dirToMoveSafely(myLoc, karbLoc);
-		//Utils.log("just a worker trying to move to " + myLoc.add(d));
+		//Utils.log("just a worker trying to move to " + karbLoc);
 		infoMan.moveAndUpdate(id, d, UnitType.Worker);
 	
 	}
@@ -217,7 +223,7 @@ public class WorkerSquad extends Squad {
 				tempDirection = Direction.North;
 			}
 			for(Direction dirToReplicate : Utils.directionsToward(tempDirection)) {
-				Utils.log("My direction to replicate is " + dirToReplicate + "," + targetLoc);
+				//Utils.log("My direction to replicate is " + dirToReplicate + "," + targetLoc);
 				if (gc.canReplicate(id, dirToReplicate)) {
 					gc.replicate(id, dirToReplicate);
 					MapLocation rloc = gc.unit(id).location().mapLocation().add(dirToReplicate);
@@ -293,7 +299,6 @@ public class WorkerSquad extends Squad {
 							    case Rocket: infoMan.rocketsToBeBuilt--;
 							    break;
 							    }
-							    infoMan.saveMoney = false;
 							}
 						}
 					}
