@@ -397,7 +397,7 @@ public class WorkerManager{
 		else{
 			distToKarbonite = infoMan.distToClosestKarbonite(gc.unit(id).location().mapLocation()).longValue();
 		}
-		Utils.log("giving out a lame score of " + distToKarbonite);
+		//Utils.log("giving out a lame score of " + distToKarbonite);
 		return  distToKarbonite > 100 ? 100 : distToKarbonite;
 	}
 	
