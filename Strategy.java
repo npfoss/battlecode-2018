@@ -172,7 +172,7 @@ public class Strategy{
 	}
 
 	public static int calcCombatUrgency(int numEnemyUnits, int size) {
-		return (numEnemyUnits * 2 - size + 15) * 10;
+		return (numEnemyUnits * 2 - size) * 5;
 	}
 
 	public boolean shouldWeRetreat(int numEnemyUnits, int size) {

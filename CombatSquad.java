@@ -44,7 +44,7 @@ public class CombatSquad extends Squad{
 	}
 
 	public double rangerMoveScore(Tile t, CombatUnit cu){
-		return t.distFromNearestHostile * MagicNumbers.HOSTILE_FACTOR_RANGER_MOVE
+		return (objective == Objective.DEFEND_LOC ? 0 : t.distFromNearestHostile * MagicNumbers.HOSTILE_FACTOR_RANGER_MOVE)
 			- (t.distFromNearestHostile - goalRangerDistance > 0 ? t.distFromNearestHostile - goalRangerDistance : 0) * MagicNumbers.DISTANCE_FACTOR_RANGER_MOVE
 			- t.possibleDamage * MagicNumbers.DAMAGE_FACTOR_RANGER_MOVE
 			- t.myLoc.distanceSquaredTo(swarmLoc) * MagicNumbers.SWARM_FACTOR_RANGER_MOVE
@@ -315,7 +315,8 @@ public class CombatSquad extends Squad{
 		infoMan.logTimeCheckpoint("units and tiles updated");
 		
 		goalRangerDistance = (goalRangerDistance < MagicNumbers.MIN_RANGER_GOAL_DIST ? MagicNumbers.MIN_RANGER_GOAL_DIST : goalRangerDistance); // magic number?
-
+		goalRangerDistance = (objective == Objective.DEFEND_LOC ? MagicNumbers.MIN_RANGER_GOAL_DIST : goalRangerDistance);
+		
 		doKnightMicro(knights, retreat, nav);
 		infoMan.logTimeCheckpoint("knights microed");
 		doMageMicro(mages, retreat, nav);
@@ -644,7 +645,7 @@ public class CombatSquad extends Squad{
 				Direction d = nav.dirToMove(cu.myLoc, swarmLoc);
 				moveAndUpdate(cu, d);
 			}
-			else if(myTile.distFromNearestHostile > MagicNumbers.MAX_DIST_THEY_COULD_HIT_NEXT_TURN){
+			else if(myTile.distFromNearestTarget > MagicNumbers.MAX_DIST_THEY_COULD_HIT_NEXT_TURN){
 				Direction d = nav.dirToMove(cu.myLoc, targetLoc);
 				moveAndUpdate(cu, d);
 			} else if (cu.health <= MagicNumbers.KNIGHT_RUN_AWAY_HEALTH_THRESH){

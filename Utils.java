@@ -33,6 +33,10 @@ public class Utils{
         }
     }
 
+    public static MapLocation midpoint(MapLocation m1, MapLocation m2){
+    	return new MapLocation(m1.getPlanet(), (m1.getX() + m2.getX())/2, (m1.getY()+m2.getY())/2);
+    }
+    
     public static Direction indexToDirection(int i){
         switch(i){
             case 0: return Direction.East;
