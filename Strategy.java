@@ -2,6 +2,8 @@
 /* REFACTOR ME! */
 /****************/
 
+import java.util.ArrayList;
+
 import bc.*;
 
 /*controls:
@@ -28,16 +30,43 @@ public class Strategy{
 	int minFactories;
 	int rocketsBuilt;
 	boolean takeAnyUnit;
+	Nav nav;
 
-    public Strategy(InfoManager im, GameController g){
+    public Strategy(InfoManager im, GameController g, Nav n){
     	infoMan = im;
     	gc = g;
+    	nav = n;
     	determineInitalStrat();
     	rocketsBuilt = 0;
     }
 
 	private void determineInitalStrat() {
 		//TODO: make this depend on stuff
+		int rushDist = -1;
+		VecUnit vu = gc.startingMap(infoMan.myPlanet).getInitial_units();
+		ArrayList<Unit> ourStarts = new ArrayList<Unit>();
+		ArrayList<Unit> theirStarts = new ArrayList<Unit>();
+		for(int i = 0; i < vu.size(); i++){
+			Unit u = vu.get(i);
+			if(u.team() == gc.team()){
+				ourStarts.add(u);
+			}
+			else{
+				theirStarts.add(u);
+			}
+		}
+		for(Unit u: ourStarts){
+			int minDist = 10000;
+			for(Unit u2: theirStarts){
+				MapLocation ml1 = u.location().mapLocation();
+				MapLocation ml2 = u2.location().mapLocation();
+				if(infoMan.isReachable(ml1, ml2) && nav.optimalStepsTo(ml1,ml2) < minDist){
+					minDist = nav.optimalStepsTo(ml1, ml2);
+				}
+			}
+			if(minDist < 10000 && minDist > rushDist)
+				rushDist = minDist;
+		}
 		researchOrder = new UnitType[]{UnitType.Ranger,UnitType.Worker,UnitType.Healer,UnitType.Healer,UnitType.Healer,UnitType.Rocket,UnitType.Ranger,UnitType.Ranger};
 		combatComposition = new int[]{0, 0, 3, 2}; //knight,mage,ranger,healer
         rocketComposition = defaultRocketComposition;
@@ -45,7 +74,7 @@ public class Strategy{
         maxFactories = 1;
         minFactories = 0;
         minWorkers = 3;
-        maxWorkers = 100;
+        maxWorkers = rushDist;
         takeAnyUnit = false;
 	}
 
@@ -54,7 +83,8 @@ public class Strategy{
 			return;
 		if(gc.round() > MagicNumbers.SEND_EVERYTHING) {
 			//Pack ur bags we gonna go to mars cuz earth is flooding and we dont wanna die
-			rocketComposition = new int[]{0,0,4,2,2};
+			rocketComposition = new int[]{0,0,5,2,1};
+			minWorkers = 0;
 			takeAnyUnit = true;
 			int numCombatants = 0;
 			for(CombatSquad cs: infoMan.combatSquads){
@@ -94,8 +124,9 @@ public class Strategy{
 	public boolean shouldLaunch(Unit rocket, int numUnitsInside) {
 		//TODO: make this better
 		return gc.round() + 1 == MagicNumbers.EARTH_FLOOD_ROUND
-		|| (rocket.health() * 2 < rocket.maxHealth() || 
-	    infoMan.tiles[rocket.location().mapLocation().getX()][rocket.location().mapLocation().getY()].possibleDamage > 0) && numUnitsInside > 0;
+		|| (rocket.health() * 2 < rocket.maxHealth() 
+		|| infoMan.tiles[rocket.location().mapLocation().getX()][rocket.location().mapLocation().getY()].possibleDamage > 0) && numUnitsInside > 0
+		|| numUnitsInside == 8;
 	}
 	
 	public boolean shouldGoToBuildLoc() {

@@ -26,7 +26,6 @@ public class WorkerManager{
 	GameController gc;
 	Strategy strat;
 
-
 	public WorkerManager(InfoManager im, GameController g, Strategy s){
 		infoMan = im;
 		gc = g;
@@ -113,9 +112,7 @@ public class WorkerManager{
 
 			if(infoMan.factories.size() < strat.maxFactories && infoMan.factoriesToBeBuilt == 0) {
 				boolean mustSteal = (strat.minFactories > infoMan.factories.size());
-				if(gc.karbonite() > 200) {
 				createBuildSquad(UnitType.Factory, mustSteal);
-				}
 			}
 			
 			infoMan.moneyToSave = infoMan.factoriesToBeBuilt * 200 + infoMan.rocketsToBeBuilt * 150;
@@ -303,7 +300,8 @@ public class WorkerManager{
 			toSteal.add(lameMiner);
 			MapLocation lmloc = gc.unit(lameMiner).location().mapLocation();
 			for(int u: lameSquad.units) {
-				if(u == lameMiner || !gc.unit(u).location().isOnMap())
+				
+				if(u == lameMiner || !gc.unit(u).location().isOnMap() || !infoMan.isReachable(gc.unit(u).location().mapLocation(), lmloc))
 					continue;
 				int dist = (int)gc.unit(u).location().mapLocation().distanceSquaredTo(lmloc);
 				distances.add(dist);

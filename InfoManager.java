@@ -159,7 +159,6 @@ public class InfoManager {
 		}
 		
 		//keeping track of our/enemy units, squad management
-		//REFACTOR: while going through units, add to tiles whether or not there is a unit there so we don't have to call gc.hasUnitAtLocation;
 		VecUnit units = gc.units();
 		workerCount = 0;
 		fighterCount = 0;
