@@ -10,19 +10,15 @@ does NOT handle worker replication, WorkerManager does that
 public class ProductionManager{
     InfoManager infoMan;
     GameController gc;
-    MagicNumbers magicNums;
 
     public ProductionManager(){}
     
-    public ProductionManager(InfoManager im, GameController g, MagicNumbers mn){
-    	magicNums = mn;
+    public ProductionManager(InfoManager im, GameController g){
         infoMan = im;
         gc = g;
     }
 
     public void update(Strategy strat){
-        // find squads with highest urgency and find factories to build them. etc junk
-    	// TODO: stuff
     }
 
     public void move(){
@@ -31,35 +27,35 @@ public class ProductionManager{
     		int id = factory.id();
     		//TODO: pick an intelligent direction
     		boolean didSomething = false;
-    		while(gc.unit(id).structureGarrison().size() >0) {
+    		while(factory.structureGarrison().size() > 0) {
     			didSomething = false;
     			for(Direction dirToUnload : Utils.orderedDirections)
     				if(gc.canUnload(factory.id(), dirToUnload)) {
     					gc.unload(id, dirToUnload);
     					didSomething = true;
+    					MapLocation locUnloaded = factory.location().mapLocation().add(dirToUnload);
+    					//it's occupied now!
+    					infoMan.tiles[locUnloaded.getX()][locUnloaded.getY()].unitID = 0;
     				}
     			if(!didSomething)
     				break;
     		}
-    		if(!infoMan.builtRocket)
+    		if((infoMan.rocketsToBeBuilt > 0 || infoMan.factoriesToBeBuilt > 0) && gc.karbonite() < MagicNumbers.FACTORY_COST)
     			continue;
     		infoMan.combatSquads.sort(Squad.byUrgency());
     		infoMan.rocketSquads.sort(Squad.byUrgency());
-    		infoMan.workerSquads.sort(Squad.byUrgency());
     		Squad toFill = null;
-    		if(infoMan.combatSquads.size()>0 && infoMan.fighters.size() < magicNums.MAX_FIGHTER_COUNT)
+    		if(infoMan.combatSquads.size() > 0 && infoMan.fighters.size() < MagicNumbers.MAX_FIGHTER_COUNT)
     			toFill = infoMan.combatSquads.get(0);
-    		if(infoMan.rocketSquads.size()>0 && (toFill == null || infoMan.rocketSquads.get(0).urgency > toFill.urgency))
+    		if(infoMan.rocketSquads.size() > 0 && (toFill == null || infoMan.rocketSquads.get(0).urgency > toFill.urgency))
     			toFill = infoMan.rocketSquads.get(0);
-    		//if(infoMan.workerSquads.size()>0 && (toFill == null || infoMan.workerSquads.get(0).urgency > toFill.urgency))
-    			//toFill = infoMan.workerSquads.get(0);
     		UnitType toMake = null;
     		if(toFill != null && toFill.requestedUnits.size() > 0){
     			toMake = toFill.requestedUnits.get(0);
-    			if(infoMan.workers.size() < 3)
+    			if(infoMan.workers.size() < 1)
     				toMake = UnitType.Worker;
     		}
-    		if(toMake != null && gc.canProduceRobot(id,toMake) && gc.round() < 650) {
+    		if(toMake != null && gc.canProduceRobot(id,toMake) && gc.round() < MagicNumbers.ROUND_TO_STOP_PRODUCTION) {
     			gc.produceRobot(id, toMake);
     		}
     	}

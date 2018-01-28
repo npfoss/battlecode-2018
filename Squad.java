@@ -37,7 +37,7 @@ public class Squad{
     	units.remove(units.indexOf(id));
     }
     
-    //not sure if i flipped the order lol
+    //not sure if i flipped the order lol REFACTOR: <-- double check and remove comment @Eli
 	public static Comparator<Squad> byUrgency()
     {   
      Comparator<Squad> comp = new Comparator<Squad>(){

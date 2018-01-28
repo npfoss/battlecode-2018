@@ -11,14 +11,21 @@ public class Player {
 
         Overseer overseer = new Overseer(gc);
 
+        // System.out.println("----begin tests-----");
+        // for(Direction d: Utils.orderedDirections){
+        //     System.out.println(d = (Direction)((byte)(d)));
+        // }
+
+        // System.out.println("----end tests-----");
+
         while (true) {
             try{
                 overseer.takeTurn();
+                System.gc();
             } catch(Exception e) {
                 System.out.println("***ERROR AHHHHHHHHHHHHHHHHHHHHHHHHH***");
                 e.printStackTrace(System.out);
                 gc.nextTurn();
-                System.gc();
             }
             // try{Thread.sleep(25);}catch(Exception e){}
         }
