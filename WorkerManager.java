@@ -394,7 +394,9 @@ public class WorkerManager{
 				distToKarbonite = gc.unit(id).location().mapLocation().distanceSquaredTo(karbLoc);
 		}
 		else{
-			distToKarbonite = infoMan.distToClosestKarbonite(gc.unit(id).location().mapLocation()).longValue();
+			Double distToK = infoMan.distToClosestKarbonite(gc.unit(id).location().mapLocation());
+			if(distToK != null)
+				distToKarbonite = distToK.longValue();
 		}
 		//Utils.log("giving out a lame score of " + distToKarbonite);
 		return  distToKarbonite > 100 ? 100 : distToKarbonite;
