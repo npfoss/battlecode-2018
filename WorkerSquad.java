@@ -217,7 +217,7 @@ public class WorkerSquad extends Squad {
 		return false;
 	}
 	
-	public void replicateWorker(int id) {
+	public void replicateWorker(int id, Nav nav) {
 		if(targetLoc != null) {
 			Direction tempDirection = gc.unit(id).location().mapLocation().directionTo(targetLoc);
 			if(tempDirection == Direction.Center) {
@@ -229,6 +229,12 @@ public class WorkerSquad extends Squad {
 					gc.replicate(id, dirToReplicate);
 					MapLocation rloc = gc.unit(id).location().mapLocation().add(dirToReplicate);
 					Unit repped = gc.senseUnitAtLocation(rloc);
+					if(!tryToMine(repped.id())) {
+						moveTowardsKarbonite(repped.id(),nav);
+						tryToMine(id);
+					}else {
+						moveTowardsKarbonite(id,nav);
+					}
 				    infoMan.tiles[rloc.getX()][rloc.getY()].unitID = repped.id();
 				    infoMan.tiles[rloc.getX()][rloc.getY()].myType = UnitType.Worker;
 					infoMan.workerCount++;
@@ -243,6 +249,12 @@ public class WorkerSquad extends Squad {
 					gc.replicate(id, dirToReplicate);
 					MapLocation rloc = gc.unit(id).location().mapLocation().add(dirToReplicate);
 					Unit repped = gc.senseUnitAtLocation(rloc);
+					if(!tryToMine(repped.id())) {
+						moveTowardsKarbonite(repped.id(),nav);
+						tryToMine(id);
+					}else {
+						moveTowardsKarbonite(id,nav);
+					}
 				    infoMan.tiles[rloc.getX()][rloc.getY()].unitID = repped.id();
 				    infoMan.tiles[rloc.getX()][rloc.getY()].myType = UnitType.Worker;
 					infoMan.workerCount++;
@@ -261,7 +273,7 @@ public class WorkerSquad extends Squad {
 			if(worker.location().isInSpace() || worker.location().isInGarrison())
 				continue;
 			if(worker.abilityHeat() < 10 && infoMan.workersToRep.contains(id)){
-				replicateWorker(id);
+				replicateWorker(id, nav);
 			}
 			switch (objective) {
 			case BUILD:
