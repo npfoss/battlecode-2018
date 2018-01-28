@@ -40,7 +40,6 @@ public class ProductionManager{
     			if(!didSomething)
     				break;
     		}
-    		Utils.log("money to save = " + infoMan.moneyToSave);
     		if(gc.karbonite() < infoMan.moneyToSave + 40)
     			continue;
     		infoMan.combatSquads.sort(Squad.byUrgency());

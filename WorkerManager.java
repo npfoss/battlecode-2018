@@ -116,8 +116,11 @@ public class WorkerManager{
 					createBuildSquad(UnitType.Factory, mustSteal);
 			}
 			
-			infoMan.moneyToSave = 150 *strat.rocketsToBuild + 200 * 
-					(strat.minFactories > infoMan.factories.size() ? strat.minFactories - infoMan.factories.size() : 0);
+			infoMan.moneyToSave = 150 * strat.rocketsToBuild +
+								  200 *(strat.minFactories > infoMan.factories.size() ? strat.minFactories - infoMan.factories.size() : 0);
+			
+    		Utils.log("money to save = " + infoMan.moneyToSave);
+    		Utils.log("rockets to build = " + strat.rocketsToBuild);
 			
 			if(infoMan.workerCount < strat.maxWorkers){
 				tellWorkersToReplicate();

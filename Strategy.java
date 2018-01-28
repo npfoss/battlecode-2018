@@ -83,18 +83,23 @@ public class Strategy{
 	public void update(){
 		if(infoMan.myPlanet == Planet.Mars)
 			return;
+		int numCombatants = 0;
+		for(CombatSquad cs: infoMan.combatSquads){
+			numCombatants += cs.units.size();
+		}
 		if(gc.round() > MagicNumbers.SEND_EVERYTHING) {
 			//Pack ur bags we gonna go to mars cuz earth is flooding and we dont wanna die
 			rocketComposition = new int[]{0,0,5,2,1};
 			minWorkers = 0;
+			maxFactories = 0;
 			takeAnyUnit = true;
-			int numCombatants = 0;
-			for(CombatSquad cs: infoMan.combatSquads){
-				numCombatants += cs.units.size();
-			}
 			rocketsToBuild = (numCombatants + 5) / 6;
 		}
-		else if(gc.round() > MagicNumbers.BUILD_UP_WORKERS){
+		else if(infoMan.researchLevels[5] > 0 && numCombatants > 40) {
+			rocketsToBuild++;
+			rocketsBuilt++;
+		}
+		if(gc.round() > MagicNumbers.BUILD_UP_WORKERS && gc.round() < MagicNumbers.SEND_EVERYTHING){
 			minWorkers = (int) (infoMan.fighterCount / MagicNumbers.FIGHTERS_PER_WORKER);
 		}
 		if(gc.karbonite() >= MagicNumbers.FACTORY_COST ) {
@@ -102,14 +107,6 @@ public class Strategy{
 			if(gc.karbonite() > 300 && minFactories < 3) {
 				minFactories++;
 			}
-		}
-		//increment rocketsToBuild appropriately
-		//if you've totally dominated them, send a bunch at the same time.
-		//otherwise if it's getting close to the end of the game send a bunch at the same time
-		//otherwise even if you're not dominating, if you're not really engaging with the enemy/running out of space to build then steadily send.
-		else if(infoMan.researchLevels[5] > 0 && infoMan.fighterCount > (40 + infoMan.rocketsToBeBuilt*8)) {
-			rocketsToBuild++;
-			rocketsBuilt++;
 		}
     }
 
