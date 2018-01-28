@@ -44,7 +44,7 @@ public class MagicNumbers{
     static double TARGET_FACTOR_KNIGHT_MOVE = 1.0;
     static double HOSTILE_FACTOR_KNIGHT_MOVE = 100.0; // get closer to hostiles
     static double SWARM_FACTOR_KNIGHT_MOVE = 1.5; 
-    static double DAMAGE_FACTOR_KNIGHT_MOVE = 50.0;
+    static double DAMAGE_FACTOR_KNIGHT_MOVE = 10.0;
 	static double ATTACK_FACTOR = 3.0;
     static double HOSTILE_FACTOR_HEALER_MOVE = 10.0; 
     static double SWARM_FACTOR_HEALER_MOVE = 2.5; 

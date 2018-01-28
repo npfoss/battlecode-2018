@@ -93,7 +93,7 @@ public class Strategy{
 			maxFactories = 1;
 			minFactories = 0;
 			minWorkers = 4;
-			maxWorkers = rushDist + 5;
+			maxWorkers = rushDist + 3;
 		}
 	}
 
@@ -114,6 +114,7 @@ public class Strategy{
 						minFactories++;
 					}
 				}
+				return;
 			}
 		}
 		int numCombatants = 0;
