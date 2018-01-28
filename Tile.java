@@ -201,6 +201,6 @@ public class Tile{
         if (!enemiesUpdated){
             updateEnemies(infoMan.gc);
         }
-        return possibleDamage;
+        return possibleDamage + (100 - distFromNearestHostile);
     }
 }
