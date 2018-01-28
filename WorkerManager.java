@@ -205,7 +205,7 @@ public class WorkerManager{
 		}
 		Utils.log("checking for sanity: " + numKarbLeftInArea);
 		Utils.log("The region im looking at has a size of " + infoMan.tiles[karbLoc.getX()][karbLoc.getY()].karbArea.tiles.size() + " and has this much karbonite on it: " + infoMan.tiles[karbLoc.getX()][karbLoc.getY()].karbArea.karbonite);
-		double score = Strategy.getReplicateScore(numKarbLeftInArea,ws.units.size(),distToKarbonite);
+		double score = strat.getReplicateScore(numKarbLeftInArea,ws.units.size(),distToKarbonite);
 		Utils.log("This unit: " + u.location().mapLocation() + " has a score of: "+ score);
 		return (score <= 100 ? score : 100);
 	}
@@ -345,6 +345,7 @@ public class WorkerManager{
 	
 	private MapLocation findBuildLoc(WorkerSquad newSquad) {
 		MapLocation start = Utils.averageMapLocation(gc, newSquad.units);
+		MapLocation sampleLoc = gc.unit(newSquad.units.get(0)).location().mapLocation();
 		int x = start.getX();
 		int y = start.getY();
 		if(okayToBuild(x,y,newSquad.toBuild))
@@ -355,12 +356,12 @@ public class WorkerManager{
 			if(dir){
 				for(int a = 0; a < increment; a++){
 					y--;
-					if(okayToBuild(x,y,newSquad.toBuild))
+					if(infoMan.isReachable(x, y, sampleLoc) && okayToBuild(x,y,newSquad.toBuild))
 						return new MapLocation(infoMan.myPlanet,x,y);
 				}
 				for(int a = 0; a < increment; a++){
 					x++;
-					if(okayToBuild(x,y,newSquad.toBuild))
+					if(infoMan.isReachable(x, y, sampleLoc) && okayToBuild(x,y,newSquad.toBuild))
 						return new MapLocation(infoMan.myPlanet,x,y);
 				}
 				increment++;
@@ -369,12 +370,12 @@ public class WorkerManager{
 			else{
 				for(int a = 0; a < increment; a++){
 					y++;
-					if(okayToBuild(x,y,newSquad.toBuild))
+					if(infoMan.isReachable(x, y, sampleLoc) && okayToBuild(x,y,newSquad.toBuild))
 						return new MapLocation(infoMan.myPlanet,x,y);
 				}
 				for(int a = 0; a < increment; a++){
 					x--;
-					if(okayToBuild(x,y,newSquad.toBuild))
+					if(infoMan.isReachable(x, y, sampleLoc) && okayToBuild(x,y,newSquad.toBuild))
 						return new MapLocation(infoMan.myPlanet,x,y);
 				}
 				increment++;

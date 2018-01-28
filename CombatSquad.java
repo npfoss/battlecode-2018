@@ -349,11 +349,12 @@ public class CombatSquad extends Squad{
 			// first check if we should nav
 			Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
 			//if we're not near any enemies nav, otherwise move and maybe attack
-			if(myTile.distFromNearestHostile > MagicNumbers.MAX_DIST_THEY_COULD_HIT_NEXT_TURN){
-				//Utils.log("navving " + cu.myLoc.getX() + " " + cu.myLoc.getY());
-				//Utils.log("trying to generate");
+			if(!swarmUnits.containsKey(cu.ID)){
+				Direction d = nav.dirToMove(cu.myLoc, swarmLoc);
+				moveAndUpdate(cu, d);
+			}
+			else if(myTile.distFromNearestHostile > MagicNumbers.MAX_DIST_THEY_COULD_HIT_NEXT_TURN){
 				Direction d = nav.dirToMove(cu.myLoc, targetLoc);
-				//Utils.log("generated");
 				moveAndUpdate(cu, d);
 			} else if (cu.health <= MagicNumbers.RANGER_RUN_AWAY_HEALTH_THRESH){
 				runAway(cu);
@@ -542,8 +543,8 @@ public class CombatSquad extends Squad{
 	private void healerMove(CombatUnit cu, Nav nav) {
 		Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
 		//if we're not near any enemies nav, otherwise run away
-		if(numEnemyUnits == 0){
-			Direction d = nav.dirToMoveSafely(cu.myLoc, targetLoc);
+		if(!swarmUnits.containsKey(cu.ID)){
+			Direction d = nav.dirToMoveSafely(cu.myLoc, swarmLoc);
 			moveAndUpdate(cu, d);
 		} else {
 			healerMove(cu);
