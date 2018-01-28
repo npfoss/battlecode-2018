@@ -68,7 +68,7 @@ public class CombatManager{
 			MapLocation ml = u.location().mapLocation();
 			TreeSet<TargetUnit> tus = infoMan.getTargetUnits(ml, MagicNumbers.DEFEND_RANGE, true);
 			if(tus.size() > 0){ 
-				addCombatSquad(ml, Objective.DEFEND_LOC, strat);
+				addCombatSquad(Utils.midpoint(ml, tus.first().myLoc), Objective.DEFEND_LOC, strat);
 			}
 		}
 		
@@ -77,7 +77,7 @@ public class CombatManager{
 				MapLocation ml = u.location().mapLocation();
 				TreeSet<TargetUnit> tus = infoMan.getTargetUnits(ml, MagicNumbers.DEFEND_RANGE, true);
 				if(tus.size() > 0){
-					addCombatSquad(ml, Objective.DEFEND_LOC, strat);
+					addCombatSquad(Utils.midpoint(ml, tus.first().myLoc), Objective.DEFEND_LOC, strat);
 				}
 			}
 		}
@@ -87,12 +87,12 @@ public class CombatManager{
 			addCombatSquad(null, Objective.EXPLORE, strat);
 		}	
 
-		if((infoMan.combatSquads.size() == 1 && infoMan.combatSquads.get(0).objective == Objective.EXPLORE)
-				|| infoMan.myPlanet == Planet.Mars){
-			for(TargetUnit tu: infoMan.targetUnits.values()){
-				addCombatSquad(tu.myLoc, Objective.ATTACK_LOC, strat);
-			}
+		//if((infoMan.combatSquads.size() == 1 && infoMan.combatSquads.get(0).objective == Objective.EXPLORE)
+		//		|| infoMan.myPlanet == Planet.Mars){
+		for(TargetUnit tu: infoMan.targetUnits.values()){
+			addCombatSquad(tu.myLoc, Objective.ATTACK_LOC, strat);
 		}
+		//}
 
 		// now deal with unassigned units
 		boolean didSomething = false;
