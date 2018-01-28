@@ -124,7 +124,6 @@ public class InfoManager {
         factories = new ArrayList<Unit>();
         unassignedUnits = new HashSet<Integer>();
         researchLevels = new int[]{0,0,0,0,0,0}; //knight, mage, ranger, healer, worker, rocket
-        moneyToSave = 0;
         
         pattern = gc.asteroidPattern();
 	}
