@@ -105,4 +105,8 @@ public class Strategy{
 		return numEnemyUnits > size * MagicNumbers.AGGRESION_FACTOR;
 	}
 
+	public static double getReplicateScore(long numKarbLeftInArea, int numMiners, long distToKarbonite) {
+		return (((numKarbLeftInArea * 10.0) - numMiners*300.0) /(distToKarbonite + 10));
+	}
+
 }

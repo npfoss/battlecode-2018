@@ -176,7 +176,6 @@ public class WorkerManager{
 	}
 
 	private double replicateScore(Unit u, WorkerSquad ws) {
-		//TODO: improve
 		long numKarbLeftInArea = 0; 
 		long distToKarbonite = 100;
 		MapLocation karbLoc;
@@ -206,7 +205,7 @@ public class WorkerManager{
 		}
 		Utils.log("checking for sanity: " + numKarbLeftInArea);
 		Utils.log("The region im looking at has a size of " + infoMan.tiles[karbLoc.getX()][karbLoc.getY()].karbArea.tiles.size() + " and has this much karbonite on it: " + infoMan.tiles[karbLoc.getX()][karbLoc.getY()].karbArea.karbonite);
-		double score = (((numKarbLeftInArea * 10.0) - ws.units.size()*300.0) /(distToKarbonite + 10));
+		double score = Strategy.getReplicateScore(numKarbLeftInArea,ws.units.size(),distToKarbonite);
 		Utils.log("This unit: " + u.location().mapLocation() + " has a score of: "+ score);
 		return (score <= 100 ? score : 100);
 	}
