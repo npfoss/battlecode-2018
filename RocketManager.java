@@ -100,12 +100,13 @@ public class RocketManager{
         // do the deed
         for (Unit unit : toSteal){
             if (unit != null){
-
-                Utils.log("actually stealing it");
+                Utils.log("actually stealing " + unit.id());
                 Squad squad = infoMan.getSquad(unit);
                 rs.units.add(unit.id());
-                if(squad == null)
+                if(squad == null){
+                	Utils.log("not actually removing " + unit.id());
                 	continue;
+                }
                 squad.removeUnit(unit.id());
                 squad.update();
             }

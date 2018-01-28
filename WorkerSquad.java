@@ -130,23 +130,24 @@ public class WorkerSquad extends Squad {
 		
 		targetKarbLocs.put(id, karbLoc);
 		Direction d = nav.dirToMoveSafelyEfficient(myLoc, karbLoc);
+		//Utils.log("just a worker trying to move to " + myLoc.add(d));
 		infoMan.moveAndUpdate(id, d, UnitType.Worker);
 	
 	}
 	
 	public void runAway(int id, MapLocation loc){
 		double bestScore = -10000000;
-		int bestInd = 0;
+		int bestInd = 8;
 		int x = loc.getX();
 		int y = loc.getY();
 		int nx,ny;
-		for(int i=0; i<9; i++){
+		for(int i=0; i < 8; i++){
 			nx = x + Utils.dx[i];
 			ny = y + Utils.dy[i];
 			if(!infoMan.isOnMap(nx,ny))
 				continue;
 			Tile t = infoMan.tiles[nx][ny];
-			if(!t.isWalkable || t.unitID > -1)
+			if(!t.isWalkable || !infoMan.isLocationClear(nx, ny))
 				continue;
 			t.updateEnemies(gc);
 			double score = -100.0 * t.possibleDamage + t.distFromNearestHostile;
@@ -203,6 +204,10 @@ public class WorkerSquad extends Squad {
 			for(Direction dirToReplicate : Utils.directionsTowardButNotIncluding(gc.unit(id).location().mapLocation().directionTo(targetLoc))) {
 				if (gc.canReplicate(id, dirToReplicate)) {
 					gc.replicate(id, dirToReplicate);
+					MapLocation rloc = gc.unit(id).location().mapLocation().add(dirToReplicate);
+					Unit repped = gc.senseUnitAtLocation(rloc);
+				    infoMan.tiles[rloc.getX()][rloc.getY()].unitID = repped.id();
+				    infoMan.tiles[rloc.getX()][rloc.getY()].myType = toBuild;
 					infoMan.workerCount++;
 					infoMan.workersToRep.remove(id);
 					break;
@@ -213,6 +218,10 @@ public class WorkerSquad extends Squad {
 			for(Direction dirToReplicate : Utils.orderedDirections) {
 				if (gc.canReplicate(id, dirToReplicate)) {
 					gc.replicate(id, dirToReplicate);
+					MapLocation rloc = gc.unit(id).location().mapLocation().add(dirToReplicate);
+					Unit repped = gc.senseUnitAtLocation(rloc);
+				    infoMan.tiles[rloc.getX()][rloc.getY()].unitID = repped.id();
+				    infoMan.tiles[rloc.getX()][rloc.getY()].myType = toBuild;
 					infoMan.workerCount++;
 					infoMan.workersToRep.remove(id);
 					break;
