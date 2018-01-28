@@ -168,7 +168,7 @@ public class InfoManager {
             if(unit.location().isOnMap()) {
             	int x = unit.location().mapLocation().getX();
             	int y = unit.location().mapLocation().getY();
-            	Utils.log("setting tile " + x + " " + y);
+            	//Utils.log("setting tile " + x + " " + y);
             	tiles[x][y].unitID = unit.id();
             	tiles[x][y].myType = unit.unitType();
             	if(unit.unitType() == UnitType.Factory || unit.unitType() == UnitType.Rocket)
@@ -547,7 +547,7 @@ public class InfoManager {
     	MapLocation start = gc.unit(id).location().mapLocation();
     	gc.moveRobot(id, d);
     	tiles[start.getX()][start.getY()].unitID = -1;
-    	Utils.log("unsetting " + start.getX() + " " + start.getY());
+    	//Utils.log("unsetting " + start.getX() + " " + start.getY());
     	MapLocation end = start.add(d);
     	tiles[end.getX()][end.getY()].unitID = id;
     	tiles[end.getX()][end.getY()].myType = type;
