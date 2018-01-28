@@ -215,7 +215,6 @@ public class CombatSquad extends Squad{
 			}
 			separatedUnits.clear();
 		}
-		//TODO: think about if this is actually a good threshold
 		int swarmThreshold = combatUnits.size()*2 + 10;
 		for(int i = separatedUnits.size()-1; i>=0; i--){
 			Unit u = gc.unit(separatedUnits.get(i));
@@ -250,7 +249,6 @@ public class CombatSquad extends Squad{
 	
 	/* REFACTOR: use or remove
 	private void moveToSwarm(Nav nav){
-		//TODO: micro more if you see enemies on the way
 		for(int uid: separatedUnits){
 			if(!gc.isMoveReaUtils.dy(uid))
 				continue;
@@ -585,7 +583,6 @@ public class CombatSquad extends Squad{
 /**************************** misc ********************************/
 
 	private void explore(Nav nav){
-		// TODO: should this use Nav's explore?
 		Direction dirToMove = Utils.orderedDirections[(int) (8*Math.random())];
 		for(int uid: units){
 			if(gc.canMove(uid, dirToMove) && gc.unit(uid).movementHeat() < 10){

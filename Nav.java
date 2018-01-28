@@ -14,7 +14,7 @@ NOTE: always make sure unit doesn't need to cool down.
 also, may return Direction.Center which will confuse gc.move()
     (so if it returns Center, don't move)(that's what it's telling you)
 */
-/* TODO
+/* 
 maybe have units all claim tiles and optimize that?
 -or maybe look at the duck's code for pathing around units
 -only if current one is bad I think
@@ -177,12 +177,10 @@ public class Nav{
     }
     
     public Direction dirToMoveEfficient(MapLocation start, MapLocation target){
-        // TODO
         return dirToMove(start, start.directionTo(target));
     }
     
     public Direction dirToMoveSafelyEfficient(MapLocation start, MapLocation target){
-        // TODO
         return dirToMoveSafely(start, start.directionTo(target));
     }
 

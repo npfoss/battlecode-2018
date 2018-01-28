@@ -237,7 +237,6 @@ public class WorkerSquad extends Squad {
 			Unit worker = gc.unit(id);
 			if(worker.location().isInSpace() || worker.location().isInGarrison())
 				continue;
-			//TODO: replicate based on manager's choice
 			if(worker.abilityHeat() < 10 && infoMan.workersToRep.contains(id)){
 				replicateWorker(id);
 			}

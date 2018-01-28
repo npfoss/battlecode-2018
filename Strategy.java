@@ -72,11 +72,11 @@ public class Strategy{
     }
 
 	public int calcWorkerUrgency(int size, Objective objective, UnitType toBuild) {
-		//TODO: make this better
 		if(objective == Objective.MINE)
 			return 0;
 		return MagicNumbers.MAX_WORKERS_PER_BUILDING - size;
 	}
+	
 	public int calcRocketUrgency(int numUnits) {
 		return (numUnits == 8 ? 0 : (gc.round() > MagicNumbers.SEND_EVERYTHING ? 100 : 50));
 	}
