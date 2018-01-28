@@ -1,7 +1,3 @@
-/****************/
-/* REFACTOR ME! */
-/****************/
-
 import bc.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -153,6 +149,7 @@ public class InfoManager {
 					tiles[x][y].roundLastUpdated = (int) gc.round();
 					tiles[x][y].enemiesUpdated = false;
 					tiles[x][y].unitID = -1;
+                    tiles[x][y].nearLaunch = false;
 					tiles[x][y].isWalkable = startingMap.isPassableTerrainAt(loc) > 0;
 					if(tiles[x][y].isWalkable)
 						tiles[x][y].updateKarbonite(gc.karboniteAt(loc));
@@ -238,13 +235,24 @@ public class InfoManager {
 			s.update();
 		}
 
-		for(Squad s: rocketSquads){
+		for(RocketSquad s: rocketSquads){
 			for(int i = s.units.size()-1; i >= 0; i--){
 				int id = s.units.get(i);
 				if(!ids.contains(id)){
 					s.removeUnit(id);
 				}
 			}
+            if (s.launchingSoon){
+                // warn surrounding tiles
+                int nx, ny;
+                int x = s.rocket.location().mapLocation().getX();
+                int y = s.rocket.location().mapLocation().getY();
+                for (int i = 0; i < 8; i++){
+                    nx = x + Utils.dx[i];
+                    ny = y + Utils.dy[i];
+                    tiles[nx][ny].nearLaunch = true;
+                }
+            }
 			// s.update(); // rocket squads get updated by rocketMan anyways
 		}
 

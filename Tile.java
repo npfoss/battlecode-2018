@@ -1,7 +1,3 @@
-/****************/
-/* REFACTOR ME! */
-/****************/
-
 import bc.*;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,6 +22,8 @@ public class Tile{
     int possibleDamage;
     HashMap<Integer, Signpost> destToDir;
     int distFromNearestHostile;
+
+    boolean nearLaunch;
     
     //for combat
     TreeSet<TargetUnit> enemiesWithinRangerRange;
@@ -58,6 +56,7 @@ public class Tile{
         enemiesUpdated = false;
         unitID = -1;
         distFromNearestHostile = 100;
+        nearLaunch = false;
     }
 
     public void updateKarbonite(long newKarb){
@@ -130,12 +129,8 @@ public class Tile{
         	accessible = false;
         }
         */
-    	for(Unit u: infoMan.rockets) {
-    		if(!u.location().isOnMap())
-    			continue;
-            // TODO: make this only happen during the rocket countdown
-    		if(u.location().mapLocation().distanceSquaredTo(myLoc) <= 2)
-    			possibleDamage += 100;
+    	if (nearLaunch) {
+    		possibleDamage += 100;
     	}
     	TreeSet<TargetUnit> enemies = infoMan.getTargetUnits(myLoc, MagicNumbers.MAX_DIST_TO_CHECK, false);
     	distFromNearestHostile = MagicNumbers.MAX_DIST_TO_CHECK + 1;
