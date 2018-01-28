@@ -482,7 +482,7 @@ public class InfoManager {
     }
 
     public boolean isLocationClear(int x, int y){
-        return isLocationWalkable(x, y) && tiles[x][y].unitID == -1;
+        return isLocationWalkable(x, y) && tiles[x][y].unitID == -1 && gc.canSenseLocation(tiles[x][y].myLoc);
     }
 
     // means on the map, passable terrain, and none of our buildings there
