@@ -112,10 +112,14 @@ public class WorkerManager{
 
 			if(infoMan.factories.size() < strat.maxFactories && infoMan.factoriesToBeBuilt == 0) {
 				boolean mustSteal = (strat.minFactories > infoMan.factories.size());
-				createBuildSquad(UnitType.Factory, mustSteal);
+				if(gc.karbonite() >= 200)
+					createBuildSquad(UnitType.Factory, mustSteal);
 			}
 			
 			infoMan.moneyToSave = infoMan.factoriesToBeBuilt * 200 + infoMan.rocketsToBeBuilt * 150;
+			if(infoMan.factoriesToBeBuilt + infoMan.factories.size() < strat.minFactories){
+				infoMan.moneyToSave += MagicNumbers.FACTORY_COST;
+			}
 			
 			if(infoMan.workerCount < strat.maxWorkers){
 				tellWorkersToReplicate();
