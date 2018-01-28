@@ -60,10 +60,11 @@ public class Strategy{
 		}
 		if(gc.karbonite() >= MagicNumbers.FACTORY_COST ) {
 			maxFactories = infoMan.factories.size() + 1 > 6 ? 6 : infoMan.factories.size() +1;
+			if(gc.karbonite() > 300 && minFactories < 3) {
+				minFactories++;
+			}
 		}
-		if(gc.karbonite() > 300 && minFactories < 3) {
-			minFactories++;
-		}
+		
 		//increment rocketsToBuild appropriately
 		//if you've totally dominated them, send a bunch at the same time.
 		//otherwise if it's getting close to the end of the game send a bunch at the same time

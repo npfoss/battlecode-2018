@@ -40,7 +40,7 @@ public class ProductionManager{
     			if(!didSomething)
     				break;
     		}
-    		if((infoMan.rocketsToBeBuilt > 0 || infoMan.factoriesToBeBuilt > 0) && gc.karbonite() < MagicNumbers.FACTORY_COST)
+    		if((infoMan.saveMoney) && gc.karbonite() < MagicNumbers.FACTORY_COST + 40)
     			continue;
     		infoMan.combatSquads.sort(Squad.byUrgency());
     		infoMan.rocketSquads.sort(Squad.byUrgency());

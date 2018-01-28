@@ -113,7 +113,12 @@ public class WorkerManager{
 
 			if(infoMan.factories.size() < strat.maxFactories && infoMan.factoriesToBeBuilt == 0) {
 				boolean mustSteal = (strat.minFactories > infoMan.factories.size());
+				if(mustSteal) {
+					infoMan.saveMoney = true;
+				}
+				if(gc.karbonite() > 200) {
 				createBuildSquad(UnitType.Factory, mustSteal);
+				}
 			}
 
 			if(infoMan.workerCount < strat.maxWorkers){
@@ -133,8 +138,10 @@ public class WorkerManager{
 		int mustRepNum = (strat.minWorkers > infoMan.workerCount ? strat.minWorkers - infoMan.workerCount : 0);
 		// Utils.log("Number to Rep: "+mustRepNum);
 		int maxToRep = strat.maxWorkers - infoMan.workerCount;
-		if(gc.karbonite() < 200 && (infoMan.factoriesToBeBuilt > 0 || infoMan.rocketsToBeBuilt > 0))
-			maxToRep = mustRepNum;
+		if(infoMan.factoriesToBeBuilt > 0 || infoMan.rocketsToBeBuilt > 0) {
+			int numToBeBuilt = infoMan.factoriesToBeBuilt + infoMan.rocketsToBeBuilt;
+			maxToRep = (int) (mustRepNum + (((gc.karbonite() - 200 * numToBeBuilt) / 60) > 0 ? ((gc.karbonite() - 200 * numToBeBuilt) / 60) : 0));
+		}
 		if(maxToRep == 0)
 			return;
 		TreeMap<Double,ArrayList<Integer>> replicateScores = new TreeMap<Double,ArrayList<Integer>>();
@@ -385,6 +392,7 @@ public class WorkerManager{
 		long distToKarbonite = 100;
 		if(ws.targetKarbLocs.containsKey(id)) {
 			MapLocation karbLoc = ws.targetKarbLocs.get(id);
+			if(karbLoc != null)
 				distToKarbonite = gc.unit(id).location().mapLocation().distanceSquaredTo(karbLoc);
 				
 		}

@@ -29,6 +29,7 @@ public class InfoManager {
 	long lastCheckpoint;
 	int rocketsToBeBuilt;
 	int factoriesToBeBuilt;
+	boolean saveMoney;
 	PlanetMap startingMap;
 	//int totalUnitCount;
 
