@@ -598,7 +598,7 @@ public class InfoManager {
     }
 
     public boolean isReachable(int x, int y, MapLocation loc) {
-        return /*isOnMap(loc1) && isOnMap(loc2) &&*/ tiles[x][y].region == tiles[loc.getX()][loc.getY()].region;
+        return isOnMap(x,y) && isOnMap(loc) && tiles[x][y].region == tiles[loc.getX()][loc.getY()].region;
     }
 
 }
