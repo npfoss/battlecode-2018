@@ -478,7 +478,7 @@ public class InfoManager {
     // this means on map, walkable, AND no unit currently in the way
     // returns false if we can't see that loc
     public boolean isLocationClear(MapLocation loc){
-        return isLocationWalkable(loc) && tiles[loc.getX()][loc.getY()].unitID == -1;
+        return isLocationWalkable(loc) && tiles[loc.getX()][loc.getY()].unitID == -1 && gc.canSenseLocation(loc);
     }
 
     public boolean isLocationClear(int x, int y){

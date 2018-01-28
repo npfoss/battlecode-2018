@@ -408,6 +408,8 @@ public class CombatSquad extends Squad{
 			if(tu.snipeDamageToDo <= snipers.size()*30){
 				Utils.log("sniping " + tu.myLoc);
 				for(int i = 0; i <= tu.snipeDamageToDo/30.0; i++){
+					if(snipers.size() == 0)
+						break;
 					gc.beginSnipe(snipers.get(snipers.size()-1).ID, tu.myLoc);
 					snipers.remove(snipers.size()-1);
 				}
