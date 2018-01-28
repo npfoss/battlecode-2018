@@ -98,7 +98,7 @@ public class Strategy{
 			minWorkers = (int) (infoMan.fighterCount / MagicNumbers.FIGHTERS_PER_WORKER);
 		}
 		if(gc.karbonite() >= MagicNumbers.FACTORY_COST ) {
-			maxFactories = infoMan.factories.size() + 1 > 6 ? 6 : infoMan.factories.size() +1;
+			maxFactories = infoMan.factories.size() + 1 > 6 ? 6 : infoMan.factories.size() + 1;
 			if(gc.karbonite() > 300 && minFactories < 3) {
 				minFactories++;
 			}

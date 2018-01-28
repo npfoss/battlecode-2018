@@ -199,10 +199,10 @@ public class WorkerManager{
 				numKarbLeftInArea = infoMan.tiles[karbLoc.getX()][karbLoc.getY()].karbArea.karbonite;
 
 		}
-		Utils.log("checking for sanity: " + numKarbLeftInArea);
-		Utils.log("The region im looking at has a size of " + infoMan.tiles[karbLoc.getX()][karbLoc.getY()].karbArea.tiles.size() + " and has this much karbonite on it: " + infoMan.tiles[karbLoc.getX()][karbLoc.getY()].karbArea.karbonite);
+		//Utils.log("checking for sanity: " + numKarbLeftInArea);
+		//Utils.log("The region im looking at has a size of " + infoMan.tiles[karbLoc.getX()][karbLoc.getY()].karbArea.tiles.size() + " and has this much karbonite on it: " + infoMan.tiles[karbLoc.getX()][karbLoc.getY()].karbArea.karbonite);
 		double score = strat.getReplicateScore(numKarbLeftInArea,ws.units.size(),distToKarbonite);
-		Utils.log("This unit: " + u.location().mapLocation() + " has a score of: "+ score);
+		//Utils.log("This unit: " + u.location().mapLocation() + " has a score of: "+ score);
 		return (score <= 100 ? score : 100);
 	}
 
@@ -397,6 +397,7 @@ public class WorkerManager{
 		else{
 			distToKarbonite = infoMan.distToClosestKarbonite(gc.unit(id).location().mapLocation()).longValue();
 		}
+		Utils.log("giving out a lame score of " + distToKarbonite);
 		return  distToKarbonite > 100 ? 100 : distToKarbonite;
 	}
 	
