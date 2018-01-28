@@ -88,7 +88,7 @@ public class Strategy{
 	        maxWorkers = 30;
 		}
 		else{
-			combatComposition = new int[]{0, 0, 3, 2}; //knight,mage,ranger,healer
+			combatComposition = new int[]{1, 0, 0, 0}; //knight,mage,ranger,healer
 			researchOrder = new UnitType[]{UnitType.Knight,UnitType.Knight,UnitType.Ranger,UnitType.Healer,UnitType.Healer,UnitType.Healer,UnitType.Rocket,UnitType.Ranger,UnitType.Ranger};
 			maxFactories = 1;
 			minFactories = 0;
