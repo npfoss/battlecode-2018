@@ -225,9 +225,12 @@ public class Nav{
     public void generateBFSMap(MapLocation start, MapLocation target){
         Utils.log("Generating map to " + mapLocToString(target));
         short dist = 0;
+        int targetHash = hashMapLoc(target);
         ArrayList<List<Integer>> currentLocs = new ArrayList<List<Integer>>();
         ArrayList<List<Integer>> nextLocs = new ArrayList<List<Integer>>();
-        infoMan.tiles[target.getX()][target.getY()].destToDir.put(hashMapLoc(target), new Signpost(Direction.Center, (short)0));
+        infoMan.tiles[target.getX()][target.getY()].destToDir.put(targetHash, new Signpost(Direction.Center, dist));
+        boolean[][] visited = new boolean[infoMan.width][infoMan.height];
+        boolean[][] visitedNonDiag = new boolean[infoMan.wjidth][infoMan.height];
 
         int startx = -1;
         int starty = -1;
@@ -237,7 +240,10 @@ public class Nav{
         }
         short startdist = 32000;
 
+        boolean filling = true;
         currentLocs.add(Arrays.asList(target.getX(), target.getY()));
+        visited[target.getX()][target.getY()] = true;
+        visitedNonDiag[target.getX()][target.getY()] = true;
         dist++;
         Signpost sign;
         int x, y, nx, ny;
@@ -253,36 +259,44 @@ public class Nav{
                         Utils.log("found the start");
                     }
                     if (infoMan.isOnMap(nx, ny)
+                            && !visitedNonDiag[nx][ny]
                             && (infoMan.isLocationWalkable(nx, ny)
                                     || infoMan.tiles[nx][ny].myType == UnitType.Rocket
                                     || infoMan.tiles[nx][ny].myType == UnitType.Factory)){
-                        if (infoMan.tiles[nx][ny].destToDir.containsKey(hashMapLoc(target))){
-                            sign = infoMan.tiles[nx][ny].destToDir.get(hashMapLoc(target));
+                        if (filling && infoMan.tiles[nx][ny].destToDir.containsKey(targetHash)){
+                            visited[nx][ny] = true;
+                            visitedNonDiag[nx][ny] = true;
+                            nextLocs.add(Arrays.asList(nx, ny));
+                            continue;
+                        }
+                        if (visited[nx][ny] && !Utils.isDiagonalDirection(i)){
+                            sign = infoMan.tiles[nx][ny].destToDir.get(targetHash);
                     // if(startdist < 32000)
                         // Utils.log("middle flag");
                             if (sign.stepsToDest == dist
-                                    && !Utils.isDiagonalDirection(i)
                                     && Utils.isDiagonalDirection(sign.direction)){
                                 // prefer to not move diagonaly if it's the same dist.
                                 // may prevent bottlenecks
-                                sign.stepsToDest = dist;
                                 sign.direction = Utils.oppositeDirection(i);
-                            } else if (sign.stepsToDest > dist){
+                                visitedNonDiag[nx][ny] = true;
+                            } /*else if (sign.stepsToDest > dist){
                                 sign.stepsToDest = dist;
                                 sign.direction = Utils.oppositeDirection(i);
                                 if(!(infoMan.tiles[nx][ny].myType == UnitType.Rocket
                                         || infoMan.tiles[nx][ny].myType == UnitType.Factory)){
                                     nextLocs.add(Arrays.asList(nx, ny));
                                 }
-                            }
-                        } else {
+                            }*/
+                        } else if (!visited[nx][ny]){
                     // if(startdist < 32000)
                         // Utils.log("middle flag first");
-                            infoMan.tiles[nx][ny].destToDir.put(hashMapLoc(target), new Signpost(Utils.oppositeDirection(i), dist));
+                            infoMan.tiles[nx][ny].destToDir.put(targetHash, new Signpost(Utils.oppositeDirection(i), dist));
                             if(!(infoMan.tiles[nx][ny].myType == UnitType.Rocket
                                     || infoMan.tiles[nx][ny].myType == UnitType.Factory)){
                                 nextLocs.add(Arrays.asList(nx, ny));
                             }
+                            visited[nx][ny] = true;
+                            visitedNonDiag[nx][ny] = !Utils.isDiagonalDirection(i);
                         }
                     }
                     // if(startdist < 32000)
