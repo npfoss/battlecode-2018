@@ -141,7 +141,6 @@ public class WorkerSquad extends Squad {
 			karbLoc = findKarbLoc(myLoc);
 			if(karbLoc == null)
 				karbLoc = infoMan.getClosestKarbonite(myLoc);
-			karbLoc = infoMan.getClosestKarbonite(myLoc);
 		}
 
 		if(karbLoc == null){
