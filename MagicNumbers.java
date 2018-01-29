@@ -74,6 +74,8 @@ public class MagicNumbers{
     static long SEND_EVERYTHING = 600;
     static long BUILD_UP_WORKERS = 400;
     static double FIGHTERS_PER_WORKER = 3.5;
+    static int ROCKET_NERVOUS_THRESH = 175; // health at which the rocket warns that it's taking off soon
+    static int HOW_LONG_TO_AVOID_ROCKETS = 10; // number of rounds before a landing to avoid the tiles
 
     // unsorted
 }
