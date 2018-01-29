@@ -17,6 +17,7 @@ public class RocketSquad extends Squad {
 	// NOTE: rocket is always unit at index 0 (maintained by manager)
 	Unit rocket;
 	long startRound;
+	boolean launchingSoon;
 
 	public RocketSquad(InfoManager infoMan, MapLocation rocketLoc){
 		super(infoMan);
@@ -24,6 +25,7 @@ public class RocketSquad extends Squad {
 		targetLoc = rocketLoc;
 		startRound = gc.round();
 		urgency = 5; // meaningless and arbitrary
+		launchingSoon = false;
 	}
 
 	public void update(Strategy strat){
@@ -87,21 +89,29 @@ public class RocketSquad extends Squad {
 				if(targetLoc == null) {
 					Utils.log("This is the saddest time because we are about to throw an exception");
 				}
-				Direction movedir = nav.dirToMove(astronaut.location().mapLocation(),targetLoc);
+				Direction movedir;
+				if (launchingSoon)
+					movedir = nav.dirToMove(astronaut.location().mapLocation(),targetLoc);
+				else
+					movedir = nav.dirToMoveSafely(astronaut.location().mapLocation(),targetLoc);
 				if (movedir != Direction.Center) {
 					infoMan.moveAndUpdate(id, movedir, astronaut.unitType());
 				}
 			}
 		}
 
+		// warn people if launching soon
+		launchingSoon = launchingSoon || numUnitsInside >= 6 || rocket.health() < MagicNumbers.ROCKET_NERVOUS_THRESH;
+
 		Utils.log("rocketsquad reporting size = " + units.size() + " urgency = " + urgency + " numUnitsInside = " + numUnitsInside);
 		
-		if (strat.shouldLaunch(rocket,numUnitsInside)){
+		if (strat.shouldLaunch(rocket, numUnitsInside)){
 			Utils.log("trying to launch rocket!");
 			MapLocation dest = nav.getNextMarsDest();
 			if(dest != null && gc.canLaunchRocket(rocket.id(), dest)){
 				gc.launchRocket(rocket.id(), dest);
 				isInSpace = true;
+				launchingSoon = false;
 			}
 		}
 	}

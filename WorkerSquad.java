@@ -15,6 +15,8 @@ public class WorkerSquad extends Squad {
 	Strategy strat;
 	private boolean blueprinted;
 	HashMap<Integer, MapLocation> targetKarbLocs;
+
+	boolean debug = false;
 	
 	public WorkerSquad(InfoManager im, Strategy s) {
 		super(im);
@@ -38,7 +40,8 @@ public class WorkerSquad extends Squad {
 				worker = gc.unit(id);
 			}
 			else if(Utils.equalsMapLocation(worker.location().mapLocation(),targetLoc)) {//We are on top of the targetLoc, move away
-				Utils.log("Trying to move away from build location");
+				if(debug)
+					Utils.log("Trying to move away from build location");
 				for(Direction dirToMove : Utils.orderedDirections) {
 					if (gc.canMove(id, dirToMove)) {
 						infoMan.moveAndUpdate(id, dirToMove, UnitType.Worker);
@@ -147,7 +150,7 @@ public class WorkerSquad extends Squad {
 		
 		targetKarbLocs.put(id, karbLoc);
 		Direction d = nav.dirToMoveSafely(myLoc, karbLoc);
-		if(infoMan.myPlanet == Planet.Mars)
+		if(debug && infoMan.myPlanet == Planet.Mars)
 			Utils.log("just a worker trying to move to " + karbLoc);
 		infoMan.moveAndUpdate(id, d, UnitType.Worker);
 	
