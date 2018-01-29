@@ -56,17 +56,33 @@ public class Overseer{
         combatMan.update(strat);
         prodMan.update(strat);
 
-        prodMan.move();
+        try{
+            prodMan.move();
+        } catch (Exception e) {
+            // darn
+        }
 
         
         for(WorkerSquad ws : infoMan.workerSquads){
-            ws.move(nav,strat);
+            try{
+                ws.move(nav,strat);
+            } catch (Exception e) {
+                // darn
+            }
         }
         for(CombatSquad cs : infoMan.combatSquads){
-            cs.move(nav);
+            try{
+                cs.move(nav);
+            } catch (Exception e) {
+                // darn
+            }
         }
         for(RocketSquad rs : infoMan.rocketSquads){
-        	rs.move(nav,strat);
+            try{
+        	   rs.move(nav,strat);
+            } catch (Exception e) {
+                // darn
+            }
         }
 
         gc.nextTurn();
