@@ -81,12 +81,12 @@ public class CombatManager{
 			addCombatSquad(null, Objective.EXPLORE, strat);
 		}	
 
-		//if((infoMan.combatSquads.size() == 1 && infoMan.combatSquads.get(0).objective == Objective.EXPLORE)
-		//		|| infoMan.myPlanet == Planet.Mars){
-		for(TargetUnit tu: infoMan.targetUnits.values()){
-			addCombatSquad(tu.myLoc, Objective.ATTACK_LOC, strat);
+		if((infoMan.combatSquads.size() == 1 && infoMan.combatSquads.get(0).objective == Objective.EXPLORE)
+				|| infoMan.myPlanet == Planet.Mars){
+			for(TargetUnit tu: infoMan.targetUnits.values()){
+				addCombatSquad(tu.myLoc, Objective.ATTACK_LOC, strat);
+			}
 		}
-		//}
 
 		// now deal with unassigned units
 		boolean didSomething = false;
