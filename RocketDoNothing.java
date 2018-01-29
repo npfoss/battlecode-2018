@@ -18,7 +18,10 @@ public class RocketDoNothing extends RocketManager{
     }
 
     public void update(Strategy strat){
+        // unload rockets
     	for(Unit r: infoMan.rockets) {
+            if (r.location().isInSpace())
+                continue;
     		boolean didSomething;
     		while(r.structureGarrison().size() > 0) { //could probably get rid of this for an if statements since below for loop checks all directions anyway?
     			didSomething = false;

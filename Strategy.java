@@ -1,9 +1,4 @@
-/****************/
-/* REFACTOR ME! */
-/****************/
-
 import java.util.ArrayList;
-
 import bc.*;
 
 /*controls:
@@ -163,11 +158,11 @@ public class Strategy{
 	}
 	
 	public boolean shouldLaunch(Unit rocket, int numUnitsInside) {
-		//TODO: make this better
-		return gc.round() + 1 == MagicNumbers.EARTH_FLOOD_ROUND
-		|| (rocket.health() * 2 < rocket.maxHealth() 
-		|| infoMan.tiles[rocket.location().mapLocation().getX()][rocket.location().mapLocation().getY()].possibleDamage > 0) && numUnitsInside > 0
-		|| numUnitsInside == 8;
+        //TODO: make this better
+        return gc.round() + 1 == MagicNumbers.EARTH_FLOOD_ROUND
+            || numUnitsInside > 0 && (rocket.health() * 2 < rocket.maxHealth() 
+                    && infoMan.tiles[rocket.location().mapLocation().getX()][rocket.location().mapLocation().getY()].possibleDamage >= rocket.health())
+            || numUnitsInside == 8 && (infoMan.orbitPattern.duration(gc.round()) < infoMan.orbitPattern.duration(gc.round() + 10) + 10);
 	}
 	
 	public boolean shouldGoToBuildLoc() {

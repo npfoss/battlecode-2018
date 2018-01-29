@@ -1,11 +1,5 @@
-/****************/
-/* REFACTOR ME! */
-/****************/
-
 import bc.*;
 import java.util.ArrayList;
-import java.util.Collection; //unused
-import java.util.Collections; //unused
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeSet;
