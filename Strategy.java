@@ -137,6 +137,7 @@ public class Strategy{
 			rocketsToBuild = (numCombatants + infoMan.workerCount + 5) / 6;
 		}
 		else if(infoMan.researchLevels[5] > 0 && (numCombatants > ((750 - gc.round()) /(rushDist == 100000 ? 20 : 5)) || infoMan.tilesWeCanSee > infoMan.tiles.length * infoMan.tiles[0].length * 0.65 && infoMan.targetUnits.size() < 2	)) {
+
 			rocketsToBuild++;
 			rocketsBuilt++;
 		}
