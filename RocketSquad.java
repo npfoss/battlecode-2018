@@ -101,7 +101,7 @@ public class RocketSquad extends Squad {
 		}
 
 		// warn people if launching soon
-		launchingSoon = launchingSoon || numUnitsInside >= 7 || rocket.health() < MagicNumbers.ROCKET_NERVOUS_THRESH;
+		launchingSoon = launchingSoon || numUnitsInside >= 6 || rocket.health() < MagicNumbers.ROCKET_NERVOUS_THRESH;
 
 		Utils.log("rocketsquad reporting size = " + units.size() + " urgency = " + urgency + " numUnitsInside = " + numUnitsInside);
 		

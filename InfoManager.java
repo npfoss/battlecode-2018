@@ -67,10 +67,13 @@ public class InfoManager {
     Tile[][] tiles;
     ArrayList<MapLocation> placesWeveSentTo;
     // short[][][][][] destToDir; // startx, starty, targetx, targety, [Direction, stepsToDest]
+    short[][] rocketLandingRound;
 
     // research
     int[] researchLevels;
+
     AsteroidPattern pattern;
+    OrbitPattern orbitPattern;
     
 	public InfoManager(GameController g, MagicNumbers mn) {
 		gc = g;
@@ -109,6 +112,7 @@ public class InfoManager {
         workersToRep = new HashSet<Integer>();
         karbAreas = new ArrayList<KarboniteArea>();
         initMap();
+        rocketLandingRound = new short[width][height];
         
         placesWeveSentTo = new ArrayList<MapLocation>();
         factoriesToBeBuilt = 0;
@@ -122,6 +126,7 @@ public class InfoManager {
         researchLevels = new int[]{0,0,0,0,0,0}; //knight, mage, ranger, healer, worker, rocket
         
         pattern = gc.asteroidPattern();
+        orbitPattern = gc.orbitPattern();
         moneyToSave = 0;
 	}
 
@@ -145,21 +150,27 @@ public class InfoManager {
 		for(int x = 0; x < tiles.length; x++){
 			for(int y = 0; y < tiles[0].length; y++){
 				MapLocation loc = tiles[x][y].myLoc;
+                if (tiles[x][y].roundLastUpdated != gc.round())
+                    tiles[x][y].nearLaunch = false;
 				if(gc.canSenseLocation(loc)){
 					tiles[x][y].roundLastUpdated = (int) gc.round();
 					tiles[x][y].enemiesUpdated = false;
 					tiles[x][y].unitID = -1;
-                    tiles[x][y].nearLaunch = false;
 					tiles[x][y].isWalkable = startingMap.isPassableTerrainAt(loc) > 0;
 					if(tiles[x][y].isWalkable)
 						tiles[x][y].updateKarbonite(gc.karboniteAt(loc));
 				}
+                if (gc.round() <= rocketLandingRound[x][y] && rocketLandingRound[x][y] <= gc.round() + MagicNumbers.HOW_LONG_TO_AVOID_ROCKETS){
+                    warnTilesOfRocket(x, y, true, true);
+                }
 			}
 		}
 		
 		if(myPlanet == Planet.Mars && pattern.hasAsteroid(gc.round())){
 			AsteroidStrike as = pattern.asteroid(gc.round());
 			Tile t = tiles[as.getLocation().getX()][as.getLocation().getY()];
+            // TODO: why does it have to be walkable, we can mine unwalkable tiles
+            // TODO: what if asteroid strikes twice in the same place?
 			if(t.isWalkable){
 				//Utils.log("found karb in sched");
 				t.updateKarbonite(as.getKarbonite());
@@ -243,15 +254,7 @@ public class InfoManager {
 				}
 			}
             if (s.launchingSoon){
-                // warn surrounding tiles
-                int nx, ny;
-                int x = s.rocket.location().mapLocation().getX();
-                int y = s.rocket.location().mapLocation().getY();
-                for (int i = 0; i < 8; i++){
-                    nx = x + Utils.dx[i];
-                    ny = y + Utils.dy[i];
-                    tiles[nx][ny].nearLaunch = true;
-                }
+                warnTilesOfRocket(s.rocket.location().mapLocation().getX(), s.rocket.location().mapLocation().getY(), false, false);
             }
 			// s.update(); // rocket squads get updated by rocketMan anyways
 		}
@@ -265,6 +268,20 @@ public class InfoManager {
 			}
 			s.update();
 		}
+
+        // update rocket landings
+        if (myPlanet == Planet.Mars){
+            RocketLandingInfo landingInfo = gc.rocketLandings();
+            for(short landingRound = (short)(gc.round() + 1); landingRound < 1001; landingRound++){
+                VecRocketLanding vec = landingInfo.landingsOn(landingRound);
+                if (vec.size() != 0){
+                    for (int i = 0; i < vec.size(); i++){
+                        MapLocation dest = vec.get(i).getDestination();
+                        rocketLandingRound[dest.getX()][dest.getY()] = landingRound;
+                    }
+                }
+            }
+        }
 		
 		logTimeCheckpoint("infoMan update done");
 	}
@@ -581,6 +598,18 @@ public class InfoManager {
     		return null;
     	//Utils.log("closest karb is in area with center " + closest.center);
     	return closest.getClosestTile(loc).myLoc;
+    }
+
+    public void warnTilesOfRocket(int x, int y, boolean includeCenter, boolean updateRound){
+        int nx, ny;
+        for (int i = 0; i < 8 + (includeCenter?1:0); i++){
+            nx = x + Utils.dx[i];
+            ny = y + Utils.dy[i];
+            if (isOnMap(nx, ny))
+                tiles[nx][ny].nearLaunch = true;
+            if (updateRound)
+                tiles[x][y].roundLastUpdated = (int) gc.round();
+        }
     }
     
 /*******  FOR LOGGING AND DEBUGGING *********/
