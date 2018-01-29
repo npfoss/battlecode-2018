@@ -133,12 +133,17 @@ public class WorkerSquad extends Squad {
 			MapLocation targetKarbLoc = targetKarbLocs.get(id);
 			if(targetKarbLoc != null && infoMan.tiles[targetKarbLoc.getX()][targetKarbLoc.getY()].karbonite == 0){
 				//Utils.log("trying to find new stuff!");
-				karbLoc = infoMan.getClosestKarbonite(myLoc);
+				karbLoc = findKarbLoc(myLoc);
+				if(karbLoc == null)
+					karbLoc = infoMan.getClosestKarbonite(myLoc);
 			}
 			else
 				karbLoc = targetKarbLoc;
 		}
 		else{
+			karbLoc = findKarbLoc(myLoc);
+			if(karbLoc == null)
+				karbLoc = infoMan.getClosestKarbonite(myLoc);
 			karbLoc = infoMan.getClosestKarbonite(myLoc);
 		}
 
@@ -339,5 +344,47 @@ public class WorkerSquad extends Squad {
 		}
 
 		infoMan.logTimeCheckpoint("workers moved");
+	}
+	
+	private MapLocation findKarbLoc(MapLocation loc) {
+		MapLocation sampleLoc = loc;
+		MapLocation start = sampleLoc;
+		int x = start.getX();
+		int y = start.getY();
+		if(infoMan.tiles[x][y].karbonite > 0)
+			return start;
+		int increment = 1;
+		boolean dir = true;
+		for(int n = 0; n < 10; n++){
+			if(dir){
+				for(int a = 0; a < increment; a++){
+					y--;
+					if(infoMan.isReachable(x, y, sampleLoc) && infoMan.tiles[x][y].karbonite > 0)
+						return new MapLocation(infoMan.myPlanet,x,y);
+				}
+				for(int a = 0; a < increment; a++){
+					x++;
+					if(infoMan.isReachable(x, y, sampleLoc) && infoMan.tiles[x][y].karbonite > 0)
+						return new MapLocation(infoMan.myPlanet,x,y);
+				}
+				increment++;
+				dir = false;
+			}
+			else{
+				for(int a = 0; a < increment; a++){
+					y++;
+					if(infoMan.isReachable(x, y, sampleLoc) && infoMan.tiles[x][y].karbonite > 0)
+						return new MapLocation(infoMan.myPlanet,x,y);
+				}
+				for(int a = 0; a < increment; a++){
+					x--;
+					if(infoMan.isReachable(x, y, sampleLoc) && infoMan.tiles[x][y].karbonite > 0)
+						return new MapLocation(infoMan.myPlanet,x,y);
+				}
+				increment++;
+				dir = true;
+			}
+		}
+		return null;
 	}
 }
