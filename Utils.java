@@ -164,8 +164,8 @@ public class Utils{
     }
     
     public static void log(String s){
-    	// System.out.println(s);
-    	// System.out.flush();
+    	System.out.println(s);
+    	System.out.flush();
     }
     
     public static MapLocation averageMapLocation(GameController gc, Collection<CombatUnit> units) {
