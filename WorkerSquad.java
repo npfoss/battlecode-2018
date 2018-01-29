@@ -354,16 +354,16 @@ public class WorkerSquad extends Squad {
 			return start;
 		int increment = 1;
 		boolean dir = true;
-		for(int n = 0; n < 10; n++){
+		for(int n = 0; n < 5; n++){
 			if(dir){
 				for(int a = 0; a < increment; a++){
 					y--;
-					if(infoMan.isReachable(x, y, sampleLoc) && infoMan.tiles[x][y].karbonite > 0)
+					if(infoMan.isReachable(x, y, sampleLoc) && infoMan.tiles[x][y].karbonite > 0 && infoMan.tiles[x][y].unitID == -1)
 						return new MapLocation(infoMan.myPlanet,x,y);
 				}
 				for(int a = 0; a < increment; a++){
 					x++;
-					if(infoMan.isReachable(x, y, sampleLoc) && infoMan.tiles[x][y].karbonite > 0)
+					if(infoMan.isReachable(x, y, sampleLoc) && infoMan.tiles[x][y].karbonite > 0 && infoMan.tiles[x][y].unitID == -1)
 						return new MapLocation(infoMan.myPlanet,x,y);
 				}
 				increment++;
@@ -372,12 +372,12 @@ public class WorkerSquad extends Squad {
 			else{
 				for(int a = 0; a < increment; a++){
 					y++;
-					if(infoMan.isReachable(x, y, sampleLoc) && infoMan.tiles[x][y].karbonite > 0)
+					if(infoMan.isReachable(x, y, sampleLoc) && infoMan.tiles[x][y].karbonite > 0 && infoMan.tiles[x][y].unitID == -1)
 						return new MapLocation(infoMan.myPlanet,x,y);
 				}
 				for(int a = 0; a < increment; a++){
 					x--;
-					if(infoMan.isReachable(x, y, sampleLoc) && infoMan.tiles[x][y].karbonite > 0)
+					if(infoMan.isReachable(x, y, sampleLoc) && infoMan.tiles[x][y].karbonite > 0 && infoMan.tiles[x][y].unitID == -1)
 						return new MapLocation(infoMan.myPlanet,x,y);
 				}
 				increment++;
