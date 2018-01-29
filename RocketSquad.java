@@ -9,30 +9,30 @@ launches rocket
 NOTE: infoMan decides destination loc
 
 TODO:
--improve launch trigger (take into account orbital stuff, coordinated launch from RocketManager)
+-improve launch trigger (take into account orbital stuff, coordinated launch from RocketManager)\
 */
 public class RocketSquad extends Squad {
 
 	boolean isInSpace = false;
-	int countdown;
 	// NOTE: rocket is always unit at index 0 (maintained by manager)
 	Unit rocket;
 	long startRound;
+	boolean launchingSoon;
 
 	public RocketSquad(InfoManager infoMan, MapLocation rocketLoc){
 		super(infoMan);
 		objective = Objective.BOARD_ROCKET;
 		targetLoc = rocketLoc;
-		countdown = 99999;
 		startRound = gc.round();
 		urgency = 5; // meaningless and arbitrary
+		launchingSoon = false;
 	}
 
-	public void update(){
-		update(Strategy.defaultRocketComposition);
+	public void update(Strategy strat){
+		update(Strategy.defaultRocketComposition, strat);
 	}
 
-	public void update(int[] idealComposition){
+	public void update(int[] idealComposition, Strategy strat){
 		// first, are we in space?
 		if (isInSpace) return;
 
@@ -62,24 +62,22 @@ public class RocketSquad extends Squad {
 				diff = capacity - units.size() - requestedUnits.size() + 1;
 			}
 			for (int i = 0; i < diff; i++){
-				if(Utils.robotTypes[ind] != UnitType.Worker)
 					requestedUnits.add(Utils.robotTypes[ind]);
 			}
 		}
-		urgency = 60;
-		if(requestedUnits.size() == 0)
-			urgency = 0;
+		urgency = strat.calcRocketUrgency(units.size());
 	}
 
-	public void move(Nav nav){
+	public void move(Nav nav, Strategy strat){
 		if(isInSpace)
 			return;
-		countdown--;
 		
 		int numUnitsInside = 0;
 		// start at 1 because rocket is first one
 		for(int i = 1; i < units.size(); i++) {
 			int id = units.get(i);
+			if(!gc.canSenseUnit(id))
+				continue;
 			Unit astronaut = gc.unit(id);
 			if(astronaut.location().isInGarrison()){
 				numUnitsInside++;
@@ -88,49 +86,33 @@ public class RocketSquad extends Squad {
 				numUnitsInside++;
 			} else if(!astronaut.location().mapLocation().isAdjacentTo(targetLoc) && gc.isMoveReady(id)) {
 				//Move towards the target location
-				/* TODO: this is not going to work if the tiles around the
-				 * 		rocket are marked as dangerous (without a fix) */
-				Direction movedir = nav.dirToMoveSafely(astronaut.location().mapLocation(),targetLoc);
+				if(targetLoc == null) {
+					Utils.log("This is the saddest time because we are about to throw an exception");
+				}
+				Direction movedir;
+				if (launchingSoon)
+					movedir = nav.dirToMove(astronaut.location().mapLocation(),targetLoc);
+				else
+					movedir = nav.dirToMoveSafely(astronaut.location().mapLocation(),targetLoc);
 				if (movedir != Direction.Center) {
-					gc.moveRobot(id, movedir);
+					infoMan.moveAndUpdate(id, movedir, astronaut.unitType());
 				}
 			}
 		}
 
-		Utils.log("rocketsquad reporting size = " + units.size() + " urgency = " + urgency + " numUnitsInside = " + numUnitsInside + " countdown = " + countdown);
-		
-		long roundsSinceStart = gc.round() - startRound;
-		
-		if (((numUnitsInside >= rocket.structureMaxCapacity() || (roundsSinceStart > 50 && numUnitsInside > 0))) && countdown > infoMan.magicNums.ROCKET_COUNTDOWN){
-			beginCountdown();
-		}
+		// warn people if launching soon
+		launchingSoon = launchingSoon || numUnitsInside >= 6 || rocket.health() < MagicNumbers.ROCKET_NERVOUS_THRESH;
 
-		if (shouldLaunch(numUnitsInside)){
+		Utils.log("rocketsquad reporting size = " + units.size() + " urgency = " + urgency + " numUnitsInside = " + numUnitsInside);
+		
+		if (strat.shouldLaunch(rocket, numUnitsInside)){
 			Utils.log("trying to launch rocket!");
 			MapLocation dest = nav.getNextMarsDest();
 			if(dest != null && gc.canLaunchRocket(rocket.id(), dest)){
 				gc.launchRocket(rocket.id(), dest);
 				isInSpace = true;
+				launchingSoon = false;
 			}
 		}
-	}
-
-	public void beginCountdown(){
-		countdown = infoMan.magicNums.ROCKET_COUNTDOWN;
-		// TODO: also warn nearby tiles of damage
-	}
-
-	public boolean shouldLaunch(int numUnitsInside){
-		/* TODO: things to consider:
-		 	* countdown (done)
-		 	* flood (done)
-		 	* orbital pattern
-		 	* if the rocket is close to death
-		 	* surrounding units (friends and foes)
-		*/
-
-		return countdown <= 0
-				|| gc.round() + 1 == infoMan.magicNums.EARTH_FLOOD_ROUND
-				|| rocket.health() * 2 < rocket.maxHealth();
 	}
 }

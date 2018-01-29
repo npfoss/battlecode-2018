@@ -20,17 +20,24 @@ public class TargetUnit {
 	long snipeDamageToDo;
 	InfoManager infoMan;
 	
-	public TargetUnit(int i, long h, int ddp, MapLocation ml, UnitType ut, long r, long d, InfoManager im){
-		ID = i;
-		health = h;
-		damageDealingPower = ddp;
-		myLoc = ml;
-		type = ut;
+	public TargetUnit(Unit unit, InfoManager im){
+		infoMan = im;
+
+		ID = unit.id();
+		type = unit.unitType();
+		health = unit.health();
+		myLoc = unit.location().mapLocation();
+		defense = type == UnitType.Knight ? unit.knightDefense() : 0;
+		damageDealingPower = 0;
+		range = 0;
+		if(unit.unitType() != UnitType.Factory && unit.unitType() != UnitType.Rocket){
+			damageDealingPower = unit.damage();
+			range = unit.attackRange();
+		}
+
 		tilesWhichHitMe = new ArrayList<Tile>();
-		range = r;
-		defense = d;
-		switch(ut){
-		    case Rocket: priority = (ml.getPlanet() == Planet.Earth ? 7 : 1); break;
+		switch(type){ // TWEAK: maybe
+		    case Rocket: priority = (myLoc.getPlanet() == Planet.Earth ? 7 : 1); break;
 		    case Factory: priority = 6; break;
 		    case Mage: priority = 5; break;
 		    case Healer: priority = 4; break;
@@ -38,18 +45,9 @@ public class TargetUnit {
 		    case Ranger: priority = 2; break;
 		    case Worker: priority = 1;
 		}
-		infoMan = im;
 	}
 	
-	public boolean equals(Object o){
-		if(!(o instanceof TargetUnit))
-			return false;
-		
-		TargetUnit tu = (TargetUnit)o;
-		
-		return ID == tu.ID;
-	}
-	
+	// TWEAK: not exactly sure what, but maybe we want to? also see the priority list above
 	public void updateSnipePriority(MapLocation swarmLoc){
 		snipePriority = priority + 1 + swarmLoc.distanceSquaredTo(myLoc) / 25.0;
 		snipeDamageToDo = health;
@@ -60,5 +58,11 @@ public class TargetUnit {
 					snipeDamageToDo = tu.health;
 			}
 		}
+	}
+
+	public boolean equals(Object o){
+		if(!(o instanceof TargetUnit))
+			return false;
+		return ID == ((TargetUnit)o).ID;
 	}
 }

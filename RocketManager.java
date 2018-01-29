@@ -7,11 +7,8 @@ for Earth
 creates and assigns RocketSquads when we build new rockets
 
 NOTE: infoMan decides where to send rockets
-
-TODO:
--coordinate multiple simultaneous launches if Mars says to
-    (will have to communicate that to squads)
 */
+
 public class RocketManager{
     InfoManager infoMan;
     public GameController gc;
@@ -21,26 +18,29 @@ public class RocketManager{
         infoMan = im;
     }
 
-    /* modifies rocketSquads as necessary
-            (remember, those are in infoMan) */
     public void update(Strategy strat){
 
         // adjust for rocket deaths
         ArrayList<Integer> toRemove = new ArrayList<Integer>();
         for (int i = infoMan.rocketSquads.size() - 1; i >= 0; i--){
             // make sure each squad has a rocket at index 0. if no rocket, delete it
-            if (infoMan.rocketSquads.get(i).units.size() < 1 || gc.unit(infoMan.rocketSquads.get(i).units.get(0)).unitType() != UnitType.Rocket
-            	|| infoMan.rocketSquads.get(i).isInSpace){
+        	RocketSquad rs = infoMan.rocketSquads.get(i);
+            if (rs.units.size() < 1 || gc.unit(rs.units.get(0)).unitType() != UnitType.Rocket
+            	|| rs.isInSpace){
                 toRemove.add(i);
+                for(int u: rs.units) {
+                	infoMan.unassignedUnits.add(u);
+                }
             }
         }
+        
         for(int i : toRemove){
             infoMan.rocketSquads.remove(i);
         }
+        
 
         // find new (unassigned) rockets and make squads
         for (Unit rocket : infoMan.newRockets){
-        	infoMan.builtRocket = true;
         	RocketSquad rs = new RocketSquad(infoMan, rocket.location().mapLocation());
         	rs.units.add(rocket.id());
             infoMan.rocketSquads.add(rs);
@@ -49,7 +49,7 @@ public class RocketManager{
         // udpate() each squad so we know what units to find
         // and poach nearby units if reasonable
         for (RocketSquad rs : infoMan.rocketSquads){
-            rs.update(strat.rocketComposition);
+            rs.update(strat.rocketComposition, strat);
 
             // how many to look for
             int[] requests = {0,0,0,0,0};
@@ -65,37 +65,59 @@ public class RocketManager{
             for (int ind = 0; ind < requests.length; ind++){
             	if(Utils.robotTypes[ind] == UnitType.Worker && rs.rocket.structureIsBuilt() == 0)
             		continue;
-                stealClosestApplicableUnitsOfType(rs, Utils.robotTypes[ind], requests[ind]);
+                stealClosestApplicableUnitsOfType(rs, Utils.robotTypes[ind], requests[ind], strat.takeAnyUnit);
             }
         }
     }
 
-    public void stealClosestApplicableUnitsOfType(RocketSquad rs, UnitType type, int num){
-        if (num <= 0) return;
+    public void stealClosestApplicableUnitsOfType(RocketSquad rs, UnitType type, int num, boolean takeAnyUnit){
 
+        if (num == 0) return;
+    	// Utils.log("Num = " + num);
         // get closest legal units
         Unit[] toSteal = new Unit[num];
         int maxInd = 0;
         long maxDist = 999999;
         ArrayList<Unit> list = type == UnitType.Worker ? infoMan.workers : infoMan.fighters;
+        // Utils.log("List length = " + list.size());
         for (Unit unit : list){
+        	if(!takeAnyUnit && unit.unitType() != type)
+        		continue;
         	if(!unit.location().isOnMap())
         		continue;
             if ((toSteal[maxInd] == null || rs.targetLoc.distanceSquaredTo(unit.location().mapLocation()) < maxDist)
                     && canStealUnit(rs, unit)){
-                toSteal[maxInd] = unit;
-                maxInd = Utils.maxDistIndex(toSteal, rs.targetLoc);
-                maxDist = toSteal[maxInd] == null ? 999999 : rs.targetLoc.distanceSquaredTo(unit.location().mapLocation());
+            	// Utils.log("Tryna steal a unit");
+            	toSteal[maxInd] = unit;
+            	maxInd = Utils.maxDistIndex(toSteal, rs.targetLoc);
+            	maxDist = toSteal[maxInd] == null ? 999999 : rs.targetLoc.distanceSquaredTo(unit.location().mapLocation());
             }
+        }
+        if(gc.round() > 700 && gc.unit(rs.units.get(0)).structureIsBuilt() > 0) {
+        	for (Unit unit : infoMan.workers){
+        		if(!unit.location().isOnMap())
+        			continue;
+        		if ((toSteal[maxInd] == null || rs.targetLoc.distanceSquaredTo(unit.location().mapLocation()) < maxDist)
+        				&& canStealUnit(rs, unit)){
+        			// Utils.log("Tryna steal a unit");
+        			toSteal[maxInd] = unit;
+        			maxInd = Utils.maxDistIndex(toSteal, rs.targetLoc);
+        			maxDist = toSteal[maxInd] == null ? 999999 : rs.targetLoc.distanceSquaredTo(unit.location().mapLocation());
+        		}
+        	}
+
         }
 
         // do the deed
         for (Unit unit : toSteal){
-            if (unit != null){
+        	if (unit != null){
+                Utils.log("actually stealing " + unit.id());
                 Squad squad = infoMan.getSquad(unit);
                 rs.units.add(unit.id());
-                if(squad == null)
+                if(squad == null){
+                	Utils.log("not actually removing " + unit.id());
                 	continue;
+                }
                 squad.removeUnit(unit.id());
                 squad.update();
             }
@@ -107,8 +129,8 @@ public class RocketManager{
         if (squad == null) return true;
 
         if (infoMan.isInSquads2(unit, infoMan.rocketSquads)) return false;
-
-        // TODO: compare urgencies of rs and the unit's squad
+        if(squad.urgency > rs.urgency)
+        	return false;
 
         return true;
     }
