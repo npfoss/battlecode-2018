@@ -26,6 +26,7 @@ public class InfoManager {
 	int rocketsToBeBuilt;
 	int factoriesToBeBuilt;
 	int moneyToSave;
+	int tilesWeCanSee;
 	PlanetMap startingMap;
 	//int totalUnitCount;
 
@@ -124,7 +125,8 @@ public class InfoManager {
         factories = new ArrayList<Unit>();
         unassignedUnits = new HashSet<Integer>();
         researchLevels = new int[]{0,0,0,0,0,0}; //knight, mage, ranger, healer, worker, rocket
-        
+
+		tilesWeCanSee = 0;
         pattern = gc.asteroidPattern();
         orbitPattern = gc.orbitPattern();
         moneyToSave = 0;
@@ -145,6 +147,7 @@ public class InfoManager {
         newRockets.clear();
 		
 		targetUnits.clear();
+		tilesWeCanSee = 0;
 
 		//updating map info
 		for(int x = 0; x < tiles.length; x++){
@@ -153,6 +156,7 @@ public class InfoManager {
                 if (tiles[x][y].roundLastUpdated != gc.round())
                     tiles[x][y].nearLaunch = false;
 				if(gc.canSenseLocation(loc)){
+					tilesWeCanSee++;
 					tiles[x][y].roundLastUpdated = (int) gc.round();
 					tiles[x][y].enemiesUpdated = false;
 					tiles[x][y].unitID = -1;
@@ -176,7 +180,7 @@ public class InfoManager {
 				t.updateKarbonite(as.getKarbonite());
 			}
 		}
-		
+				
 		//keeping track of our/enemy units, squad management
 		VecUnit units = gc.units();
 		workerCount = 0;
@@ -405,6 +409,15 @@ public class InfoManager {
         return ret;
     }
     
+    public TreeSet<TargetUnit> getTargetUnitsExcludeWorker(MapLocation ml, int radius){
+        TreeSet<TargetUnit> ret = new TreeSet<TargetUnit>(new descendingPriorityComp());
+        for(TargetUnit tu: targetUnits.values()){
+            if(tu.type != UnitType.Worker && tu.myLoc.distanceSquaredTo(ml) <= radius)
+                ret.add(tu);
+        }
+        return ret;
+    }
+    
     public int distToHostile(MapLocation ml){
     	TreeSet<TargetUnit> tus = getTargetUnits(ml,150,true);
     	int closest = 150;
@@ -552,9 +565,11 @@ public class InfoManager {
         		if(minDist > bestDist){
         			bestDist = minDist;
         			bestloc = loc;
+        			Utils.log("new bestloc = " + bestloc);
         		}
         	}
         }
+		Utils.log("decided on dest of = " + bestloc);
         placesWeveSentTo.add(bestloc);
         return bestloc;
     }
@@ -587,17 +602,21 @@ public class InfoManager {
     
     public MapLocation getClosestKarbonite(MapLocation loc){
     	long minDist = 1000000;
-    	KarboniteArea closest = null;
+    	MapLocation closest = null;
     	for(KarboniteArea kA: karbAreas){
-    		if(kA.tiles.size() > 0 && kA.center.distanceSquaredTo(loc) < minDist && isReachable(loc,kA.tiles.get(0).myLoc)){
-    			minDist = kA.center.distanceSquaredTo(loc);
-    			closest = kA;
+    		if(kA.tiles.size() > 0 && isReachable(loc,kA.tiles.get(0).myLoc)){
+    			MapLocation closestLoc = kA.getClosestTile(loc).myLoc;
+    			long dist = closestLoc.distanceSquaredTo(loc);
+    			if(dist < minDist){
+    				closest = closestLoc;
+    				minDist = dist;
+    			}
     		}
     	}
     	if(closest == null)
     		return null;
     	//Utils.log("closest karb is in area with center " + closest.center);
-    	return closest.getClosestTile(loc).myLoc;
+    	return closest;
     }
 
     public void warnTilesOfRocket(int x, int y, boolean includeCenter, boolean updateRound){

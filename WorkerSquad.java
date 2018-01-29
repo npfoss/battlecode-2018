@@ -62,7 +62,7 @@ public class WorkerSquad extends Squad {
 		int x = targetLoc.getX();
 		int y = targetLoc.getY();
 		Tile t = infoMan.tiles[x][y];
-		if(((t.unitID == -1 || t.myType != toBuild) && blueprinted) || (!blueprinted && infoMan.getTargetUnits(t.myLoc, MagicNumbers.FACTORY_SCARED_RADIUS, false).size() > 0)) {
+		if(((t.unitID == -1 || t.myType != toBuild) && blueprinted) || (!blueprinted && infoMan.getTargetUnitsExcludeWorker(t.myLoc, MagicNumbers.FACTORY_SCARED_RADIUS).size() > 0)) {
 			//oh shit someone killed our building better get away or it's not safe
 			if(!blueprinted){
 				switch(toBuild){
@@ -150,7 +150,7 @@ public class WorkerSquad extends Squad {
 		
 		targetKarbLocs.put(id, karbLoc);
 		Direction d = nav.dirToMoveSafely(myLoc, karbLoc);
-		if(debug)
+		if(debug && infoMan.myPlanet == Planet.Mars)
 			Utils.log("just a worker trying to move to " + karbLoc);
 		infoMan.moveAndUpdate(id, d, UnitType.Worker);
 	

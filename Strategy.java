@@ -25,6 +25,8 @@ public class Strategy{
 	int minFactories;
 	int rocketsBuilt;
 	boolean takeAnyUnit;
+	boolean knightRush;
+	int rushDist;
 	Nav nav;
 
     public Strategy(InfoManager im, GameController g, Nav n){
@@ -37,13 +39,15 @@ public class Strategy{
 
 	private void determineInitalStrat() {
 		//TODO: make this depend on stuff
+		
 		researchOrder = new UnitType[]{UnitType.Worker,UnitType.Ranger,UnitType.Healer,UnitType.Healer,UnitType.Healer,UnitType.Rocket,UnitType.Ranger,UnitType.Ranger};
+		
 		if(infoMan.myPlanet == Planet.Mars){
 			maxWorkers = 10000;
 			minWorkers = 10;
 			return;
 		}
-		int rushDist = -1;
+		rushDist = -1;
 		VecUnit vu = gc.startingMap(infoMan.myPlanet).getInitial_units();
 		ArrayList<Unit> ourStarts = new ArrayList<Unit>();
 		ArrayList<Unit> theirStarts = new ArrayList<Unit>();
@@ -56,31 +60,63 @@ public class Strategy{
 				theirStarts.add(u);
 			}
 		}
+		
 		for(Unit u: ourStarts){
-			int minDist = 10000;
+			int maxDist = -1;
 			for(Unit u2: theirStarts){
 				MapLocation ml1 = u.location().mapLocation();
 				MapLocation ml2 = u2.location().mapLocation();
-				if(infoMan.isReachable(ml1, ml2) && nav.optimalStepsTo(ml1,ml2) < minDist){
-					minDist = nav.optimalStepsTo(ml1, ml2);
+				if(infoMan.isReachable(ml1, ml2) && nav.optimalStepsTo(ml1,ml2) > maxDist){
+					maxDist = nav.optimalStepsTo(ml1, ml2);
 				}
 			}
-			if(minDist < 10000 && minDist > rushDist)
-				rushDist = minDist;
+			if(maxDist >-1 && maxDist > rushDist)
+				rushDist = maxDist;
 		}
-		combatComposition = new int[]{0, 0, 3, 2}; //knight,mage,ranger,healer
-        rocketComposition = defaultRocketComposition;
+		if(rushDist == -1)
+			rushDist = 100000; //can't get to enemy
         rocketsToBuild = 0;
-        maxFactories = 1;
-        minFactories = 0;
-        minWorkers = 3;
-        maxWorkers = (rushDist < 30 ? rushDist : 30);
         takeAnyUnit = false;
+		knightRush = rushDist < MagicNumbers.MAX_DIST_RUSH;
+        rocketComposition = defaultRocketComposition;
+		if(!knightRush){
+			combatComposition = new int[]{0, 0, 3, 2}; //knight,mage,ranger,healer
+	        maxFactories = 1;
+	        minFactories = 0;
+	        minWorkers = 4;
+	        maxWorkers = 30;
+		}
+		else{
+			combatComposition = new int[]{1, 0, 0, 0}; //knight,mage,ranger,healer
+			researchOrder = new UnitType[]{UnitType.Knight,UnitType.Knight,UnitType.Ranger,UnitType.Healer,UnitType.Healer,UnitType.Healer,UnitType.Rocket,UnitType.Ranger,UnitType.Ranger};
+			maxFactories = 1;
+			minFactories = 0;
+			minWorkers = 4;
+			maxWorkers = rushDist + 3;
+		}
 	}
 
 	public void update(){
 		if(infoMan.myPlanet == Planet.Mars){
 			return;
+		}
+		if(knightRush){
+			if(gc.round() > 200 && (infoMan.fighterCount < infoMan.targetUnits.size() * 1.5 || gc.round() > 400)){
+				//end the rush
+				Utils.log("ending knight rush");
+				knightRush = false;
+				combatComposition = new int[]{0, 0, 3, 2};
+			}
+			else{
+				if(gc.karbonite() >= MagicNumbers.FACTORY_COST) {
+					maxFactories = infoMan.factories.size() + 1 > 6 ? 6 : infoMan.factories.size() + 1;
+					if(gc.karbonite() > 200 && minFactories < 3) {
+						Utils.log("plz build more factories");
+						minFactories++;
+					}
+				}
+				return;
+			}
 		}
 		int numCombatants = 0;
 		for(CombatSquad cs: infoMan.combatSquads){
@@ -93,9 +129,9 @@ public class Strategy{
 			minFactories = 0;
 			maxFactories = 0;
 			takeAnyUnit = true;
-			rocketsToBuild = (numCombatants + 5) / 6;
+			rocketsToBuild = (numCombatants + infoMan.workerCount + 5) / 6;
 		}
-		else if(infoMan.researchLevels[5] > 0 && numCombatants > ((750 - gc.round()) / 4)) {
+		else if(infoMan.researchLevels[5] > 0 && (numCombatants > ((750 - gc.round()) /(rushDist == 100000 ? 20 : 5)) || infoMan.tilesWeCanSee > infoMan.tiles.length * infoMan.tiles[0].length * 0.65)) {
 			rocketsToBuild++;
 			rocketsBuilt++;
 		}
@@ -103,7 +139,7 @@ public class Strategy{
 			minWorkers = (int) (infoMan.fighterCount / MagicNumbers.FIGHTERS_PER_WORKER);
 		}
 		if(gc.karbonite() >= MagicNumbers.FACTORY_COST && gc.round() < MagicNumbers.SEND_EVERYTHING) {
-			maxFactories = infoMan.factories.size() + 1 > 6 ? 6 : infoMan.factories.size() + 1;
+			maxFactories = infoMan.factories.size() + 1 > 6  && gc.karbonite() < 600 ? 6 : infoMan.factories.size() + 1;
 			if(gc.karbonite() > 300 && minFactories < 3) {
 				minFactories++;
 			}
@@ -134,16 +170,19 @@ public class Strategy{
 		//return gc.karbonite() >= MagicNumbers.FACTORY_COST - infoMan.workerCount * 10;
 	}
 
-	public static int calcCombatUrgency(int numEnemyUnits, int size) {
-		return (numEnemyUnits * 2 - size + 15) * 10;
+	public static int calcCombatUrgency(int numEnemyUnits, int size, Objective o) {
+		return (numEnemyUnits * 2 - size) * (o == Objective.DEFEND_LOC ? 15 : 5);
 	}
 
-	public static boolean shouldWeRetreat(int numEnemyUnits, int size) {
-		return numEnemyUnits > size * MagicNumbers.AGGRESION_FACTOR;
+	public boolean shouldWeRetreat(int numEnemyUnits, int size) {
+		return numEnemyUnits > size * (knightRush ? 2.0 : MagicNumbers.AGGRESION_FACTOR);
 	}
 
-	public double getReplicateScore(long numKarbLeftInArea, int numMiners, long distToKarbonite) {
-		return (((numKarbLeftInArea * 8.0) - numMiners*numMiners*65.0) /(distToKarbonite/2.0 + 10.0)) + (infoMan.myPlanet == Planet.Mars && gc.round() >= 750 ? 100 : 0);
+	public double getReplicateScore(long numKarbLeftInArea, int numMiners, long distToKarbonite, long distToHostile) {
+		return (((numKarbLeftInArea * 9.0) - numMiners*numMiners*70.0) /(distToKarbonite/2.0 + 10.0)) 
+				+ (infoMan.myPlanet == Planet.Mars && gc.round() >= 750 ? 100 : 0)
+				- (infoMan.myPlanet == Planet.Earth && infoMan.targetUnits.size() > 0 ? MagicNumbers.REPLICATION_ENEMY_FACTOR : 0)
+				- (infoMan.myPlanet == Planet.Earth ? (MagicNumbers.MAX_DIST_TO_CHECK - distToHostile) * MagicNumbers.REPLICATION_NEARBY_ENEMY_FACTOR : 0);
 	}
 
 }

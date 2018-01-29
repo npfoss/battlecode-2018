@@ -22,6 +22,7 @@ public class Tile{
     int possibleDamage;
     HashMap<Integer, Signpost> destToDir;
     int distFromNearestHostile;
+    int distFromNearestTarget;
 
     boolean nearLaunch;
     
@@ -56,6 +57,7 @@ public class Tile{
         enemiesUpdated = false;
         unitID = -1;
         distFromNearestHostile = 100;
+        distFromNearestTarget = 100;
         nearLaunch = false;
     }
 
@@ -134,12 +136,16 @@ public class Tile{
     	}
     	TreeSet<TargetUnit> enemies = infoMan.getTargetUnits(myLoc, MagicNumbers.MAX_DIST_TO_CHECK, false);
     	distFromNearestHostile = MagicNumbers.MAX_DIST_TO_CHECK + 1;
+    	distFromNearestTarget = MagicNumbers.MAX_DIST_TO_CHECK + 1;
     	boolean didSomething;
     	for(TargetUnit tu: enemies){
     		MapLocation ml = tu.myLoc;
     		long dist = myLoc.distanceSquaredTo(ml);
     		if(Utils.isTypeHostile(tu.type) && dist < distFromNearestHostile){
     			distFromNearestHostile = (int)dist;
+    		}
+    		if(dist < distFromNearestTarget){
+    			distFromNearestTarget = (int)dist;
     		}
     		if(dist > MagicNumbers.MAX_DIST_THEY_COULD_HIT_NEXT_TURN)
     			continue;

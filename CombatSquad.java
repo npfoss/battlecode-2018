@@ -24,10 +24,12 @@ public class CombatSquad extends Squad{
     HashSet<Integer> separatedUnits;
     HashMap<Integer,CombatUnit> swarmUnits;
 	MapLocation swarmLoc;
+	ArrayList<Unit> acceptableUnits;
 	int numEnemyUnits;
 	int goalRangerDistance;
 	int[] unitCounts;
 	int[] unitCompGoal;
+	Strategy strat;
 
 /************ ALL THE THINGS TO TWEAK ****************/
 
@@ -42,7 +44,7 @@ public class CombatSquad extends Squad{
 	}
 
 	public double rangerMoveScore(Tile t, CombatUnit cu){
-		return t.distFromNearestHostile * MagicNumbers.HOSTILE_FACTOR_RANGER_MOVE
+		return (objective == Objective.DEFEND_LOC ? 0 : t.distFromNearestHostile * MagicNumbers.HOSTILE_FACTOR_RANGER_MOVE)
 			- (t.distFromNearestHostile - goalRangerDistance > 0 ? t.distFromNearestHostile - goalRangerDistance : 0) * MagicNumbers.DISTANCE_FACTOR_RANGER_MOVE
 			- t.possibleDamage * MagicNumbers.DAMAGE_FACTOR_RANGER_MOVE
 			- t.myLoc.distanceSquaredTo(swarmLoc) * MagicNumbers.SWARM_FACTOR_RANGER_MOVE
@@ -56,6 +58,25 @@ public class CombatSquad extends Squad{
 		}
 		TargetUnit toAttack = t.enemiesWithinRangerRange.first();
 		return baseScore + (300 - toAttack.health) * MagicNumbers.ATTACK_FACTOR;
+	}
+	
+	public double knightMoveAttackScore(Tile t, CombatUnit cu){
+		double baseScore = knightMoveScore(t,cu);
+		if(t.enemiesWithinKnightRange.size() == 0){
+			return baseScore;
+		}
+		TargetUnit toAttack = t.enemiesWithinKnightRange.first();
+		double score = baseScore + (300 - toAttack.health) * MagicNumbers.ATTACK_FACTOR;
+		return score;
+	}
+	
+	public double knightMoveScore(Tile t, CombatUnit cu){
+		double score = - t.distFromNearestTarget * MagicNumbers.HOSTILE_FACTOR_KNIGHT_MOVE
+				- t.possibleDamage * MagicNumbers.DAMAGE_FACTOR_KNIGHT_MOVE
+				- t.myLoc.distanceSquaredTo(swarmLoc) * MagicNumbers.SWARM_FACTOR_KNIGHT_MOVE
+				- t.myLoc.distanceSquaredTo(targetLoc) * MagicNumbers.TARGET_FACTOR_KNIGHT_MOVE;
+		Utils.log("knight score for " + t.myLoc + " = " + score);
+		return score;
 	}
 
 	public double healerMoveScore(Tile t, CombatUnit cu){
@@ -76,9 +97,7 @@ public class CombatSquad extends Squad{
 	}
 
 	private boolean shouldWeRetreat(){
-		// TODO: make this better
-		// put in strategy too?
-		return Strategy.shouldWeRetreat(numEnemyUnits,swarmUnits.size());
+		return strat.shouldWeRetreat(numEnemyUnits,swarmUnits.size());
 	}
 
 	private boolean areWeDone(){
@@ -91,7 +110,7 @@ public class CombatSquad extends Squad{
 	}
 
 	public void updateUrgency(){
-		urgency = Strategy.calcCombatUrgency(numEnemyUnits,swarmUnits.size()); // TODO: tweak this formula, possibly put it in strategy
+		urgency = Strategy.calcCombatUrgency(numEnemyUnits,swarmUnits.size(), objective); 
 		if(urgency < 0)
 			urgency = 0;
 		else if(urgency > 100)
@@ -100,13 +119,14 @@ public class CombatSquad extends Squad{
 
 /******************** END TWEAKING *******************/
 /******************** NORMAL SQUAD STUFF *************************/
-	public CombatSquad(GameController g, InfoManager im, int[] ucg) {
+	public CombatSquad(GameController g, InfoManager im, Strategy s, int[] ucg) {
 		super(im);
 		combatUnits = new HashMap<Integer,CombatUnit>();
 		separatedUnits = new HashSet<Integer>();
 		swarmUnits = new HashMap<Integer,CombatUnit>();
 		unitCounts = new int[]{0,0,0,0}; //knight,mage,ranger,healer
 		unitCompGoal = ucg;
+		strat = s;
 	}
 
 	public void update(){
@@ -295,7 +315,8 @@ public class CombatSquad extends Squad{
 		infoMan.logTimeCheckpoint("units and tiles updated");
 		
 		goalRangerDistance = (goalRangerDistance < MagicNumbers.MIN_RANGER_GOAL_DIST ? MagicNumbers.MIN_RANGER_GOAL_DIST : goalRangerDistance); // magic number?
-
+		goalRangerDistance = (objective == Objective.DEFEND_LOC ? MagicNumbers.MIN_RANGER_GOAL_DIST : goalRangerDistance);
+		
 		doKnightMicro(knights, retreat, nav);
 		infoMan.logTimeCheckpoint("knights microed");
 		doMageMicro(mages, retreat, nav);
@@ -417,6 +438,30 @@ public class CombatSquad extends Squad{
 			int toAttack = t.enemiesWithinRangerRange.first().ID;
 			if(debug)
 				Utils.log(cu.ID + " trying to attack " + t.enemiesWithinRangerRange.first().myLoc + " from " + cu.myLoc);
+			gc.attack(cu.ID, toAttack);
+			updateDamage(cu, infoMan.targetUnits.get(toAttack));
+			cu.canAttack = false;
+		}
+	}
+	
+	private void knightMove(CombatUnit cu) {
+		Direction toMove = highestScoringDir(cu, true, true, this::knightMoveScore);
+		if (toMove != null)
+			moveAndUpdate(cu, toMove);
+	}
+	
+	private void knightMoveAndAttack(CombatUnit cu) {
+		// move normally (but with a different scoring funct)
+		Direction toMove = highestScoringDir(cu, true, true, this::knightMoveAttackScore);
+		if (toMove != null){
+			moveAndUpdate(cu, toMove);
+		}
+		// now attack if possible
+		Tile t = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
+		if (t.enemiesWithinKnightRange.size() > 0){
+			int toAttack = t.enemiesWithinKnightRange.first().ID;
+			if(debug)
+				Utils.log(cu.ID + " trying to attack " + t.enemiesWithinKnightRange.first().myLoc + " from " + cu.myLoc);
 			gc.attack(cu.ID, toAttack);
 			updateDamage(cu, infoMan.targetUnits.get(toAttack));
 			cu.canAttack = false;
@@ -564,7 +609,56 @@ public class CombatSquad extends Squad{
 //--------------------- KNIGHT MICRO ------------------------
 
 	private void doKnightMicro(TreeSet<CombatUnit> knights, boolean retreat, Nav nav) {
-		// TODO Auto-generated method stub
+		//first go through rangers which can attack already
+		for(CombatUnit cu: knights.descendingSet()){
+			if(!cu.canAttack)
+				continue;
+			Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
+			if(myTile.enemiesWithinKnightRange.size() > 0){
+				if(debug)
+					Utils.log(cu.ID + " trying to attack " + myTile.enemiesWithinKnightRange.first().myLoc + " from " + cu.myLoc);
+				gc.attack(cu.ID, myTile.enemiesWithinKnightRange.first().ID);
+				updateDamage(cu, myTile.enemiesWithinKnightRange.first());
+				cu.canAttack = false;
+			}
+		}
+
+		//now if retreating, run away
+		if(retreat){
+			for(CombatUnit cu: knights.descendingSet()){
+				if(cu.canMove){
+					runAway(cu);
+				}
+			}
+			return;
+		}
+
+		//otherwise, do moves and attacks heuristically
+		for(CombatUnit cu: knights){ 
+			if(!cu.canMove){
+				continue;
+			}
+			// first check if we should nav
+			Tile myTile = infoMan.tiles[cu.myLoc.getX()][cu.myLoc.getY()];
+			//if we're not near any enemies nav, otherwise move and maybe attack
+			if(!swarmUnits.containsKey(cu.ID)){
+				Direction d = nav.dirToMove(cu.myLoc, swarmLoc);
+				moveAndUpdate(cu, d);
+			}
+			else if(myTile.distFromNearestTarget > MagicNumbers.MAX_DIST_THEY_COULD_HIT_NEXT_TURN){
+				Direction d = nav.dirToMove(cu.myLoc, targetLoc);
+				moveAndUpdate(cu, d);
+			} else if (cu.health <= MagicNumbers.KNIGHT_RUN_AWAY_HEALTH_THRESH){
+				runAway(cu);
+			} else {
+				// ok, we're not using nav
+				if(cu.canAttack){
+					knightMoveAndAttack(cu);
+				} else {
+					knightMove(cu);
+				}
+			}
+		}
 	}
 
 /**************************** misc ********************************/
@@ -620,7 +714,8 @@ public class CombatSquad extends Squad{
 	private void updateDamage(CombatUnit cu, TargetUnit tu){
 		tu = infoMan.targetUnits.get(tu.ID);
 		int damageDone = (int) (cu.damage - tu.defense);
-		Utils.log("doing " + damageDone + " dmg to a unit with " + tu.health + " health");
+		if(debug)
+			Utils.log("doing " + damageDone + " dmg to a unit with " + tu.health + " health");
 		if(damageDone >= tu.health){
 			infoMan.targetUnits.remove(tu.ID);
 			infoMan.removeEnemyUnit(tu.ID, tu.type);

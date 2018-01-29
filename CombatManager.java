@@ -37,6 +37,10 @@ public class CombatManager{
 	// call update method of each squad?
 	// remember, the squads will move on their own after you update everything
 	public void update(Strategy strat){
+		for(CombatSquad cs: infoMan.combatSquads){
+			cs.unitCompGoal = strat.combatComposition;
+		}
+		
 		// set units whose objective is NONE (meaning they completed it) to unassignedUnits
 		ArrayList<CombatSquad> toRemove = new ArrayList<CombatSquad>();
 		for(CombatSquad cs: infoMan.combatSquads){
@@ -58,7 +62,7 @@ public class CombatManager{
 			MapLocation ml = u.location().mapLocation();
 			TreeSet<TargetUnit> tus = infoMan.getTargetUnits(ml, MagicNumbers.DEFEND_RANGE, true);
 			if(tus.size() > 0){ 
-				addCombatSquad(ml, Objective.DEFEND_LOC, strat);
+				addCombatSquad(Utils.midpoint(ml, tus.first().myLoc), Objective.DEFEND_LOC, strat);
 			}
 		}
 		
@@ -67,7 +71,7 @@ public class CombatManager{
 				MapLocation ml = u.location().mapLocation();
 				TreeSet<TargetUnit> tus = infoMan.getTargetUnits(ml, MagicNumbers.DEFEND_RANGE, true);
 				if(tus.size() > 0){
-					addCombatSquad(ml, Objective.DEFEND_LOC, strat);
+					addCombatSquad(Utils.midpoint(ml, tus.first().myLoc), Objective.DEFEND_LOC, strat);
 				}
 			}
 		}
@@ -77,12 +81,12 @@ public class CombatManager{
 			addCombatSquad(null, Objective.EXPLORE, strat);
 		}	
 
-		if((infoMan.combatSquads.size() == 1 && infoMan.combatSquads.get(0).objective == Objective.EXPLORE)
-				|| infoMan.myPlanet == Planet.Mars){
-			for(TargetUnit tu: infoMan.targetUnits.values()){
-				addCombatSquad(tu.myLoc, Objective.ATTACK_LOC, strat);
-			}
+		//if((infoMan.combatSquads.size() == 1 && infoMan.combatSquads.get(0).objective == Objective.EXPLORE)
+		//		|| infoMan.myPlanet == Planet.Mars){
+		for(TargetUnit tu: infoMan.targetUnits.values()){
+			addCombatSquad(tu.myLoc, Objective.ATTACK_LOC, strat);
 		}
+		//}
 
 		// now deal with unassigned units
 		boolean didSomething = false;
@@ -107,10 +111,43 @@ public class CombatManager{
 						cs.addUnit(a);
 						didSomething = true;
 					}
-					if(didSomething)
+					if(didSomething){
 						break;
+					}
 				}
 				if(didSomething)
+					break;
+			}
+			if(!didSomething)
+				break;
+		}
+		
+		while(infoMan.unassignedUnits.size() > 0) {
+			didSomething = false;
+			infoMan.combatSquads.sort(Squad.byUrgency());
+			for(CombatSquad cs : infoMan.combatSquads) {
+				for(int i : infoMan.unassignedUnits) {
+					if(gc.unit(i).unitType() == UnitType.Worker)
+						continue;
+					Unit a = gc.unit(i);
+					if(cs.targetLoc != null
+							&& ((!turnUnassigned.containsKey(a.id()) && gc.round() == 1)
+								|| (turnUnassigned.containsKey(a.id()) && turnUnassigned.get(a.id()) == gc.round()))){
+						MapLocation ml = cs.targetLoc;
+						if(a.location().isOnMap())
+							ml = a.location().mapLocation();
+						else
+							ml = gc.unit(a.location().structure()).location().mapLocation();
+						if(!infoMan.isReachable(cs.targetLoc, ml))
+							continue;
+					}
+					cs.addUnit(a);
+					didSomething = true;
+					if(didSomething){
+						break;
+					}
+				}
+				if(!didSomething)
 					break;
 			}
 			if(!didSomething)
@@ -127,7 +164,7 @@ public class CombatManager{
 			   				|| targetLoc.distanceSquaredTo(cs.swarmLoc) < MagicNumbers.SWARM_SEPARATION_THRESHOLD))
 				return;
 		}
-		CombatSquad cs = new CombatSquad(gc, infoMan, strat.combatComposition);
+		CombatSquad cs = new CombatSquad(gc, infoMan, strat, strat.combatComposition);
 		cs.objective = obj;
 		cs.targetLoc = targetLoc;
 		cs.update();
