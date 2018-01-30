@@ -5,7 +5,7 @@
 
 Some other team (team #12)
 
-Winning bot for 6.147, MIT's Battlecode programming competition?
+Made it to round of 32.
 
 ## Battlecode 2017
 
